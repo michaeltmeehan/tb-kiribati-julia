@@ -1,6 +1,6 @@
 using Test
 
-function zero_transition_params(; beta = 0.0)
+function zero_transition_params(; beta = 0.0, demography = nothing, ageing_enabled::Bool = false)
     p = make_parameters(default_contact_matrix();
         beta = beta,
         containment_child = 0.0,
@@ -23,7 +23,9 @@ function zero_transition_params(; beta = 0.0)
         tx_relapse_rate = 0.0,
         tx_death_rate = 0.0,
         disease_mortality_clin_lowinf = 0.0,
-        disease_mortality_clin_inf = 0.0)
+        disease_mortality_clin_inf = 0.0,
+        demography = demography,
+        ageing_enabled = ageing_enabled)
     fill!(p.containment_rate, 0.0)
     fill!(p.progression_rate, 0.0)
     return p

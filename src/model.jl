@@ -26,13 +26,11 @@ const CumTreatmentInitiation = 14
 const CumTreatmentCompletion = 15
 const CumRelapseTB = 16
 
-include("parameters.jl")
-
 export NAGE, NEPI, NCUM, NSTATE
 export MtbNaive, Contained, Cleared, Recovered, Incipient, SubClinLow, SubClinInf, ClinLow, ClinInf, Treatment
 export CumInfectionsOther, CumInfectionsContained, CumProgressionToActiveTB, CumTreatmentInitiation, CumTreatmentCompletion, CumRelapseTB
-export TBParams, make_parameters, make_default_parameters, default_contact_matrix, default_population, initial_state
-export compute_force_of_infection!, tb_rhs!, simulate_demo
+export TBParams, DemographicSchedule, make_parameters, make_default_parameters, make_demographic_parameters, default_contact_matrix, default_population, initial_state
+export compute_force_of_infection!, tb_rhs_epi!, tb_rhs!, apply_demography!, synthetic_demographic_schedule, simulate_demo, simulate_demographic_demo
 
 function compute_force_of_infection!(λ::AbstractVector{<:Real}, u::AbstractVector, p::TBParams)
     length(λ) == NAGE || error("λ must have length 96")
@@ -65,9 +63,7 @@ function compute_force_of_infection!(λ::AbstractVector{<:Real}, u::AbstractVect
     return λ
 end
 
-function tb_rhs!(du, u, p::TBParams, t)
-    fill!(du, 0.0)
-
+function tb_rhs_epi!(du, u, p::TBParams, t)
     λ = p.tmp_foi
     compute_force_of_infection!(λ, u, p)
 
@@ -148,17 +144,38 @@ function tb_rhs!(du, u, p::TBParams, t)
     return nothing
 end
 
+function tb_rhs!(du, u, p::TBParams, t)
+    fill!(du, 0.0)
+    tb_rhs_epi!(du, u, p, t)
+    apply_demography!(du, u, p, t)
+    return nothing
+end
+
 function simulate_demo(; population::AbstractVector{<:Real} = default_population(),
     contact::AbstractMatrix{<:Real} = default_contact_matrix(),
     tspan::Tuple{Real,Real} = (2025.0, 2030.0),
     saveat::Real = 0.25,
     reltol::Real = 1e-8,
     abstol::Real = 1e-10,
+    demography = nothing,
+    ageing_enabled::Bool = false,
     kwargs...)
-    params = make_parameters(contact; kwargs...)
+    params = make_parameters(contact; demography = demography, ageing_enabled = ageing_enabled, kwargs...)
     u0 = initial_state(population)
     prob = ODEProblem(tb_rhs!, u0, (Float64(tspan[1]), Float64(tspan[2])), params)
-    # Rosenbrock23 is a good default here because the model mixes fast and slow
-    # disease transitions and can become moderately stiff without extra machinery.
+    return solve(prob, Rosenbrock23(autodiff = AutoFiniteDiff()); reltol = reltol, abstol = abstol, saveat = saveat)
+end
+
+function simulate_demographic_demo(; population::AbstractVector{<:Real} = default_population(),
+    contact::AbstractMatrix{<:Real} = default_contact_matrix(),
+    schedule::DemographicSchedule = synthetic_demographic_schedule(),
+    tspan::Tuple{Real,Real} = (2025.0, 2030.0),
+    saveat::Real = 0.25,
+    reltol::Real = 1e-8,
+    abstol::Real = 1e-10,
+    kwargs...)
+    params = make_demographic_parameters(contact, schedule; kwargs...)
+    u0 = initial_state(population)
+    prob = ODEProblem(tb_rhs!, u0, (Float64(tspan[1]), Float64(tspan[2])), params)
     return solve(prob, Rosenbrock23(autodiff = AutoFiniteDiff()); reltol = reltol, abstol = abstol, saveat = saveat)
 end

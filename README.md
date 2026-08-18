@@ -1,78 +1,45 @@
-\# TB Kiribati Julia
+# TB Kiribati Julia
 
+A lightweight Julia implementation of an age-structured tuberculosis transmission model for Kiribati.
 
+Phase 1 provides:
 
-A lightweight Julia implementation of an age-structured tuberculosis
+- 96 one-year age groups
+- 10 epidemiological compartments
+- age-specific susceptibility and progression
+- age-structured contact mixing
+- tuberculosis natural-history transitions
+- treatment and disease mortality
+- age-resolved cumulative epidemiological flows
+- deterministic simulation via SciML
 
-transmission model for Kiribati.
+Phase 2 adds synthetic demographic coupling:
 
+- background mortality
+- continuous ageing from ages `0` through `94`
+- an open-ended `95+` age group
+- births into `MtbNaive` at age `0`
+- proportional net migration
+- annual stepwise demographic schedules
 
+The demographic schedules in this phase are synthetic on purpose. WPP 2024 integration is deferred to Phase 3.
 
-The project is being developed as an independent implementation of a model
+## Run
 
-originally constructed using the R package `agepi`.
-
-
-
-\## Current status
-
-
-
-Phase 1 implements:
-
-
-
-\- 96 one-year age groups
-
-\- 10 epidemiological compartments
-
-\- age-specific susceptibility and progression
-
-\- age-structured contact mixing
-
-\- tuberculosis natural-history transitions
-
-\- treatment
-
-\- disease-induced mortality
-
-\- age-resolved cumulative epidemiological flows
-
-\- deterministic simulation using the SciML ecosystem
-
-
-
-Demographic coupling using UN World Population Prospects 2024 data will be
-
-added in subsequent development.
-
-
-
-\## Running the model
-
-
-
-From the project directory:
-
-
+Phase 1 model:
 
 ```julia
-
-julia --project=. scripts/run\_model.jl
-
+julia --project=. scripts/run_model.jl
 ```
 
-
-
-\## Running the model
+Phase 2 demographic model:
 
 ```julia
+julia --project=. scripts/run_demographic_model.jl
+```
 
+## Tests
+
+```julia
 julia --project=. test/runtests.jl
-
 ```
-
-
-
-
-
