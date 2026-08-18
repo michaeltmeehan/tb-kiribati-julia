@@ -1,0 +1,21 @@
+# Julia
+*.ji
+*.cov
+*.mem
+Manifest.toml
+
+# Julia package/development artefacts
+deps/deps.jl
+docs/build/
+
+# IDE/editor
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.log
