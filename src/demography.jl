@@ -5,6 +5,8 @@ struct DemographicSchedule
     mortality::Matrix{Float64}
     fertility::Matrix{Float64}
     migration::Matrix{Float64}
+    births::Union{Nothing,Vector{Float64}}
+    fertility_mode::Symbol
     first_year::Int
     last_year::Int
 end
@@ -20,10 +22,13 @@ function DemographicSchedule(
     years::AbstractVector{<:Integer},
     mortality::AbstractMatrix{<:Real},
     fertility::AbstractMatrix{<:Real},
-    migration::AbstractMatrix{<:Real},
+    migration::AbstractMatrix{<:Real};
+    births::Union{Nothing,AbstractVector{<:Real}} = nothing,
+    fertility_mode::Symbol = :agepi_compatible,
 )
     nyears = length(years)
     nyears > 0 || error("years must not be empty")
+    fertility_mode in (:agepi_compatible, :wpp) || error("unsupported fertility_mode: $fertility_mode")
 
     yrs = Int[years...]
     for i in 2:nyears
@@ -42,12 +47,43 @@ function DemographicSchedule(
     any(<(0.0), mort) && error("mortality must be non-negative")
     any(<(0.0), fert) && error("fertility must be non-negative")
 
-    return DemographicSchedule(yrs, mort, fert, mig, yrs[1], yrs[end])
+    birth_vec = if births === nothing
+        nothing
+    else
+        vec = Float64[births...]
+        length(vec) == nyears || error("births must have one value per simulation year")
+        any(<(0.0), vec) && error("births must be non-negative")
+        vec
+    end
+
+    fertility_mode === :wpp && birth_vec === nothing && error("births must be provided when fertility_mode = :wpp")
+
+    return DemographicSchedule(yrs, mort, fert, mig, birth_vec, fertility_mode, yrs[1], yrs[end])
+end
+
+@inline function demographic_births(schedule::DemographicSchedule, year_idx::Int, age_pop::AbstractVector)
+    if schedule.fertility_mode === :wpp
+        births = schedule.births
+        births === nothing && error("wpp fertility mode requires births to be populated")
+        return births[year_idx]
+    elseif schedule.fertility_mode === :agepi_compatible
+        total = 0.0
+        @inbounds for a in 1:NAGE
+            total += schedule.fertility[a, year_idx] * age_pop[a]
+        end
+        return total
+    else
+        error("unsupported fertility_mode: $(schedule.fertility_mode)")
+    end
 end
 
 @inline function demographic_year_index(schedule::DemographicSchedule, t::Real)
     year = floor(Int, t)
     return clamp(year - schedule.first_year + 1, 1, length(schedule.years))
+end
+
+@inline function demographic_tstops(schedule::DemographicSchedule)
+    return Float64.(schedule.years[2:end])
 end
 
 @inline function age_population!(age_pop::AbstractVector{<:Real}, u::AbstractVector)
@@ -86,11 +122,7 @@ function apply_demography!(du, u, p, t)
     age_pop = p.tmp_age_pop
     age_population!(age_pop, u)
 
-    births = 0.0
-    @inbounds for a in 1:NAGE
-        births += schedule.fertility[a, year_idx] * age_pop[a]
-    end
-    du[MtbNaive] += births
+    du[MtbNaive] += demographic_births(schedule, year_idx, age_pop)
 
     @inbounds for a in 1:NAGE
         base = (a - 1) * NSTATE

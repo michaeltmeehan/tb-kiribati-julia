@@ -1,0 +1,12 @@
+key,value
+country,Kiribati
+years,2025:2030
+age_structure,0:95+
+migration,TRUE
+fertility_exposure_fraction,0.5
+population_timing,end-of-calendar-year
+vital_rate_timing,calendar-year
+population_units,persons
+mortality_convention,annual_hazard
+fertility_convention,births_per_female_person_year
+migration_convention,count

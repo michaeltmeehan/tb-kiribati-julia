@@ -1,7 +1,6 @@
 using LinearAlgebra: I, mul!
-using ADTypes: AutoFiniteDiff
 using DifferentialEquations: ODEProblem, solve
-using OrdinaryDiffEq: Rosenbrock23
+using OrdinaryDiffEq: Vern7
 
 const NAGE = 96
 const NEPI = 10
@@ -163,7 +162,8 @@ function simulate_demo(; population::AbstractVector{<:Real} = default_population
     params = make_parameters(contact; demography = demography, ageing_enabled = ageing_enabled, kwargs...)
     u0 = initial_state(population)
     prob = ODEProblem(tb_rhs!, u0, (Float64(tspan[1]), Float64(tspan[2])), params)
-    return solve(prob, Rosenbrock23(autodiff = AutoFiniteDiff()); reltol = reltol, abstol = abstol, saveat = saveat)
+    solve_kwargs = demography isa DemographicSchedule ? (tstops = demographic_tstops(demography),) : NamedTuple()
+    return solve(prob, Vern7(); reltol = reltol, abstol = abstol, saveat = saveat, solve_kwargs...)
 end
 
 function simulate_demographic_demo(; population::AbstractVector{<:Real} = default_population(),
@@ -177,5 +177,5 @@ function simulate_demographic_demo(; population::AbstractVector{<:Real} = defaul
     params = make_demographic_parameters(contact, schedule; kwargs...)
     u0 = initial_state(population)
     prob = ODEProblem(tb_rhs!, u0, (Float64(tspan[1]), Float64(tspan[2])), params)
-    return solve(prob, Rosenbrock23(autodiff = AutoFiniteDiff()); reltol = reltol, abstol = abstol, saveat = saveat)
+    return solve(prob, Vern7(); reltol = reltol, abstol = abstol, saveat = saveat, tstops = demographic_tstops(schedule))
 end
