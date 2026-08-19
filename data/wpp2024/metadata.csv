@@ -1,9 +1,10 @@
 key,value
 country,Kiribati
-years,2025:2030
+years,1950:2030
 population_units,persons
 mortality_units,annual hazard / central death rate proxy
 fertility_units,births per female person-year
+births_units,persons per year
 migration_units,persons per year
 population_timing,end-of-calendar-year population
 vital_rate_timing,calendar-year rates/counts

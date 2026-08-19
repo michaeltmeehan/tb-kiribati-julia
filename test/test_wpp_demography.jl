@@ -212,7 +212,7 @@ function _make_zero_epi_params(schedule)
 end
 
 function _simulate_kiribati_wpp()
-    data = load_kiribati_wpp_data(data_dir = WPP_DATA_DIR)
+    data = load_kiribati_wpp_data(data_dir = WPP_DATA_DIR, years = 2025:2030, fertility_mode = :wpp)
     u0 = initial_state(data.population_2025)
     p = make_parameters(default_contact_matrix();
         beta = 1e-3,
@@ -259,7 +259,8 @@ end
     @test size(data.migration) == (NAGE, length(WPP_YEARS))
     @test data.schedule.years == collect(WPP_YEARS)
     @test data.schedule.fertility_mode == :agepi_compatible
-    @test data.births == [3385.0, 3370.0, 3363.0, 3363.0, 3368.0, 3376.0]
+    @test data.population_1950 == load_kiribati_wpp_data(data_dir = WPP_DATA_DIR, years = 1950:1950).population_1950
+    @test data.births[2025 - first(data.years) + 1:2030 - first(data.years) + 1] == [3385.0, 3370.0, 3363.0, 3363.0, 3368.0, 3376.0]
 
     @test isapprox(_max_abs_diff(data.population_2025, ref.population), 0.0; atol = 1e-12)
     @test isapprox(_max_abs_diff(data.mortality, ref.mortality), 0.0; atol = 1e-12)
@@ -275,12 +276,13 @@ end
 @testset "WPP fertility modes" begin
     agepi_data = load_kiribati_wpp_data(data_dir = WPP_DATA_DIR, fertility_mode = :agepi_compatible)
     wpp_data = load_kiribati_wpp_data(data_dir = WPP_DATA_DIR, fertility_mode = :wpp)
+    births_2025_2030 = wpp_data.births[2025 - first(wpp_data.years) + 1:2030 - first(wpp_data.years) + 1]
 
     @test agepi_data.schedule.fertility_mode == :agepi_compatible
     @test wpp_data.schedule.fertility_mode == :wpp
     @test agepi_data.schedule.births == wpp_data.births
     @test wpp_data.schedule.births == wpp_data.births
-    @test wpp_data.births == [3385.0, 3370.0, 3363.0, 3363.0, 3368.0, 3376.0]
+    @test births_2025_2030 == [3385.0, 3370.0, 3363.0, 3363.0, 3368.0, 3376.0]
     @test wpp_kiribati_demographic_schedule(data_dir = WPP_DATA_DIR, fertility_mode = :wpp).fertility_mode == :wpp
 end
 
@@ -300,7 +302,7 @@ end
 end
 
 @testset "Demography only" begin
-    data = load_kiribati_wpp_data(data_dir = WPP_DATA_DIR)
+    data = load_kiribati_wpp_data(data_dir = WPP_DATA_DIR, years = 2025:2030, fertility_mode = :wpp)
     p = _make_zero_epi_params(data.schedule)
     u0 = initial_state(data.population_2025)
     prob = ODEProblem(tb_rhs!, u0, (2025.0, 2030.0), p)

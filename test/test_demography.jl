@@ -346,7 +346,7 @@ end
 end
 
 @testset "WPP demographic accounting" begin
-    data = load_kiribati_wpp_data(data_dir = WPP_DATA_DIR, fertility_mode = :wpp)
+    data = load_kiribati_wpp_data(data_dir = WPP_DATA_DIR, years = 2025:2030, fertility_mode = :wpp)
     schedule = data.schedule
     p = _make_zero_epi_params(schedule)
     u0 = initial_state(data.population_2025)

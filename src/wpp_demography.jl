@@ -1,5 +1,7 @@
 const WPP_COUNTRY_KIRIBATI = "Kiribati"
-const WPP_YEARS = 2025:2030
+const WPP_START_YEAR = 1950
+const WPP_END_YEAR = 2030
+const WPP_YEARS = WPP_START_YEAR:WPP_END_YEAR
 const WPP_OPEN_AGE = 95
 const WPP_AGE_LABELS = vcat(string.(0:94), "95+")
 
@@ -44,8 +46,8 @@ function _age_label(lower::Integer)
     return lower == WPP_OPEN_AGE ? "95+" : string(lower)
 end
 
-function _allocate_wpp_matrix(fill_value::Real = 0.0)
-    return fill(Float64(fill_value), NAGE, length(WPP_YEARS))
+function _allocate_wpp_matrix(years::AbstractVector{<:Integer} = collect(WPP_YEARS), fill_value::Real = 0.0)
+    return fill(Float64(fill_value), NAGE, length(years))
 end
 
 function _load_long_table(path::AbstractString)
@@ -55,7 +57,12 @@ end
 
 function _parse_numeric_column(headers, rows, name)
     values = _csv_column(headers, rows, name)
-    return parse.(Float64, values)
+    out = Vector{Float64}(undef, length(values))
+    @inbounds for i in eachindex(values)
+        value = strip(values[i])
+        out[i] = isempty(value) || uppercase(value) == "NA" ? 0.0 : parse(Float64, value)
+    end
+    return out
 end
 
 function _parse_int_column(headers, rows, name)
@@ -65,6 +72,18 @@ end
 
 function _parse_string_column(headers, rows, name)
     return _csv_column(headers, rows, name)
+end
+
+function _extract_year_column(matrix::AbstractMatrix{<:Real}, years::AbstractVector{<:Integer}, year::Integer)
+    idx = findfirst(==(Int(year)), years)
+    idx === nothing && error("Missing year $year")
+    return Float64.(matrix[:, idx])
+end
+
+function _maybe_extract_year_column(matrix::AbstractMatrix{<:Real}, years::AbstractVector{<:Integer}, year::Integer)
+    idx = findfirst(==(Int(year)), years)
+    idx === nothing && return nothing
+    return Float64.(matrix[:, idx])
 end
 
 function _load_population_reference(path::AbstractString)
@@ -123,26 +142,26 @@ function _population_reference_matrix(data_dir::AbstractString)
     return pop
 end
 
-function _build_population_matrix(data_dir::AbstractString)
+function _build_population_matrix(data_dir::AbstractString, selected_years::AbstractVector{<:Integer})
     headers, rows = _load_long_table(joinpath(data_dir, "population.csv"))
-    years = _parse_int_column(headers, rows, "year")
+    row_years = _parse_int_column(headers, rows, "year")
     ages = _parse_string_column(headers, rows, "age")
     pop = _parse_numeric_column(headers, rows, "pop")
-    matrix = _allocate_wpp_matrix()
-    col_lookup = Dict(year => i for (i, year) in pairs(collect(WPP_YEARS)))
-    _fill_full_age_matrix!(matrix, years, ages, pop, col_lookup; collapse_open_age = true)
+    matrix = _allocate_wpp_matrix(selected_years)
+    col_lookup = Dict(year => i for (i, year) in pairs(collect(selected_years)))
+    _fill_full_age_matrix!(matrix, row_years, ages, pop, col_lookup; collapse_open_age = true)
     return matrix
 end
 
-function _build_mortality_matrix(data_dir::AbstractString)
+function _build_mortality_matrix(data_dir::AbstractString, selected_years::AbstractVector{<:Integer})
     headers, rows = _load_long_table(joinpath(data_dir, "mortality.csv"))
-    years = _parse_int_column(headers, rows, "year")
+    row_years = _parse_int_column(headers, rows, "year")
     ages = _parse_string_column(headers, rows, "age")
     mx = _parse_numeric_column(headers, rows, "mxB")
-    matrix = _allocate_wpp_matrix()
-    col_lookup = Dict(year => i for (i, year) in pairs(collect(WPP_YEARS)))
+    matrix = _allocate_wpp_matrix(selected_years)
+    col_lookup = Dict(year => i for (i, year) in pairs(collect(selected_years)))
     @inbounds for i in eachindex(mx)
-        year = years[i]
+        year = row_years[i]
         col = get(col_lookup, year, 0)
         col == 0 && continue
         age_lower = _parse_age_lower(ages[i])
@@ -153,27 +172,27 @@ function _build_mortality_matrix(data_dir::AbstractString)
     return matrix
 end
 
-function _build_migration_matrix(data_dir::AbstractString)
+function _build_migration_matrix(data_dir::AbstractString, selected_years::AbstractVector{<:Integer})
     headers, rows = _load_long_table(joinpath(data_dir, "migration.csv"))
-    years = _parse_int_column(headers, rows, "year")
+    row_years = _parse_int_column(headers, rows, "year")
     ages = _parse_string_column(headers, rows, "age")
     mig = _parse_numeric_column(headers, rows, "mig")
-    matrix = _allocate_wpp_matrix()
-    col_lookup = Dict(year => i for (i, year) in pairs(collect(WPP_YEARS)))
-    _fill_full_age_matrix!(matrix, years, ages, 1000.0 .* mig, col_lookup; collapse_open_age = true)
+    matrix = _allocate_wpp_matrix(selected_years)
+    col_lookup = Dict(year => i for (i, year) in pairs(collect(selected_years)))
+    _fill_full_age_matrix!(matrix, row_years, ages, 1000.0 .* mig, col_lookup; collapse_open_age = true)
     return matrix
 end
 
-function _build_fertility_matrix(data_dir::AbstractString)
+function _build_fertility_matrix(data_dir::AbstractString, selected_years::AbstractVector{<:Integer})
     headers, rows = _load_long_table(joinpath(data_dir, "fertility.csv"))
-    years = _parse_int_column(headers, rows, "year")
+    row_years = _parse_int_column(headers, rows, "year")
     ages = _parse_string_column(headers, rows, "age")
     pasfr = _parse_numeric_column(headers, rows, "pasfr")
     tfr = _parse_numeric_column(headers, rows, "tfr")
-    matrix = _allocate_wpp_matrix()
-    col_lookup = Dict(year => i for (i, year) in pairs(collect(WPP_YEARS)))
+    matrix = _allocate_wpp_matrix(selected_years)
+    col_lookup = Dict(year => i for (i, year) in pairs(collect(selected_years)))
     @inbounds for i in eachindex(pasfr)
-        year = years[i]
+        year = row_years[i]
         col = get(col_lookup, year, 0)
         col == 0 && continue
         age_lower = _parse_age_lower(ages[i])
@@ -185,31 +204,34 @@ function _build_fertility_matrix(data_dir::AbstractString)
     return matrix
 end
 
-function _build_births_vector(data_dir::AbstractString)
+function _build_births_vector(data_dir::AbstractString, selected_years::AbstractVector{<:Integer})
     headers, rows = _load_long_table(joinpath(data_dir, "births.csv"))
-    years = _parse_int_column(headers, rows, "year")
+    row_years = _parse_int_column(headers, rows, "year")
     births = _parse_numeric_column(headers, rows, "births")
-    vector = zeros(Float64, length(WPP_YEARS))
-    col_lookup = Dict(year => i for (i, year) in pairs(collect(WPP_YEARS)))
+    vector = zeros(Float64, length(selected_years))
+    col_lookup = Dict(year => i for (i, year) in pairs(collect(selected_years)))
     @inbounds for i in eachindex(births)
-        col = get(col_lookup, years[i], 0)
+        col = get(col_lookup, row_years[i], 0)
         col == 0 && continue
         vector[col] = births[i]
     end
     return vector
 end
 
-function load_kiribati_wpp_data(; data_dir::AbstractString = _wpp_data_dir(), fertility_mode::Symbol = :agepi_compatible)
-    population = _build_population_matrix(data_dir)
-    mortality = _build_mortality_matrix(data_dir)
-    fertility = _build_fertility_matrix(data_dir)
-    migration = _build_migration_matrix(data_dir)
-    births = _build_births_vector(data_dir)
-    schedule = DemographicSchedule(collect(WPP_YEARS), mortality, fertility, migration; births = births, fertility_mode = fertility_mode)
-    population_2025 = population[:, 1]
+function load_kiribati_wpp_data(; data_dir::AbstractString = _wpp_data_dir(), years::AbstractVector{<:Integer} = collect(WPP_YEARS), fertility_mode::Symbol = :agepi_compatible)
+    selected_years = Int[years...]
+    population = _build_population_matrix(data_dir, selected_years)
+    mortality = _build_mortality_matrix(data_dir, selected_years)
+    fertility = _build_fertility_matrix(data_dir, selected_years)
+    migration = _build_migration_matrix(data_dir, selected_years)
+    births = _build_births_vector(data_dir, selected_years)
+    schedule = DemographicSchedule(selected_years, mortality, fertility, migration; births = births, fertility_mode = fertility_mode)
+    population_1950 = _maybe_extract_year_column(population, selected_years, WPP_START_YEAR)
+    population_2025 = _maybe_extract_year_column(population, selected_years, 2025)
     return (
         country = WPP_COUNTRY_KIRIBATI,
-        years = collect(WPP_YEARS),
+        years = selected_years,
+        population_1950 = population_1950,
         population_2025 = population_2025,
         population = population,
         mortality = mortality,
@@ -249,10 +271,19 @@ function _reference_population_vector(population::AbstractVector{<:Real})
     return Float64.(population)
 end
 
-function wpp_kiribati_population_2025(; data_dir::AbstractString = _wpp_data_dir())
-    return _reference_population_vector(load_kiribati_wpp_data(data_dir = data_dir).population_2025)
+function wpp_kiribati_population(year::Integer = 2025; data_dir::AbstractString = _wpp_data_dir())
+    data = load_kiribati_wpp_data(data_dir = data_dir)
+    return _reference_population_vector(_extract_year_column(data.population, data.years, year))
 end
 
-function wpp_kiribati_demographic_schedule(; data_dir::AbstractString = _wpp_data_dir(), fertility_mode::Symbol = :agepi_compatible)
-    return load_kiribati_wpp_data(data_dir = data_dir, fertility_mode = fertility_mode).schedule
+function wpp_kiribati_population_2025(; data_dir::AbstractString = _wpp_data_dir())
+    return wpp_kiribati_population(2025; data_dir = data_dir)
+end
+
+function wpp_kiribati_population_1950(; data_dir::AbstractString = _wpp_data_dir())
+    return wpp_kiribati_population(1950; data_dir = data_dir)
+end
+
+function wpp_kiribati_demographic_schedule(; data_dir::AbstractString = _wpp_data_dir(), years::AbstractVector{<:Integer} = collect(WPP_YEARS), fertility_mode::Symbol = :agepi_compatible)
+    return load_kiribati_wpp_data(data_dir = data_dir, years = years, fertility_mode = fertility_mode).schedule
 end

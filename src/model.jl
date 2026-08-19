@@ -2,11 +2,12 @@ using LinearAlgebra: I, mul!
 using DifferentialEquations: ODEProblem, solve
 using OrdinaryDiffEq: Vern7
 
-const NAGE = 96
-const NEPI = 10
-const NCUM = 6
+const NAGE = 96     # Number of age groups: [0,1), [1,2), ..., [94,95), [95,inf)
+const NEPI = 10     # Number of epi compartments
+const NCUM = 6      # Number of cumulative flow (auxiliary) compartments
 const NSTATE = NEPI + NCUM
 
+# Compartments (numeric encoding / indexing)
 const MtbNaive = 1
 const Contained = 2
 const Cleared = 3
@@ -28,10 +29,14 @@ const CumRelapseTB = 16
 export NAGE, NEPI, NCUM, NSTATE
 export MtbNaive, Contained, Cleared, Recovered, Incipient, SubClinLow, SubClinInf, ClinLow, ClinInf, Treatment
 export CumInfectionsOther, CumInfectionsContained, CumProgressionToActiveTB, CumTreatmentInitiation, CumTreatmentCompletion, CumRelapseTB
-export TBParams, DemographicSchedule, make_parameters, make_default_parameters, make_demographic_parameters, default_contact_matrix, default_population, initial_state
-export compute_force_of_infection!, tb_rhs_epi!, tb_rhs!, apply_demography!, synthetic_demographic_schedule, simulate_demo, simulate_demographic_demo
+export TBParams, HistoricalTBParameters, DemographicSchedule, make_parameters, make_default_parameters, make_demographic_parameters, historical_parameter_schedule, demonstration_historical_parameters, default_contact_matrix, default_population, initial_state, burnin_seed_state
+export compute_force_of_infection!, tb_rhs_epi!, tb_rhs!, tb_rhs_stationary_burnin!, apply_demography!, synthetic_demographic_schedule, simulate_demo, simulate_demographic_demo
 
 function compute_force_of_infection!(λ::AbstractVector{<:Real}, u::AbstractVector, p::TBParams)
+    return compute_force_of_infection!(λ, u, p, p.beta)
+end
+
+function compute_force_of_infection!(λ::AbstractVector{<:Real}, u::AbstractVector, p::TBParams, beta::Real)
     length(λ) == NAGE || error("λ must have length 96")
     q = p.tmp_q
     @inbounds for a in 1:NAGE
@@ -57,14 +62,15 @@ function compute_force_of_infection!(λ::AbstractVector{<:Real}, u::AbstractVect
     end
     mul!(λ, p.contact, q)
     @inbounds for a in 1:NAGE
-        λ[a] *= p.beta
+        λ[a] *= Float64(beta)
     end
     return λ
 end
 
 function tb_rhs_epi!(du, u, p::TBParams, t)
     λ = p.tmp_foi
-    compute_force_of_infection!(λ, u, p)
+    beta, detection_rate, tx_recovery_rate, tx_relapse_rate, tx_death_rate, rel_detection_subclin = current_intervention_parameters(p, t)
+    compute_force_of_infection!(λ, u, p, beta)
 
     @inbounds for a in 1:NAGE
         base = (a - 1) * NSTATE
@@ -105,14 +111,14 @@ function tb_rhs_epi!(du, u, p::TBParams, t)
         to_rec_from_sub_low = p.self_recovery_rate * sublow
         to_rec_from_sub_inf = p.self_recovery_rate * subinf
 
-        to_tx_from_sub_low = p.rel_detection_subclin * p.detection_rate * sublow
-        to_tx_from_sub_inf = p.rel_detection_subclin * p.detection_rate * subinf
-        to_tx_from_clin_low = p.detection_rate * clinlow
-        to_tx_from_clin_inf = p.detection_rate * clininf
+        to_tx_from_sub_low = rel_detection_subclin * detection_rate * sublow
+        to_tx_from_sub_inf = rel_detection_subclin * detection_rate * subinf
+        to_tx_from_clin_low = detection_rate * clinlow
+        to_tx_from_clin_inf = detection_rate * clininf
 
-        tx_to_rec = p.tx_recovery_rate * tx
-        tx_to_relapse = p.tx_relapse_rate * tx
-        tx_to_death = p.tx_death_rate * tx
+        tx_to_rec = tx_recovery_rate * tx
+        tx_to_relapse = tx_relapse_rate * tx
+        tx_to_death = tx_death_rate * tx
 
         clinlow_death = p.disease_mortality_clin_lowinf * clinlow
         clininf_death = p.disease_mortality_clin_inf * clininf
@@ -143,10 +149,27 @@ function tb_rhs_epi!(du, u, p::TBParams, t)
     return nothing
 end
 
+function tb_rhs_stationary_burnin!(du, u, p::TBParams, t)
+    tb_rhs_epi!(du, u, p, t)
+
+    @inbounds for a in 1:NAGE
+        base = (a - 1) * NSTATE
+        clinlow_death = p.disease_mortality_clin_lowinf * u[base + ClinLow]
+        clininf_death = p.disease_mortality_clin_inf * u[base + ClinInf]
+        du[base + MtbNaive] += clinlow_death + clininf_death
+    end
+
+    return nothing
+end
+
 function tb_rhs!(du, u, p::TBParams, t)
     fill!(du, 0.0)
-    tb_rhs_epi!(du, u, p, t)
-    apply_demography!(du, u, p, t)
+    if p.simulation_regime === :stationary_burnin
+        tb_rhs_stationary_burnin!(du, u, p, t)
+    else
+        tb_rhs_epi!(du, u, p, t)
+        apply_demography!(du, u, p, t)
+    end
     return nothing
 end
 
