@@ -8,7 +8,7 @@ using TBKiribatiJulia
 
 data = load_kiribati_wpp_data()
 u0 = initial_state(data.population_2025)
-p = make_parameters(default_contact_matrix();
+p = make_parameters(load_solomon_islands_contact_matrix();
     beta = 1e-3,
     containment_child = 4.4,
     containment_adult = 2.0,

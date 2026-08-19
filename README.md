@@ -85,6 +85,32 @@ Phase 3 WPP-backed model:
 julia --project=. scripts/run_kiribati_wpp.jl
 ```
 
+## Phase 7 contact matrix
+
+Phase 7 replaces the temporary synthetic contact matrix used in production runs with the Solomon Islands Prem/contactdata proxy inherited from the `agepi` R workflow.
+
+### Provenance
+
+- Kiribati-specific contact data are not available in the current workflow.
+- The model therefore uses the Solomon Islands proxy.
+- Source: Prem-style synthetic contact data via the `contactdata` package.
+- Setting: `"all"`.
+- The source matrix is loaded on its native five-year age grid and then adapted to the model's 1-year age grid.
+- This choice is inherited from the current model scaffold and is not a calibrated assumption.
+
+### Files
+
+- `data-raw/export_contact_matrix.R` exports the raw Solomon Islands source matrix and the validated 96×96 agepi reference matrix.
+- `data/contact/prem_solomon_islands_all_source_matrix.csv` stores the compact source matrix.
+- `data/contact/prem_solomon_islands_all_agebands.csv` stores the source age-band definitions.
+- `validation/reference/contact/prem_solomon_islands_all_age96_agepi.csv` stores the validated 96×96 reference matrix.
+- `validation/reference/contact/metadata.csv` stores provenance and adaptation metadata.
+
+### Scripts
+
+- `scripts/run_kiribati_wpp.jl` runs the production Kiribati model with the validated Solomon Islands proxy matrix.
+- `scripts/compare_contact_matrices.jl` compares the synthetic identity matrix with the empirical proxy matrix and reports force-of-infection diagnostics.
+
 Compare fertility modes:
 
 ```bash

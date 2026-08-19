@@ -1,0 +1,19 @@
+key,value
+source_package,contactdata
+source_dataset,Prem et al. 2017 / 2021 synthetic contact matrices
+country,Solomon Islands
+setting,all
+geographic_setting,all
+data_source,2020
+source_age_bands,00_05 | 05_10 | 10_15 | 15_20 | 20_25 | 25_30 | 30_35 | 35_40 | 40_45 | 45_50 | 50_55 | 55_60 | 60_65 | 65_70 | 70_75 | 75_80
+source_orientation,recipient_source
+source_units,contacts per person-year
+source_reciprocity,no
+source_population_weighting,no
+adaptation_method,source_band
+target_age_structure,0:95+
+target_max_age,95
+target_orientation,recipient_source
+target_units,contacts per person-year
+target_reciprocity,no
+target_population_weighting,no
