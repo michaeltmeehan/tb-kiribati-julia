@@ -8,6 +8,7 @@ const MAX_POP_YEAR = 2100.
 const FERTILITY = readdlm(".\\data\\fertility", Float64)
 const MIN_FERT_AGE = 10
 const MAX_FERT_AGE = 54
+const FEMALE_FRACTION = 0.485
 
 const MORTALITY = readdlm(".\\data\\mortality", Float64)
 const MIN_MORT_AGE = 0
@@ -21,8 +22,8 @@ end
 
 # Fertility rates begin at age 10 and go up to age 54
 @inline function fertility_rate(a::Int, t::Float64)
-    a < MIN_FERT_AGE || a > MAX_FERT_AGE && return 0.
-    FERTILITY[a - 10 + 1, year_index(t)]
+    (a < MIN_FERT_AGE || a > MAX_FERT_AGE) && return 0.
+    FEMALE_FRACTION * FERTILITY[a - 10 + 1, year_index(t)]
 end
 
 # Mortality rates begin at age 0 and go up to age 100
@@ -88,7 +89,7 @@ function _apply_demography!(u, t)
     end
 
     # Clear age-0 epi states and introduce newborns as Mtb naive
-    for c in 2:NEPI
+    for c in 1:NEPI
         u[c] = 0.0
     end
     u[MtbNaive] = newborns
@@ -104,4 +105,18 @@ end
 
 function apply_demography!(integrator)
     _apply_demography!(integrator.u, integrator.t)
+end
+
+
+function get_age_distribution(u)
+    pop = zeros(NAGE)
+    for a in 1:NAGE
+        total = 0.
+        base = (a - 1) * NSTATE
+        for c in 1:NEPI
+            total += u[base + c]
+        end
+        pop[a] = total
+    end
+    return pop
 end

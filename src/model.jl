@@ -1,7 +1,4 @@
 using LinearAlgebra: I, mul!
-using DifferentialEquations: ODEProblem, solve
-using OrdinaryDiffEq: Vern7
-import DiffEqCallbacks as CB
 
 const NAGE = 96   # Number of age groups: [0,1), [1,2), ..., [94,95), [95,inf)
 const NEPI = 10   # Number of epi compartments
@@ -153,47 +150,3 @@ end
 # cb = CB.PresetTimeCallback(dosetimes, affect!)
 # sol = DE.solve(prob, DE.Tsit5(), callback = cb)
 # Plots.plot(sol)
-
-
-tspan = (2025.0, 2100.0)
-times = tspan[1]:1.0:tspan[2]
-
-
-contact = default_contact_matrix()
-params = make_parameters(contact)
-population = get_population(tspan[1])
-u0 = initial_state(population)
-prob = ODEProblem(tb_rhs!, u0, tspan, params)
-cb = CB.PresetTimeCallback(times, apply_demography!)
-sol = DE.solve(prob, Vern7(), callback = cb; saveat = times)
-
-
-function simulate_demo(; population::AbstractVector{<:Real} = default_population(),
-    contact::AbstractMatrix{<:Real} = default_contact_matrix(),
-    tspan::Tuple{Real,Real} = (2025.0, 2030.0),
-    saveat::Real = 0.25,
-    reltol::Real = 1e-8,
-    abstol::Real = 1e-10,
-    demography = nothing,
-    ageing_enabled::Bool = false,
-    kwargs...)
-    params = make_parameters(contact; demography = demography, ageing_enabled = ageing_enabled, kwargs...)
-    u0 = initial_state(population)
-    prob = ODEProblem(tb_rhs!, u0, (Float64(tspan[1]), Float64(tspan[2])), params)
-    solve_kwargs = demography isa DemographicSchedule ? (tstops = demographic_tstops(demography),) : NamedTuple()
-    return solve(prob, Vern7(); reltol = reltol, abstol = abstol, saveat = saveat, solve_kwargs...)
-end
-
-function simulate_demographic_demo(; population::AbstractVector{<:Real} = default_population(),
-    contact::AbstractMatrix{<:Real} = default_contact_matrix(),
-    schedule::DemographicSchedule = synthetic_demographic_schedule(),
-    tspan::Tuple{Real,Real} = (2025.0, 2030.0),
-    saveat::Real = 0.25,
-    reltol::Real = 1e-8,
-    abstol::Real = 1e-10,
-    kwargs...)
-    params = make_demographic_parameters(contact, schedule; kwargs...)
-    u0 = initial_state(population)
-    prob = ODEProblem(tb_rhs!, u0, (Float64(tspan[1]), Float64(tspan[2])), params)
-    return solve(prob, Vern7(); reltol = reltol, abstol = abstol, saveat = saveat, tstops = demographic_tstops(schedule))
-end
