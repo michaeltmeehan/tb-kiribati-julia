@@ -1,5 +1,5 @@
-mutable struct TBParams{M<:AbstractMatrix{Float64}, D}
-    contact::M
+mutable struct TBParams
+    contact::Matrix{Float64}
     beta::Float64
     susceptibility_naive::Vector{Float64}
     susceptibility_contained::Vector{Float64}
@@ -23,7 +23,6 @@ mutable struct TBParams{M<:AbstractMatrix{Float64}, D}
     tx_death_rate::Float64
     disease_mortality_clin_lowinf::Float64
     disease_mortality_clin_inf::Float64
-    demography::D
     ageing_enabled::Bool
     tmp_q::Vector{Float64}
     tmp_foi::Vector{Float64}
@@ -31,7 +30,7 @@ mutable struct TBParams{M<:AbstractMatrix{Float64}, D}
 end
 
 function default_contact_matrix()
-    Matrix{Float64}(I, NAGE, NAGE)
+    ones(NAGE, NAGE)
 end
 
 function default_population()
@@ -78,7 +77,6 @@ function make_parameters(
     tx_death_rate::Union{Nothing,Real} = nothing,
     disease_mortality_clin_lowinf::Real = 0.025,
     disease_mortality_clin_inf::Real = 0.4,
-    demography = nothing,
     ageing_enabled::Bool = false,
 )
     size(contact) == (NAGE, NAGE) || error("contact matrix must be 96×96")
@@ -133,7 +131,6 @@ function make_parameters(
         tx_death,
         Float64(disease_mortality_clin_lowinf),
         Float64(disease_mortality_clin_inf),
-        demography,
         ageing_enabled,
         zeros(Float64, NAGE),
         zeros(Float64, NAGE),
@@ -143,19 +140,6 @@ end
 
 function make_default_parameters(; kwargs...)
     make_parameters(default_contact_matrix(); kwargs...)
-end
-
-function make_demographic_parameters(
-    contact::AbstractMatrix{<:Real},
-    demography::DemographicSchedule;
-    ageing_enabled::Bool = true,
-    kwargs...,
-)
-    make_parameters(contact; demography = demography, ageing_enabled = ageing_enabled, kwargs...)
-end
-
-function make_demographic_parameters(demography::DemographicSchedule; kwargs...)
-    make_demographic_parameters(default_contact_matrix(), demography; kwargs...)
 end
 
 function initial_state(population::AbstractVector{<:Real})

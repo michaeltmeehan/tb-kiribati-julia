@@ -1,12 +1,14 @@
 using LinearAlgebra: I, mul!
 using DifferentialEquations: ODEProblem, solve
 using OrdinaryDiffEq: Vern7
+import DiffEqCallbacks as CB
 
-const NAGE = 96
-const NEPI = 10
-const NCUM = 6
+const NAGE = 96   # Number of age groups: [0,1), [1,2), ..., [94,95), [95,inf)
+const NEPI = 10   # Number of epi compartments
+const NCUM = 6    # Number of cumulative flow / auxiliary compartments
 const NSTATE = NEPI + NCUM
 
+# Compartment encoding / indexing
 const MtbNaive = 1
 const Contained = 2
 const Cleared = 3
@@ -62,7 +64,7 @@ function compute_force_of_infection!(λ::AbstractVector{<:Real}, u::AbstractVect
     return λ
 end
 
-function tb_rhs_epi!(du, u, p::TBParams, t)
+function tb_rhs!(du, u, p::TBParams, t)
     λ = p.tmp_foi
     compute_force_of_infection!(λ, u, p)
 
@@ -86,69 +88,85 @@ function tb_rhs_epi!(du, u, p::TBParams, t)
         inf_cleared = λa * p.susceptibility_cleared[a] * cleared
         inf_recovered = λa * p.susceptibility_recovered[a] * recovered
 
-        to_contained = p.containment_rate[a] * incipient
-        to_cleared = p.clearance_rate * contained
-        to_breakdown = p.breakdown_rate * contained
+        containment = p.containment_rate[a] * incipient
+        clearance = p.clearance_rate * contained
+        breakdown = p.breakdown_rate * contained
 
-        to_sub_low = (1 - p.prop_infectious) * p.progression_rate[a] * incipient
-        to_sub_inf = p.prop_infectious * p.progression_rate[a] * incipient
+        progression_to_sublow = (1 - p.prop_infectious) * p.progression_rate[a] * incipient
+        progression_to_subinf = p.prop_infectious * p.progression_rate[a] * incipient
 
-        to_clin_low = p.clinical_progression_rate * sublow
-        to_clin_inf = p.clinical_progression_rate * subinf
-        to_sub_inf_from_clin_low = p.clinical_regression_rate * clinlow
-        to_sub_inf_from_clin_inf = p.clinical_regression_rate * clininf
-        to_sub_low_from_gain = p.infectiousness_gain_rate * sublow
-        to_clin_inf_from_gain = p.infectiousness_gain_rate * clinlow
-        to_sub_low_from_loss = p.infectiousness_loss_rate * subinf
-        to_clin_low_from_loss = p.infectiousness_loss_rate * clininf
+        clin_progression_to_clinlow = p.clinical_progression_rate * sublow
+        clin_progression_to_clininf = p.clinical_progression_rate * subinf
+        clin_regression_to_sublow = p.clinical_regression_rate * clinlow
+        clin_regression_to_subinf = p.clinical_regression_rate * clininf
+        inf_gain_to_subinf = p.infectiousness_gain_rate * sublow
+        inf_gain_to_clininf = p.infectiousness_gain_rate * clinlow
+        inf_loss_to_sublow = p.infectiousness_loss_rate * subinf
+        inf_loss_to_clinlow = p.infectiousness_loss_rate * clininf
 
-        to_rec_from_sub_low = p.self_recovery_rate * sublow
-        to_rec_from_sub_inf = p.self_recovery_rate * subinf
+        to_rec_from_sublow = p.self_recovery_rate * sublow
+        to_rec_from_subinf = p.self_recovery_rate * subinf
 
-        to_tx_from_sub_low = p.rel_detection_subclin * p.detection_rate * sublow
-        to_tx_from_sub_inf = p.rel_detection_subclin * p.detection_rate * subinf
-        to_tx_from_clin_low = p.detection_rate * clinlow
-        to_tx_from_clin_inf = p.detection_rate * clininf
+        to_tx_from_sublow = p.rel_detection_subclin * p.detection_rate * sublow
+        to_tx_from_subinf = p.rel_detection_subclin * p.detection_rate * subinf
+        to_tx_from_clinlow = p.detection_rate * clinlow
+        to_tx_from_clininf = p.detection_rate * clininf
 
         tx_to_rec = p.tx_recovery_rate * tx
         tx_to_relapse = p.tx_relapse_rate * tx
-        tx_to_death = p.tx_death_rate * tx
-
+        
+        tx_death = p.tx_death_rate * tx
         clinlow_death = p.disease_mortality_clin_lowinf * clinlow
         clininf_death = p.disease_mortality_clin_inf * clininf
 
-        du[base + MtbNaive] -= inf_naive
+        du[base + MtbNaive] = -inf_naive
 
-        du[base + Contained] += to_contained - to_cleared - to_breakdown - inf_contained
-        du[base + Cleared] += to_cleared - inf_cleared
-        du[base + Recovered] += to_rec_from_sub_low + to_rec_from_sub_inf + tx_to_rec - inf_recovered
-        du[base + Incipient] += inf_naive + inf_contained + inf_cleared + inf_recovered - to_contained - to_sub_low - to_sub_inf + to_breakdown
+        du[base + Contained] = containment - clearance - breakdown - inf_contained
+        du[base + Cleared] = clearance - inf_cleared
+        du[base + Recovered] = to_rec_from_sublow + to_rec_from_subinf + tx_to_rec - inf_recovered
+        du[base + Incipient] = inf_naive + inf_contained + inf_cleared + inf_recovered - containment - progression_to_sublow - progression_to_subinf + breakdown
 
-        du[base + SubClinLow] += to_sub_low + to_sub_low_from_loss + tx_to_relapse - to_clin_low - to_sub_low_from_gain - to_rec_from_sub_low - to_tx_from_sub_low
-        du[base + SubClinInf] += to_sub_inf + to_sub_inf_from_clin_low + to_sub_low_from_gain + to_sub_inf_from_clin_inf - to_clin_inf - to_sub_low_from_loss - to_rec_from_sub_inf - to_tx_from_sub_inf
+        du[base + SubClinLow] = progression_to_sublow + clin_regression_to_sublow + inf_loss_to_sublow + tx_to_relapse - clin_progression_to_clinlow - inf_gain_to_subinf - to_rec_from_sublow - to_tx_from_sublow
+        du[base + SubClinInf] = progression_to_subinf + clin_regression_to_subinf + inf_gain_to_subinf - clin_progression_to_clininf - inf_loss_to_sublow - to_rec_from_subinf - to_tx_from_subinf
 
-        du[base + ClinLow] += to_clin_low + to_clin_low_from_loss - to_sub_inf_from_clin_low - to_clin_inf_from_gain - to_tx_from_clin_low - clinlow_death
-        du[base + ClinInf] += to_clin_inf + to_clin_inf_from_gain - to_sub_inf_from_clin_inf - to_clin_low_from_loss - to_tx_from_clin_inf - clininf_death
+        du[base + ClinLow] = clin_progression_to_clinlow + inf_loss_to_clinlow - clin_regression_to_sublow - inf_gain_to_clininf - to_tx_from_clinlow - clinlow_death
+        du[base + ClinInf] = clin_progression_to_clininf + inf_gain_to_clininf - clin_regression_to_subinf - inf_loss_to_clinlow - to_tx_from_clininf - clininf_death
 
-        du[base + Treatment] += to_tx_from_sub_low + to_tx_from_sub_inf + to_tx_from_clin_low + to_tx_from_clin_inf - tx_to_rec - tx_to_relapse - tx_to_death
+        du[base + Treatment] = to_tx_from_sublow + to_tx_from_subinf + to_tx_from_clinlow + to_tx_from_clininf - tx_to_rec - tx_to_relapse - tx_death
 
-        du[base + CumInfectionsOther] += inf_naive + inf_cleared + inf_recovered
-        du[base + CumInfectionsContained] += inf_contained
-        du[base + CumProgressionToActiveTB] += to_sub_low + to_sub_inf
-        du[base + CumTreatmentInitiation] += to_tx_from_sub_low + to_tx_from_sub_inf + to_tx_from_clin_low + to_tx_from_clin_inf
-        du[base + CumTreatmentCompletion] += tx_to_rec
-        du[base + CumRelapseTB] += tx_to_relapse
+        du[base + CumInfectionsOther] = inf_naive + inf_cleared + inf_recovered
+        du[base + CumInfectionsContained] = inf_contained
+        du[base + CumProgressionToActiveTB] = progression_to_sublow + progression_to_subinf
+        du[base + CumTreatmentInitiation] = to_tx_from_sublow + to_tx_from_subinf + to_tx_from_clinlow + to_tx_from_clininf
+        du[base + CumTreatmentCompletion] = tx_to_rec
+        du[base + CumRelapseTB] = tx_to_relapse
     end
 
     return nothing
 end
 
-function tb_rhs!(du, u, p::TBParams, t)
-    fill!(du, 0.0)
-    tb_rhs_epi!(du, u, p, t)
-    apply_demography!(du, u, p, t)
-    return nothing
-end
+
+# Use this example to incorporate demography (source: https://docs.sciml.ai/DiffEqDocs/stable/features/callback_functions)
+# PresetTimeCallback
+# dosetimes = [4.0, 8.0]
+# affect!(integrator) = integrator.u[1] += 10
+# cb = CB.PresetTimeCallback(dosetimes, affect!)
+# sol = DE.solve(prob, DE.Tsit5(), callback = cb)
+# Plots.plot(sol)
+
+
+tspan = (2025.0, 2100.0)
+times = tspan[1]:1.0:tspan[2]
+
+
+contact = default_contact_matrix()
+params = make_parameters(contact)
+population = get_population(tspan[1])
+u0 = initial_state(population)
+prob = ODEProblem(tb_rhs!, u0, tspan, params)
+cb = CB.PresetTimeCallback(times, apply_demography!)
+sol = DE.solve(prob, Vern7(), callback = cb; saveat = times)
+
 
 function simulate_demo(; population::AbstractVector{<:Real} = default_population(),
     contact::AbstractMatrix{<:Real} = default_contact_matrix(),
