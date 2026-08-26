@@ -14,22 +14,33 @@ const MORTALITY = readdlm(".\\data\\mortality", Float64)
 const MIN_MORT_AGE = 0
 const MAX_MORT_AGE = 100
 
+
+const MIGRATION = readdlm(".\\data\\migration", Float64)
+const MIN_MIGRATION_AGE = 0
+const MAX_MIGRATION_AGE = 100
+
+
+# TODO: Check whether I want the fertility and mortality rates time clamped - I probably just want them zeroed beyond the time window
 # All datasets begin in the year 1950 and run up to 2100
 @inline function year_index(t::Float64)
     t = clamp(t, MIN_POP_YEAR, MAX_POP_YEAR)
-    Int(round(t) - 1950) + 1
+    Int(floor(t) - MIN_POP_YEAR) + 1
 end
 
 # Fertility rates begin at age 10 and go up to age 54
 @inline function fertility_rate(a::Int, t::Float64)
     (a < MIN_FERT_AGE || a > MAX_FERT_AGE) && return 0.
-    FEMALE_FRACTION * FERTILITY[a - 10 + 1, year_index(t)]
+    FEMALE_FRACTION * FERTILITY[a - MIN_FERT_AGE + 1, year_index(t)]
 end
 
 # Mortality rates begin at age 0 and go up to age 100
 @inline function mortality_rate(a::Int, t::Float64)
     a = clamp(a, MIN_MORT_AGE, MAX_MORT_AGE)
     MORTALITY[a + 1, year_index(t)]
+end
+
+@inline function migration_flow(t)
+    return MIGRATION[year_index(t)] * 1e3
 end
 
 @inline migration_inflow(a, t) =
@@ -51,14 +62,13 @@ end
 
 function _apply_demography!(u, t)
     newborns = 0.0
-
-    # Apply births, deaths and migration outflow
+    total_pop = 0.0
+    # Apply births and deaths
     for a in 1:NAGE
         base = (a - 1) * NSTATE
 
-        fertility = fertility_rate(a, t)
-        mortality = mortality_rate(a, t)
-        outflow = migration_outflow(a, t)
+        fertility = fertility_rate(a - 1, t)
+        mortality = mortality_rate(a - 1, t)
 
         for c in 1:NEPI
             x = u[base + c]
@@ -67,7 +77,18 @@ function _apply_demography!(u, t)
             newborns += fertility * x
 
             # Remove deaths and emigrants
-            u[base + c] = (1 - mortality - outflow) * x
+            u[base + c] = (1 - mortality) * x
+
+            total_pop += u[base + c]
+        end
+    end
+
+    # Apply migration
+    net_migration = migration_flow(t)
+    for a in 1:NAGE
+        base = (a - 1) * NSTATE
+        for c in 1:NEPI
+            u[base + c] += u[base + c] * net_migration / total_pop
         end
     end
 
@@ -103,8 +124,12 @@ function _apply_demography!(u, t)
     return nothing
 end
 
+# TODO: Investigate the "rest" in the first couple of iteration
+# TODO: Do not apply demography during burn-in period (i.e., integrator.t < 1950 && return)
 function apply_demography!(integrator)
+    println("Before: ", [sum(integrator.u[(a-1)*NSTATE+1:(a-1)*NSTATE+NEPI]) for a in 1:5])
     _apply_demography!(integrator.u, integrator.t)
+    println("After:  ", [sum(integrator.u[(a-1)*NSTATE+1:(a-1)*NSTATE+NEPI]) for a in 1:5])
 end
 
 

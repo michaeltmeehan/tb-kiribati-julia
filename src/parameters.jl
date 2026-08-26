@@ -49,7 +49,7 @@ function _age_vector(f::Function)
     end
     return out
 end
-
+# TODO: Need to switch back on disease-induced mortality
 function make_parameters(
     contact::AbstractMatrix{<:Real};
     beta::Real = 1e-3,
@@ -71,12 +71,12 @@ function make_parameters(
     rel_detection_subclin::Real = 0.0,
     tx_period::Real = 0.5,
     tx_success_prop::Real = 0.8,
-    pct_neg_tx_death::Real = 0.4,
+    pct_neg_tx_death::Real = 0, #0.4,
     tx_recovery_rate::Union{Nothing,Real} = nothing,
     tx_relapse_rate::Union{Nothing,Real} = nothing,
     tx_death_rate::Union{Nothing,Real} = nothing,
-    disease_mortality_clin_lowinf::Real = 0.025,
-    disease_mortality_clin_inf::Real = 0.4,
+    disease_mortality_clin_lowinf::Real = 0, #0.025,
+    disease_mortality_clin_inf::Real = 0, #0.4,
     ageing_enabled::Bool = false,
 )
     size(contact) == (NAGE, NAGE) || error("contact matrix must be 96×96")

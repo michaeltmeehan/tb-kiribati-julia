@@ -1,6 +1,7 @@
 using LinearAlgebra: I, mul!
 
-const NAGE = 96   # Number of age groups: [0,1), [1,2), ..., [94,95), [95,inf)
+const OLDEST_AGE = 95
+const NAGE = OLDEST_AGE + 1   # Number of age groups: [0,1), [1,2), ..., [94,95), [95,inf)
 const NEPI = 10   # Number of epi compartments
 const NCUM = 6    # Number of cumulative flow / auxiliary compartments
 const NSTATE = NEPI + NCUM
