@@ -11,7 +11,7 @@ times = tinit:1.0:tfinal
 
 contact = default_contact_matrix()
 params = make_parameters(contact)
-population = get_population(tinit)
+population = get_population(STATIC_YEAR)
 u0 = initial_state(population)
 prob = ODEProblem(tb_rhs!, u0, tspan, params)
 cb = CB.PresetTimeCallback(times, apply_demography!)

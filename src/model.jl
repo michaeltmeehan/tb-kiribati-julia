@@ -25,14 +25,14 @@ const CumTreatmentInitiation = 14
 const CumTreatmentCompletion = 15
 const CumRelapseTB = 16
 
-export NAGE, NEPI, NCUM, NSTATE
+export OLDEST_AGE, NAGE, NEPI, NCUM, NSTATE
 export MtbNaive, Contained, Cleared, Recovered, Incipient, SubClinLow, SubClinInf, ClinLow, ClinInf, Treatment
 export CumInfectionsOther, CumInfectionsContained, CumProgressionToActiveTB, CumTreatmentInitiation, CumTreatmentCompletion, CumRelapseTB
-export TBParams, DemographicSchedule, make_parameters, make_default_parameters, make_demographic_parameters, default_contact_matrix, default_population, initial_state
-export compute_force_of_infection!, tb_rhs_epi!, tb_rhs!, apply_demography!, synthetic_demographic_schedule, simulate_demo, simulate_demographic_demo
+export TBParams, make_parameters, make_default_parameters, default_contact_matrix, default_population, initial_state
+export compute_force_of_infection!, tb_rhs!, apply_demography!
 
 function compute_force_of_infection!(λ::AbstractVector{<:Real}, u::AbstractVector, p::TBParams)
-    length(λ) == NAGE || error("λ must have length 96")
+    length(λ) == NAGE || error("λ must have length ", NAGE)
     q = p.tmp_q
     @inbounds for a in 1:NAGE
         age = a - 1
@@ -142,12 +142,3 @@ function tb_rhs!(du, u, p::TBParams, t)
 
     return nothing
 end
-
-
-# Use this example to incorporate demography (source: https://docs.sciml.ai/DiffEqDocs/stable/features/callback_functions)
-# PresetTimeCallback
-# dosetimes = [4.0, 8.0]
-# affect!(integrator) = integrator.u[1] += 10
-# cb = CB.PresetTimeCallback(dosetimes, affect!)
-# sol = DE.solve(prob, DE.Tsit5(), callback = cb)
-# Plots.plot(sol)

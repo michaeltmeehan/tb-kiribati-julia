@@ -39,17 +39,9 @@ end
     MORTALITY[a + 1, year_index(t)]
 end
 
-@inline function migration_flow(t)
+@inline function migration_flow(t::Float64)
     return MIGRATION[year_index(t)] * 1e3
 end
-
-@inline migration_inflow(a, t) =
-    0.
-    # MIGRATION_IN[a, year_index(t)]
-
-@inline migration_outflow(a, t) =
-    0.
-    # MIGRATION_OUT[a, year_index(t)]
 
   
 function get_population(t::Float64)
@@ -115,21 +107,16 @@ function _apply_demography!(u, t)
     end
     u[MtbNaive] = newborns
 
-    # Migration inflow into the new age distribution
-    for a in 1:NAGE
-        base = (a - 1) * NSTATE
-        u[base + MtbNaive] += migration_inflow(a, t)
-    end
-
     return nothing
 end
 
-# TODO: Investigate the "rest" in the first couple of iteration
 # TODO: Do not apply demography during burn-in period (i.e., integrator.t < 1950 && return)
 function apply_demography!(integrator)
-    println("Before: ", [sum(integrator.u[(a-1)*NSTATE+1:(a-1)*NSTATE+NEPI]) for a in 1:5])
-    _apply_demography!(integrator.u, integrator.t)
-    println("After:  ", [sum(integrator.u[(a-1)*NSTATE+1:(a-1)*NSTATE+NEPI]) for a in 1:5])
+    if integrator.t <= STATIC_YEAR
+        _apply_static_demography!(integrator.u)
+    else
+        _apply_demography!(integrator.u, integrator.t - 1.0)
+    end
 end
 
 
