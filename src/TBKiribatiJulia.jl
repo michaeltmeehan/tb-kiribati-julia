@@ -9,5 +9,6 @@ export fertility_rate, mortality_rate, migration_flow
 export get_population, initial_state, _apply_demography!, apply_demography!, get_age_distribution
 export tb_rhs!
 export _apply_static_demography!
+export CONTACT, STATIC_YEAR
 
 end # module
