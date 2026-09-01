@@ -39,24 +39,22 @@ end
     annual_incidence_per_100k(sol)
 
 Calculate annual TB incidence per 100,000 population from the
-increment in CumProgressionToActiveTB.
+CumProgressionToActiveTB counter immediately before each annual reset.
 """
 function annual_incidence_per_100k(sol)
 
-    years = sol.t[2:end]
+    years = collect((sol.prob.tspan[1] + 1.0):1.0:sol.prob.tspan[2])
 
     incidence = Vector{Float64}(undef, length(years))
 
-    for i in 2:length(sol.t)
+    for (i, t) in enumerate(years)
 
-        cases =
-            cumulative_incidence(sol.u[i]) -
-            cumulative_incidence(sol.u[i - 1])
+        u = sol(t, continuity = :left)
 
-        population = sum(get_age_distribution(sol.u[i]))
+        cases = cumulative_incidence(u)
+        population = sum(get_age_distribution(u))
 
-        incidence[i - 1] = 1e5 * cases / population
-
+        incidence[i] = 1e5 * cases / population
     end
 
     return years, incidence

@@ -38,7 +38,7 @@ end
 # β = 0.593 gives 335 / 1e5 incidence
 
 population = get_population(STATIC_YEAR) 
-beta = 0.583
+beta = 0.75
 params.beta = beta
 prob = ODEProblem(tb_rhs!, u0, tspan, params)
 sol = solve(prob, Vern7(), callback = cb; saveat = times)
