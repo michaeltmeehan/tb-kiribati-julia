@@ -110,15 +110,6 @@ function _apply_demography!(u, t)
     return nothing
 end
 
-# TODO: Do not apply demography during burn-in period (i.e., integrator.t < 1950 && return)
-function apply_demography!(integrator)
-    if integrator.t <= STATIC_YEAR
-        _apply_static_demography!(integrator.u)
-    else
-        _apply_demography!(integrator.u, integrator.t - 1.0)
-    end
-end
-
 
 function get_age_distribution(u)
     pop = zeros(NAGE)
