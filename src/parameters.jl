@@ -82,7 +82,8 @@ function make_parameters(
     size(contact) == (NAGE, NAGE) || error("contact matrix must be 96×96")
 
     contact_matrix = Matrix{Float64}(contact)
-    susceptibility_naive = _age_vector(age -> age < 15 ? 0.5 : 1.0)
+    # susceptibility_naive = _age_vector(age -> age < 15 ? 0.5 : 1.0)
+    susceptibility_naive = _age_vector(age -> age < 15 ? 1.0 : 1.0)
     susceptibility_contained = fill(0.2, NAGE)
     susceptibility_cleared = fill(1.0, NAGE)
     susceptibility_recovered = fill(1.0, NAGE)

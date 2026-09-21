@@ -110,7 +110,7 @@ function _apply_demography!(u, t)
     return nothing
 end
 
-
+# Sum state vector over epi states
 function get_age_distribution(u)
     pop = zeros(NAGE)
     for a in 1:NAGE
@@ -122,4 +122,18 @@ function get_age_distribution(u)
         pop[a] = total
     end
     return pop
+end
+
+
+function aggregate_age_bands(x, age_cutoffs)
+    n_age_groups = length(age_cutoffs)
+    pop_grouped = zeros(n_age_groups)
+    pidx = 1
+    for (xidx, n) in enumerate(x)
+        if xidx > age_cutoffs[pidx]
+            pidx += 1
+        end
+        pop_grouped[pidx] += n
+    end
+    return pop_grouped
 end

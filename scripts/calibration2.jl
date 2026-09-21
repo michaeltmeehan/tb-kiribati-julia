@@ -3,9 +3,20 @@ using OrdinaryDiffEq: Vern7
 import DiffEqCallbacks as CB
 using Optim
 
+# Estimated number of TB cases by age and sex, 2024
+# > men
+#  0-14 15-24 25-34 35-44 45-54 55-64   65+ 
+#   220   120   100    72    72    68    38 
+# > women
+#  0-14 15-24 25-34 35-44 45-54 55-64   65+ 
+#   190   100    83    58    47    53    43 
+# > men + women
+#  0-14 15-24 25-34 35-44 45-54 55-64   65+ 
+#   410   220   183   130   119   121    81 
 
 const CALIBRATION_AGE_BREAKS = [0, 15, 25, 35, 45, 55, 65, 96]
 
+# Data from Hill et al. 10.5588/ijtid.14.0007
 const CALIBRATION_INCIDENCE = [
     26.0,
     173.0,
@@ -16,9 +27,31 @@ const CALIBRATION_INCIDENCE = [
     147.0
 ]
 
+# Data from WHO, 2024
+const CALIBRATION_CASES = [
+    410.0,
+    220.0,
+    183.0,
+    130.0,
+    119.0,
+    121.0,
+    81.0,
+]
+
+const CALIBRATION_LOWER = [
+    # lower uncertainty limits
+]
+
+const CALIBRATION_UPPER = [
+    # upper uncertainty limits
+]
+
+const CALIBRATION_SIGMA =
+    (log.(CALIBRATION_UPPER) .- log.(CALIBRATION_LOWER)) ./ (2 * 1.96)
+
 
 tinit = 1800.0
-tfinal = 2100.0
+tfinal = 2024.0
 times = tinit:1.0:tfinal
 
 
@@ -101,7 +134,8 @@ function model_incidence_by_age_group(
             pop += population[age + 1]
         end
 
-        predicted[g] = 1e5 * cases / pop
+        # predicted[g] = 1e5 * cases / pop
+        predicted[g] = cases
     end
 
     return predicted
@@ -130,7 +164,8 @@ function calibration_loss(
 
     residuals =
         log.(predicted) .-
-        log.(CALIBRATION_INCIDENCE)
+        # log.(CALIBRATION_INCIDENCE)
+        log.(CALIBRATION_CASES)
 
     return sum(abs2, residuals)
 end
@@ -152,7 +187,8 @@ end
 x0 = [
     0.75,   # beta
     2.4,    # progression_child
-    2.0,    # progression_5_14
+    # 2.0,    # progression_5_14
+    0.05,    # progression_5_14
     0.1,    # progression_15_64
     2.4,    # progression_65_plus
 ]
@@ -170,7 +206,8 @@ lower = [
 upper = [
     5.0,    # beta
     10.0,   # progression_child
-    10.0,   # progression_5_14
+    # 10.0,   # progression_5_14
+    0.2,   # progression_5_14   -> Imposed upper bound to restrict infection rate in the 5-14 cohort
     10.0,   # progression_15_64
     10.0,   # progression_65_plus
 ]
@@ -224,7 +261,8 @@ fitted_incidence = model_incidence_by_age_group(
 println()
 println("Age-group fit:")
 
-for g in eachindex(CALIBRATION_INCIDENCE)
+# for g in eachindex(CALIBRATION_INCIDENCE)
+for g in eachindex(CALIBRATION_CASES)
 
     lower_age = CALIBRATION_AGE_BREAKS[g]
     upper_age = CALIBRATION_AGE_BREAKS[g + 1] - 1
@@ -232,7 +270,8 @@ for g in eachindex(CALIBRATION_INCIDENCE)
     println(
         lower_age, "-", upper_age,
         ": observed = ",
-        round(CALIBRATION_INCIDENCE[g], digits = 2),
+        # round(CALIBRATION_INCIDENCE[g], digits = 2),
+        round(CALIBRATION_CASES[g], digits = 2),
         ", predicted = ",
         round(fitted_incidence[g], digits = 2),
     )
