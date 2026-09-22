@@ -71,9 +71,8 @@ function model_incidence_by_age_group(
         progression_5_14 = progression_5_14,
         progression_15_64 = progression_15_64,
         progression_65_plus = progression_65_plus,
+        infectiousness_weights = infectiousness_weights,
     )
-
-    params.infectiousness_weights = infectiousness_weights
 
     population = get_population(STATIC_YEAR)
     u0 = TBKiribatiJulia.initial_state(population)
