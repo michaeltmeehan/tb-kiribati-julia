@@ -1,5 +1,3 @@
-using DifferentialEquations: ODEProblem, solve
-using OrdinaryDiffEq: Vern7
 using Optim
 
 # Estimated number of TB cases by age and sex, 2024
@@ -80,19 +78,13 @@ function model_incidence_by_age_group(
     population = get_population(STATIC_YEAR)
     u0 = TBKiribatiJulia.initial_state(population)
 
-    prob = ODEProblem(
-        tb_rhs!,
-        u0,
-        (tinit, tfinal),
-        params,
-    )
-
-    sol = solve(
-        prob,
-        Vern7(),
-        callback = cb;
-        saveat = times,
-    )
+    sol = simulate(
+    params;
+    tspan = tspan,
+    u0 = u0,
+    saveat = times,
+    callback = cb,
+)
 
     _, incidence_by_age = raw_annual_incidence_by_age(sol)
 

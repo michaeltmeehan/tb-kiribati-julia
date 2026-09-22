@@ -1,4 +1,6 @@
 import DiffEqCallbacks as CB
+using DifferentialEquations: ODEProblem, solve
+using OrdinaryDiffEq: Vern7
 
 
 function reset_cumulative_counters!(u)
@@ -34,4 +36,39 @@ function make_annual_callback(times; demography = :static)
     end
 
     return CB.PresetTimeCallback(times, annual_update!)
+end
+
+
+function simulate(
+    params;
+    tspan,
+    u0,
+    saveat = 1.0,
+    callback = nothing,
+    solver = Vern7(),
+    kwargs...,
+)
+    prob = ODEProblem(
+        tb_rhs!,
+        u0,
+        tspan,
+        params,
+    )
+
+    if isnothing(callback)
+        return solve(
+            prob,
+            solver;
+            saveat = saveat,
+            kwargs...,
+        )
+    end
+
+    return solve(
+        prob,
+        solver;
+        saveat = saveat,
+        callback = callback,
+        kwargs...,
+    )
 end

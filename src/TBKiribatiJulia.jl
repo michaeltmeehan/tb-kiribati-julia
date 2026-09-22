@@ -12,7 +12,7 @@ export get_population, initial_state, _apply_demography!, apply_demography!, get
 export tb_rhs!
 export _apply_static_demography!
 export CONTACT, STATIC_YEAR
-export reset_cumulative_counters!, make_annual_callback
+export reset_cumulative_counters!, make_annual_callback, simulate
 export raw_annual_incidence_by_age, annual_incidence_per_100k
 
 end # module
