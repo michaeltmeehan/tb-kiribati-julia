@@ -73,7 +73,7 @@ function model_incidence_by_age_group(
         infectiousness_weights = infectiousness_weights,
     )
 
-    population = get_population(STATIC_YEAR)
+    population = get_population(EQUILIBRIUM_YEAR)
     u0 = seeded_initial_state(population)
 
     sol = simulate(

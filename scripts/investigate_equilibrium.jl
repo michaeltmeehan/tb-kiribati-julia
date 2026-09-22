@@ -13,7 +13,7 @@ params = make_parameters(
         progression_15_64 = 0.25,
         progression_65_plus = 0.5,
     )
-population = get_population(STATIC_YEAR)    
+population = get_population(EQUILIBRIUM_YEAR)    
 u0 = seeded_initial_state(population)
 sol = simulate(
     params;

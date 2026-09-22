@@ -99,7 +99,7 @@ function demographic_summary(summary)
     ntime = length(summary.years)
 
     median_ages = Vector{Float64}(undef, ntime)
-    prop_under_15 = Vector{Float64}(undef, ntime)
+    prop_under_5 = Vector{Float64}(undef, ntime)
     prop_65_plus = Vector{Float64}(undef, ntime)
 
     for i in 1:ntime
@@ -107,7 +107,7 @@ function demographic_summary(summary)
         total = sum(pop)
 
         median_ages[i] = median_age(pop)
-        prop_under_15[i] = sum(@view pop[1:15]) / total
+        prop_under_5[i] = sum(@view pop[1:5]) / total
         prop_65_plus[i] = sum(@view pop[66:end]) / total
     end
 
@@ -115,7 +115,7 @@ function demographic_summary(summary)
         years = summary.years,
         population = summary.population,
         median_age = median_ages,
-        prop_under_15 = prop_under_15,
+        prop_under_5 = prop_under_5,
         prop_65_plus = prop_65_plus,
     )
 end

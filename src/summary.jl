@@ -3,6 +3,10 @@ function simulation_summary(sol)
 
     incidence = vec(sum(incidence_by_age; dims = 2))
 
+    _, deaths_by_age = raw_annual_deaths_by_age(sol)
+
+    deaths = vec(sum(deaths_by_age; dims = 2))
+
     population_by_age = Matrix{Float64}(undef, length(years), NAGE)
 
     for (i, t) in enumerate(years)
@@ -14,6 +18,8 @@ function simulation_summary(sol)
 
     incidence_per_100k = 1e5 .* incidence ./ population
 
+    deaths_per_100k = 1e5 .* deaths ./ population
+
     return (
         years = years,
         population = population,
@@ -21,5 +27,8 @@ function simulation_summary(sol)
         incidence = incidence,
         incidence_by_age = incidence_by_age,
         incidence_per_100k = incidence_per_100k,
+        deaths = deaths,
+        deaths_by_age = deaths_by_age,
+        deaths_per_100k = deaths_per_100k
     )
 end

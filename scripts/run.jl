@@ -12,13 +12,13 @@ times = tinit:1.0:tfinal
 # contact = default_contact_matrix()
 params = make_parameters(CONTACT)
 params.beta = 0.75
-population = get_population(STATIC_YEAR)    
+population = get_population(EQUILIBRIUM_YEAR)    
 u0 = initial_state(population)
 prob = ODEProblem(tb_rhs!, u0, tspan, params)
 
 function annual_update!(integrator)
     # Apply demography
-    if integrator.t <= 2100. # STATIC_YEAR
+    if integrator.t <= 2100. # EQUILIBRIUM_YEAR
         _apply_static_demography!(integrator.u)
     else
         _apply_demography!(integrator.u, integrator.t - 1.0)

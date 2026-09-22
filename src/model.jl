@@ -5,7 +5,7 @@ const CONTACT = readdlm(data_path("contact"), Float64)
 const OLDEST_AGE = 95
 const NAGE = OLDEST_AGE + 1   # Number of age groups: [0,1), [1,2), ..., [94,95), [95,inf)
 const NEPI = 10   # Number of epi compartments
-const NCUM = 6    # Number of cumulative flow / auxiliary compartments
+const NCUM = 7    # Number of cumulative flow / auxiliary compartments
 const NSTATE = NEPI + NCUM
 
 # Compartment encoding / indexing
@@ -26,10 +26,11 @@ const CumProgressionToActiveTB = 13
 const CumTreatmentInitiation = 14
 const CumTreatmentCompletion = 15
 const CumRelapseTB = 16
+const CumDeathsTB = 17
 
 export OLDEST_AGE, NAGE, NEPI, NCUM, NSTATE
 export MtbNaive, Contained, Cleared, Recovered, Incipient, SubClinLow, SubClinInf, ClinLow, ClinInf, Treatment
-export CumInfectionsOther, CumInfectionsContained, CumProgressionToActiveTB, CumTreatmentInitiation, CumTreatmentCompletion, CumRelapseTB
+export CumInfectionsOther, CumInfectionsContained, CumProgressionToActiveTB, CumTreatmentInitiation, CumTreatmentCompletion, CumRelapseTB, CumDeathsTB
 export TBParams, make_parameters, make_default_parameters, default_contact_matrix, default_population, initial_state
 export compute_force_of_infection!, tb_rhs!, apply_demography!
 
@@ -140,6 +141,7 @@ function tb_rhs!(du, u, p::TBParams, t)
         du[base + CumTreatmentInitiation] = to_tx_from_sublow + to_tx_from_subinf + to_tx_from_clinlow + to_tx_from_clininf
         du[base + CumTreatmentCompletion] = tx_to_rec
         du[base + CumRelapseTB] = tx_to_relapse
+        du[base + CumDeathsTB] = clinlow_death + clininf_death
     end
 
     return nothing

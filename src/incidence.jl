@@ -35,6 +35,25 @@ function raw_annual_incidence_by_age(sol)
 end
 
 
+function raw_annual_deaths_by_age(sol)
+
+    years = collect(Int(round(sol.t[1])) + 1:Int(round(sol.t[end])))
+
+    deaths = Matrix{Float64}(undef, length(years), NAGE)
+
+    for (i, t) in enumerate(years)
+        u = sol(t, continuity = :left)
+
+        @inbounds for a in 1:NAGE
+            base = (a - 1) * NSTATE
+            deaths[i, a] = u[base + CumDeathsTB]
+        end
+    end
+
+    return years, deaths
+end
+
+
 """
     annual_incidence_per_100k(sol)
 
