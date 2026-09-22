@@ -44,25 +44,28 @@ function simulate(
     tspan,
     u0,
     saveat = 1.0,
-    callback = nothing,
+    demography = :static,
+    annual_update_times = nothing,
     solver = Vern7(),
     kwargs...,
 )
+    if isnothing(annual_update_times)
+        start_year = ceil(Int, first(tspan)) + 1
+        end_year = floor(Int, last(tspan))
+        annual_update_times = collect(start_year:end_year)
+    end
+
+    callback = make_annual_callback(
+        annual_update_times;
+        demography = demography,
+    )
+
     prob = ODEProblem(
         tb_rhs!,
         u0,
         tspan,
         params,
     )
-
-    if isnothing(callback)
-        return solve(
-            prob,
-            solver;
-            saveat = saveat,
-            kwargs...,
-        )
-    end
 
     return solve(
         prob,

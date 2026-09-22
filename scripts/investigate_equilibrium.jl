@@ -20,7 +20,7 @@ sol = simulate(
     tspan = tspan,
     u0 = u0,
     saveat = times,
-    callback = cb,
+    demography = :static,
 )
 
 _, incidence_by_age = raw_annual_incidence_by_age(sol)

@@ -51,7 +51,6 @@ tinit = 1800.0
 tfinal = 2024.0
 times = tinit:1.0:tfinal
 
-cb = make_annual_callback(times; demography = :static)
 
 
 function model_incidence_by_age_group(
@@ -82,7 +81,7 @@ function model_incidence_by_age_group(
     tspan = tspan,
     u0 = u0,
     saveat = times,
-    callback = cb,
+    demography = :static,
 )
 
     _, incidence_by_age = raw_annual_incidence_by_age(sol)
