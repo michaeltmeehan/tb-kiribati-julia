@@ -144,14 +144,32 @@ function make_default_parameters(; kwargs...)
     make_parameters(default_contact_matrix(); kwargs...)
 end
 
-function initial_state(population::AbstractVector{<:Real})
+function seeded_initial_state(population::AbstractVector{<:Real};
+    naive_fraction = 0.99,
+    clinical_infectious_fraction = 0.01
+    )
     length(population) == NAGE || error("population vector must have length 96")
+    naive_fraction >= 0 ||
+    throw(ArgumentError("naive_fraction must be non-negative"))
+
+clinical_infectious_fraction >= 0 ||
+    throw(ArgumentError("clinical_infectious_fraction must be non-negative"))
+
+isapprox(
+    naive_fraction + clinical_infectious_fraction,
+    1.0;
+    atol = 1e-12,
+) || throw(
+    ArgumentError(
+        "naive_fraction and clinical_infectious_fraction must sum to 1"
+    )
+)
     u = zeros(Float64, NSTATE * NAGE)
     U = reshape(u, NSTATE, NAGE)
     @inbounds for a in 1:NAGE
         pop = Float64(population[a])
-        U[MtbNaive, a] = 0.99 * pop
-        U[ClinInf, a] = 0.01 * pop
+        U[MtbNaive, a] = naive_fraction * pop
+        U[ClinInf, a] = clinical_infectious_fraction * pop
     end
     return u
 end

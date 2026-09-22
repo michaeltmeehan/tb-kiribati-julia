@@ -14,7 +14,7 @@ params = make_parameters(
         progression_65_plus = 0.5,
     )
 population = get_population(STATIC_YEAR)    
-u0 = TBKiribatiJulia.initial_state(population)
+u0 = seeded_initial_state(population)
 sol = simulate(
     params;
     tspan = tspan,
