@@ -87,29 +87,10 @@ function model_incidence_by_age_group(
 
     _, incidence_by_age = raw_annual_incidence_by_age(sol)
 
-    predicted = Vector{Float64}(
-        undef,
-        length(CALIBRATION_AGE_BREAKS) - 1,
-    )
-
-    for g in eachindex(predicted)
-
-        lower = CALIBRATION_AGE_BREAKS[g]
-        upper = CALIBRATION_AGE_BREAKS[g + 1]
-
-        cases = 0.0
-        pop = 0.0
-
-        for age in lower:(upper - 1)
-            cases += incidence_by_age[end, age + 1]
-            pop += population[age + 1]
-        end
-
-        # predicted[g] = 1e5 * cases / pop
-        predicted[g] = cases
-    end
-
-    return predicted
+return aggregate_age_groups(
+    incidence_by_age[end, :],
+    CALIBRATION_AGE_BREAKS,
+)
 end
 
 

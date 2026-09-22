@@ -59,3 +59,23 @@ function annual_incidence_per_100k(sol)
 
     return years, incidence
 end
+
+
+function aggregate_age_groups(values, age_breaks)
+    length(values) == NAGE ||
+        throw(ArgumentError("values must have length $NAGE"))
+
+    first(age_breaks) == 0 ||
+        throw(ArgumentError("age_breaks must start at 0"))
+
+    last(age_breaks) == NAGE ||
+        throw(ArgumentError("age_breaks must end at $NAGE"))
+
+    issorted(age_breaks) ||
+        throw(ArgumentError("age_breaks must be sorted"))
+
+    return [
+        sum(@view values[(lo + 1):hi])
+        for (lo, hi) in zip(age_breaks[1:end-1], age_breaks[2:end])
+    ]
+end
