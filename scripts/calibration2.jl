@@ -1,6 +1,5 @@
 using DifferentialEquations: ODEProblem, solve
 using OrdinaryDiffEq: Vern7
-import DiffEqCallbacks as CB
 using Optim
 
 # Estimated number of TB cases by age and sex, 2024
@@ -54,26 +53,7 @@ tinit = 1800.0
 tfinal = 2024.0
 times = tinit:1.0:tfinal
 
-
-function annual_update!(integrator)
-
-    if integrator.t <= 2100.0
-        _apply_static_demography!(integrator.u)
-    else
-        _apply_demography!(integrator.u, integrator.t - 1.0)
-    end
-
-    @inbounds for a in 1:NAGE
-        base = (a - 1) * NSTATE
-
-        for c in (NEPI + 1):NSTATE
-            integrator.u[base + c] = 0.0
-        end
-    end
-end
-
-
-cb = CB.PresetTimeCallback(times, annual_update!)
+cb = make_annual_callback(times; demography = :static)
 
 
 function model_incidence_by_age_group(
