@@ -4,7 +4,7 @@ using TBKiribatiJulia
 # Simulation settings ---------------------------------------------------------
 
 burnin_start = 1800.0
-projection_start = 2024.0
+projection_start = 2025.0
 projection_end = 2100.0
 
 burnin_times = burnin_start:1.0:projection_start

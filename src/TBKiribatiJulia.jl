@@ -18,7 +18,7 @@ export tb_rhs!
 export _apply_equilibrium_demography!
 export CONTACT, EQUILIBRIUM_YEAR
 export reset_cumulative_counters!, make_annual_callback, simulate
-export raw_annual_incidence_by_age, raw_annual_deaths_by_age, annual_incidence_per_100k, aggregate_age_groups
+export raw_annual_incidence_by_age, raw_annual_deaths_by_age, annual_incidence_per_100k, aggregate_age_groups, median_age, demographic_summary
 export simulation_summary
 
 end # module
