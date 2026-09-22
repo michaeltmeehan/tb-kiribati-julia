@@ -1,5 +1,9 @@
 module TBKiribatiJulia
 
+const DATA_DIR = normpath(joinpath(@__DIR__, "..", "data"))
+
+data_path(filename) = joinpath(DATA_DIR, filename)
+
 include("demography.jl")
 include("parameters.jl")
 include("model.jl")

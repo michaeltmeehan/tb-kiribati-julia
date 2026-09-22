@@ -1,6 +1,6 @@
 using LinearAlgebra: I, mul!
 
-const CONTACT = readdlm(".\\data\\contact", Float64)
+const CONTACT = readdlm(data_path("contact"), Float64)
 
 const OLDEST_AGE = 95
 const NAGE = OLDEST_AGE + 1   # Number of age groups: [0,1), [1,2), ..., [94,95), [95,inf)
