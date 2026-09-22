@@ -15,7 +15,7 @@ projection_times = projection_start:1.0:projection_end
 
 params = make_parameters(
     CONTACT;
-    beta = 0.75,
+    beta = 0.8,
     progression_child = 3.0,
     progression_5_14 = 0.1,
     progression_15_64 = 0.25,
@@ -77,49 +77,154 @@ dynamic_summary = simulation_summary(dynamic_sol)
 
 # Demographic summaries -------------------------------------------------------
 
-function median_age(population_by_age)
-    total = sum(population_by_age)
-    target = total / 2
-
-    cumulative = 0.0
-
-    for (i, n) in enumerate(population_by_age)
-        cumulative += n
-
-        if cumulative >= target
-            return i - 1
-        end
-    end
-
-    return NAGE - 1
-end
-
-
-function demographic_summary(summary)
-    ntime = length(summary.years)
-
-    median_ages = Vector{Float64}(undef, ntime)
-    prop_under_5 = Vector{Float64}(undef, ntime)
-    prop_65_plus = Vector{Float64}(undef, ntime)
-
-    for i in 1:ntime
-        pop = @view summary.population_by_age[i, :]
-        total = sum(pop)
-
-        median_ages[i] = median_age(pop)
-        prop_under_5[i] = sum(@view pop[1:5]) / total
-        prop_65_plus[i] = sum(@view pop[66:end]) / total
-    end
-
-    return (
-        years = summary.years,
-        population = summary.population,
-        median_age = median_ages,
-        prop_under_5 = prop_under_5,
-        prop_65_plus = prop_65_plus,
-    )
-end
-
-
 equilibrium_demography = demographic_summary(equilibrium_summary)
 dynamic_demography = demographic_summary(dynamic_summary)
+
+
+using Plots
+
+# Overall TB incidence --------------------------------------------------------
+
+plot(
+           equilibrium_summary.years,
+           equilibrium_summary.incidence_per_100k;
+           label = "Equilibrium demography",
+           xlabel = "Year",
+           ylabel = "TB incidence per 100,000",
+           linewidth = 2,
+           ylims = (0, 1_000),
+       )
+
+plot!(
+           dynamic_summary.years,
+           dynamic_summary.incidence_per_100k;
+           label = "Dynamic demography",
+           linewidth = 2,
+       )
+
+
+
+# Relative difference in TB incidence -----------------------------------------
+
+incidence_relative_difference = 100 .* (
+    dynamic_summary.incidence_per_100k ./
+    equilibrium_summary.incidence_per_100k .- 1
+)
+
+plot(
+    equilibrium_summary.years,
+    incidence_relative_difference;
+    label = false,
+    xlabel = "Year",
+    ylabel = "Difference in TB incidence (%)",
+    linewidth = 2,
+    legend = false,
+)
+
+hline!([0]; linestyle = :dash, label = false)
+
+
+# Median age ------------------------------------------------------------------
+
+plot(
+    equilibrium_demography.years,
+    equilibrium_demography.median_age;
+    label = "Equilibrium demography",
+    xlabel = "Year",
+    ylabel = "Median age (years)",
+    linewidth = 2,
+    ylims = (0, 50),
+)
+
+plot!(
+    dynamic_demography.years,
+    dynamic_demography.median_age;
+    label = "Dynamic demography",
+    linewidth = 2,
+)
+
+
+# Proportion aged 65+ ---------------------------------------------------------
+
+plot(
+    equilibrium_demography.years,
+    100 .* equilibrium_demography.prop_65_plus;
+    label = "Equilibrium demography",
+    xlabel = "Year",
+    ylabel = "Population aged 65+ (%)",
+    linewidth = 2,
+    ylims = (0, 17)
+)
+
+plot!(
+    dynamic_demography.years,
+    100 .* dynamic_demography.prop_65_plus;
+    label = "Dynamic demography",
+    linewidth = 2,
+)
+
+
+# TB mortality ---------------------------------------------------------------
+
+plot(
+    equilibrium_summary.years,
+    equilibrium_summary.deaths_per_100k;
+    label = "Equilibrium demography",
+    xlabel = "Year",
+    ylabel = "TB deaths per 100,000",
+    linewidth = 2,
+    ylim = (0, 100)
+)
+
+plot!(
+    dynamic_summary.years,
+    dynamic_summary.deaths_per_100k;
+    label = "Dynamic demography",
+    linewidth = 2,
+)
+
+
+
+using DataFrames
+
+# Summary table ---------------------------------------------------------------
+
+summary_years = [2050, 2075, 2100]
+
+rows = DataFrame()
+
+    push!(rows, (
+        year = 2025,
+        scenario = "Equilibrium",
+        incidence_per_100k = equilibrium_summary.incidence_per_100k[1],
+        deaths_per_100k = equilibrium_summary.deaths_per_100k[1],
+        median_age = equilibrium_demography.median_age[1],
+        prop_65_plus = 100 * equilibrium_demography.prop_65_plus[1],
+        prop_under_5 = 100 * equilibrium_demography.prop_under_5[1],
+    ))
+
+for year in summary_years
+    i = findfirst(==(year), equilibrium_summary.years)
+
+    # push!(rows, (
+    #     year = year,
+    #     scenario = "Equilibrium",
+    #     incidence_per_100k = equilibrium_summary.incidence_per_100k[i],
+    #     deaths_per_100k = equilibrium_summary.deaths_per_100k[i],
+    #     median_age = equilibrium_demography.median_age[i],
+    #     prop_65_plus = 100 * equilibrium_demography.prop_65_plus[i],
+    #     prop_under_5 = 100 * equilibrium_demography.prop_under_5[i],
+    # ))
+
+    push!(rows, (
+        year = year,
+        scenario = "Dynamic",
+        incidence_per_100k = dynamic_summary.incidence_per_100k[i],
+        deaths_per_100k = dynamic_summary.deaths_per_100k[i],
+        median_age = dynamic_demography.median_age[i],
+        prop_65_plus = 100 * dynamic_demography.prop_65_plus[i],
+        prop_under_5 = 100 * dynamic_demography.prop_under_5[i],
+    ))
+end
+
+rows
