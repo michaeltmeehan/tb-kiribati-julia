@@ -16,18 +16,18 @@ function reset_cumulative_counters!(u)
 end
 
 
-function make_annual_callback(times; demography = :static)
+function make_annual_callback(times; demography = :equilibrium)
 
-    demography in (:static, :dynamic, :none) ||
-        error("demography must be :static, :dynamic, or :none")
+    demography in (:equilibrium, :dynamic, :none) ||
+        error("demography must be :equilibrium, :dynamic, or :none")
 
     function annual_update!(integrator)
 
-        if demography === :static
-            _apply_static_demography!(integrator.u)
+        if demography === :equilibrium
+            _apply_equilibrium_demography!(integrator.u)
 
         elseif demography === :dynamic
-            apply_demography!(integrator)
+            _apply_demography!(integrator.u, integrator.t)
         end
 
         reset_cumulative_counters!(integrator.u)
@@ -44,7 +44,7 @@ function simulate(
     tspan,
     u0,
     saveat = 1.0,
-    demography = :static,
+    demography = :equilibrium,
     annual_update_times = nothing,
     solver = Vern7(),
     kwargs...,

@@ -1,21 +1,21 @@
 using DelimitedFiles
 
-const POPULATION = readdlm(".\\data\\population", Float64)
+const POPULATION = readdlm(data_path("population"), Float64)
 const MIN_POP_YEAR = 1950.
 const MAX_POP_YEAR = 2100.
 
 
-const FERTILITY = readdlm(".\\data\\fertility", Float64)
+const FERTILITY = readdlm(data_path("fertility"), Float64)
 const MIN_FERT_AGE = 10
 const MAX_FERT_AGE = 54
 const FEMALE_FRACTION = 0.485
 
-const MORTALITY = readdlm(".\\data\\mortality", Float64)
+const MORTALITY = readdlm(data_path("mortality"), Float64)
 const MIN_MORT_AGE = 0
 const MAX_MORT_AGE = 100
 
 
-const MIGRATION = readdlm(".\\data\\migration", Float64)
+const MIGRATION = readdlm(data_path("migration"), Float64)
 const MIN_MIGRATION_AGE = 0
 const MAX_MIGRATION_AGE = 100
 

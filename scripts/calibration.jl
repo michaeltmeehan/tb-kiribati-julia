@@ -81,7 +81,7 @@ function model_incidence_by_age_group(
     tspan = (times[1], times[end]),
     u0 = u0,
     saveat = times,
-    demography = :static,
+    demography = :equilibrium,
 )
 
     _, incidence_by_age = raw_annual_incidence_by_age(sol)

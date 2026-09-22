@@ -1,33 +1,33 @@
-const STATIC_YEAR = 2025.0
-const STATIC_POPULATION = get_population(STATIC_YEAR)
+const EQUILIBRIUM_YEAR = 2025.0
+const EQUILIBRIUM_POPULATION = get_population(EQUILIBRIUM_YEAR)
 
-const STATIC_MORTALITY = [mortality_rate(a - 1, STATIC_YEAR) for a in 1 :NAGE]
+const EQUILIBRIUM_MORTALITY = [mortality_rate(a - 1, EQUILIBRIUM_YEAR) for a in 1 :NAGE]
 
-const STATIC_NEWBORNS = STATIC_POPULATION[1]
+const EQUILIBRIUM_NEWBORNS = EQUILIBRIUM_POPULATION[1]
 
-const STATIC_SURVIVORS = (1. .- STATIC_MORTALITY) .* STATIC_POPULATION
+const EQUILIBRIUM_SURVIVORS = (1. .- EQUILIBRIUM_MORTALITY) .* EQUILIBRIUM_POPULATION
 
-const STATIC_MIGRATION = let 
+const EQUILIBRIUM_MIGRATION = let 
     net_migration = zeros(NAGE)
 
     # Age 0 is supplied by births (no migration balancing required)
     
     for a in 2:(NAGE - 1)
-        net_migration[a] = STATIC_POPULATION[a] - STATIC_SURVIVORS[a - 1]
+        net_migration[a] = EQUILIBRIUM_POPULATION[a] - EQUILIBRIUM_SURVIVORS[a - 1]
     end
 
-    net_migration[end] = STATIC_POPULATION[end] - STATIC_SURVIVORS[end] - STATIC_SURVIVORS[end - 1]
+    net_migration[end] = EQUILIBRIUM_POPULATION[end] - EQUILIBRIUM_SURVIVORS[end] - EQUILIBRIUM_SURVIVORS[end - 1]
 
     net_migration
     
 end
 
 
-function _apply_static_demography!(u)
+function _apply_equilibrium_demography!(u)
 
     for a in 1:NAGE
         base = (a - 1) * NSTATE
-        survival = 1.0 - STATIC_MORTALITY[a]
+        survival = 1.0 - EQUILIBRIUM_MORTALITY[a]
 
         for c in 1:NEPI
             u[base + c] *= survival
@@ -58,7 +58,7 @@ function _apply_static_demography!(u)
             age_pop += u[base + c]
         end
 
-        net_migration = STATIC_MIGRATION[a]
+        net_migration = EQUILIBRIUM_MIGRATION[a]
 
         if age_pop > 0.0
             scale = 1.0 + net_migration / age_pop
@@ -73,7 +73,7 @@ function _apply_static_demography!(u)
     end
 
     # Introduce newborn
-    u[MtbNaive] = STATIC_NEWBORNS
+    u[MtbNaive] = EQUILIBRIUM_NEWBORNS
     
     return
 end
