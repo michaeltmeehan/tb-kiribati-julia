@@ -23,7 +23,7 @@ params = make_parameters(
     infectiousness_weights = (0.2, 0.5, 0.4, 1.0),
 
     # TB-related mortality
-    pct_neg_tx_death = 0.4,
+    pct_neg_tx_death = 0.0,
     disease_mortality_clin_lowinf = 0.0,
     disease_mortality_clin_inf = 0.0,
 )

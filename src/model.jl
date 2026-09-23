@@ -143,7 +143,7 @@ function tb_rhs!(du, u, p::TBParams, t)
         du[base + CumTreatmentInitiation] = to_tx_from_sublow + to_tx_from_subinf + to_tx_from_clinlow + to_tx_from_clininf
         du[base + CumTreatmentCompletion] = tx_to_rec
         du[base + CumRelapseTB] = tx_to_relapse
-        du[base + CumDeathsTB] = clinlow_death + clininf_death
+        du[base + CumDeathsTB] = clinlow_death + clininf_death + tx_death
     end
 
     return nothing

@@ -3,9 +3,11 @@ const EQUILIBRIUM_POPULATION = get_population(EQUILIBRIUM_YEAR)
 
 const EQUILIBRIUM_MORTALITY = [mortality_rate(a - 1, EQUILIBRIUM_YEAR) for a in 1 :NAGE]
 
+const EQUILIBRIUM_SURVIVAL = exp.(-EQUILIBRIUM_MORTALITY)
+
 const EQUILIBRIUM_NEWBORNS = EQUILIBRIUM_POPULATION[1]
 
-const EQUILIBRIUM_SURVIVORS = (1. .- EQUILIBRIUM_MORTALITY) .* EQUILIBRIUM_POPULATION
+const EQUILIBRIUM_SURVIVORS = EQUILIBRIUM_SURVIVAL .* EQUILIBRIUM_POPULATION
 
 const EQUILIBRIUM_MIGRATION = let 
     net_migration = zeros(NAGE)
@@ -27,7 +29,8 @@ function _apply_equilibrium_demography!(u)
 
     for a in 1:NAGE
         base = (a - 1) * NSTATE
-        survival = 1.0 - EQUILIBRIUM_MORTALITY[a]
+        # survival = 1.0 - EQUILIBRIUM_MORTALITY[a]
+        survival = EQUILIBRIUM_SURVIVAL[a]
 
         for c in 1:NEPI
             u[base + c] *= survival

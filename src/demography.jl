@@ -69,7 +69,8 @@ function _apply_demography!(u, t)
             newborns += fertility * x
 
             # Remove deaths and emigrants
-            u[base + c] = (1 - mortality) * x
+            # u[base + c] = (1 - mortality) * x
+            u[base + c] = exp(-mortality) * x   # Mortality is provided as a rate, not a risk
 
             total_pop += u[base + c]
         end
