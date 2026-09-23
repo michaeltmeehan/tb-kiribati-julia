@@ -27,7 +27,7 @@ function raw_annual_incidence_by_age(sol)
 
         @inbounds for a in 1:NAGE
             base = (a - 1) * NSTATE
-            incidence[i, a] = u[base + CumProgressionToActiveTB]
+            incidence[i, a] = u[base + CumProgressionToActiveTB] + u[base + CumRelapseTB]
         end
     end
 

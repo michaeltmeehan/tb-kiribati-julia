@@ -43,6 +43,7 @@ function compute_force_of_infection!(λ::AbstractVector{<:Real}, u::AbstractVect
         if age < 15
             q[a] = 0.0
         else
+        # rel_infectiousness_by_age = age < 15 ? 0.2 : 1.0
             total = 0.0
             for c in 1:NEPI
                 total += u[base + c]
@@ -52,7 +53,8 @@ function compute_force_of_infection!(λ::AbstractVector{<:Real}, u::AbstractVect
                            p.infectiousness_weights[2] * u[base + SubClinInf] +
                            p.infectiousness_weights[3] * u[base + ClinLow] +
                            p.infectiousness_weights[4] * u[base + ClinInf]
-                q[a] = weighted / total
+                q[a] = weighted / total           
+                # q[a] = rel_infectiousness_by_age * weighted / total
             else
                 q[a] = 0.0
             end

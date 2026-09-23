@@ -24,8 +24,8 @@ params = make_parameters(
 
     # TB-related mortality
     pct_neg_tx_death = 0.4,
-    disease_mortality_clin_lowinf = 0.025,
-    disease_mortality_clin_inf = 0.4,
+    disease_mortality_clin_lowinf = 0.0,
+    disease_mortality_clin_inf = 0.0,
 )
 
 
@@ -45,6 +45,23 @@ burnin_sol = simulate(
 
 # Both projection scenarios start from exactly the same epidemiological state.
 projection_u0 = copy(burnin_sol.u[end])
+
+
+# Re-introduce TB deaths ------------------------------------------------------
+params = make_parameters(
+    CONTACT;
+    beta = 0.8,
+    progression_child = 3.0,
+    progression_5_14 = 0.1,
+    progression_15_64 = 0.25,
+    progression_65_plus = 0.5,
+    infectiousness_weights = (0.2, 0.5, 0.4, 1.0),
+
+    # TB-related mortality
+    pct_neg_tx_death = 0.4,
+    disease_mortality_clin_lowinf = 0.025,
+    disease_mortality_clin_inf = 0.4,
+)
 
 
 # Equilibrium-demography projection -------------------------------------------
@@ -189,32 +206,22 @@ using DataFrames
 
 # Summary table ---------------------------------------------------------------
 
-summary_years = [2050, 2075, 2100]
+summary_years = [2050, 2075, projection_end]
 
 rows = DataFrame()
 
     push!(rows, (
-        year = 2025,
+        year = projection_end,
         scenario = "Equilibrium",
-        incidence_per_100k = equilibrium_summary.incidence_per_100k[1],
-        deaths_per_100k = equilibrium_summary.deaths_per_100k[1],
-        median_age = equilibrium_demography.median_age[1],
-        prop_65_plus = 100 * equilibrium_demography.prop_65_plus[1],
-        prop_under_5 = 100 * equilibrium_demography.prop_under_5[1],
+        incidence_per_100k = equilibrium_summary.incidence_per_100k[end],
+        deaths_per_100k = equilibrium_summary.deaths_per_100k[end],
+        median_age = equilibrium_demography.median_age[end],
+        prop_65_plus = 100 * equilibrium_demography.prop_65_plus[end],
+        prop_under_5 = 100 * equilibrium_demography.prop_under_5[end],
     ))
 
 for year in summary_years
     i = findfirst(==(year), equilibrium_summary.years)
-
-    # push!(rows, (
-    #     year = year,
-    #     scenario = "Equilibrium",
-    #     incidence_per_100k = equilibrium_summary.incidence_per_100k[i],
-    #     deaths_per_100k = equilibrium_summary.deaths_per_100k[i],
-    #     median_age = equilibrium_demography.median_age[i],
-    #     prop_65_plus = 100 * equilibrium_demography.prop_65_plus[i],
-    #     prop_under_5 = 100 * equilibrium_demography.prop_under_5[i],
-    # ))
 
     push!(rows, (
         year = year,
