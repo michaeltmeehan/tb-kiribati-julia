@@ -45,10 +45,12 @@ const CALIBRATION_AGE_LABELS = [
 # Only this relative detection rate is needed for the age-composition
 # likelihood; the absolute child/adult rates are derived afterwards from the
 # WHO overall notification/incidence ratio.
-const CHILD_TO_ADULT_DETECTION_RATIO = 0.5
+const INFANT_TO_ADULT_DETECTION_RATIO = 0.5
+
+const CHILD_TO_ADULT_DETECTION_RATIO = 0.75
 
 const RELATIVE_DETECTION = [
-    CHILD_TO_ADULT_DETECTION_RATIO,   # 0-4
+    INFANT_TO_ADULT_DETECTION_RATIO,   # 0-4
     CHILD_TO_ADULT_DETECTION_RATIO,   # 5-14
     1.0,                              # 15-24
     1.0,                              # 25-34
@@ -173,7 +175,7 @@ function notification_observation(year, predicted_incidence)
 
         push!(counts, Int(y04))
         push!(expected_weights,
-            CHILD_TO_ADULT_DETECTION_RATIO * predicted_incidence[1])
+            INFANT_TO_ADULT_DETECTION_RATIO * predicted_incidence[1])
         push!(labels, "0-4")
 
         push!(counts, Int(y514))
@@ -185,8 +187,8 @@ function notification_observation(year, predicted_incidence)
 
         push!(counts, Int(y014))
         push!(expected_weights,
-            CHILD_TO_ADULT_DETECTION_RATIO *
-            (predicted_incidence[1] + predicted_incidence[2]))
+            INFANT_TO_ADULT_DETECTION_RATIO * predicted_incidence[1] +
+            CHILD_TO_ADULT_DETECTION_RATIO * predicted_incidence[2])
         push!(labels, "0-14")
 
     else
@@ -354,7 +356,7 @@ lower = [
 upper = [
      5.0,   # beta
     10.0,   # progression_child
-     0.2,   # progression_5_14
+    10.0,   # progression_5_14
     10.0,   # progression_15_64
     10.0,   # progression_65_plus
 ]
@@ -437,17 +439,19 @@ end
 # Implied absolute detection probabilities
 # ---------------------------------------------------------------------------
 
-# The likelihood above uses only the assumed relative child/adult detection
-# ratio. After fitting, combine that ratio with the WHO overall
-# notification/incidence ratio to recover the implied absolute rates.
-
-child_incidence = fitted_incidence[1] + fitted_incidence[2]
+infant_incidence = fitted_incidence[1]
+child_incidence = fitted_incidence[2]
 adult_incidence = sum(fitted_incidence[3:end])
-total_incidence = child_incidence + adult_incidence
+
+total_incidence =
+    infant_incidence +
+    child_incidence +
+    adult_incidence
 
 implied_detection = DataFrame(
     year = Int[],
     overall = Float64[],
+    infant = Float64[],
     child = Float64[],
     adult = Float64[],
 )
@@ -462,9 +466,13 @@ for row in eachrow(INCIDENCE)
     q_adult =
         q_overall * total_incidence /
         (
-            adult_incidence +
-            CHILD_TO_ADULT_DETECTION_RATIO * child_incidence
+            INFANT_TO_ADULT_DETECTION_RATIO * infant_incidence +
+            CHILD_TO_ADULT_DETECTION_RATIO * child_incidence +
+            adult_incidence
         )
+
+    q_infant =
+        INFANT_TO_ADULT_DETECTION_RATIO * q_adult
 
     q_child =
         CHILD_TO_ADULT_DETECTION_RATIO * q_adult
@@ -474,6 +482,7 @@ for row in eachrow(INCIDENCE)
         (
             year = year,
             overall = q_overall,
+            infant = q_infant,
             child = q_child,
             adult = q_adult,
         ),
@@ -487,14 +496,17 @@ for row in eachrow(implied_detection)
     println(
         row.year,
         ": overall = ", round(row.overall, digits = 3),
-        ", 0-14 = ", round(row.child, digits = 3),
+        ", 0-4 = ", round(row.infant, digits = 3),
+        ", 5-14 = ", round(row.child, digits = 3),
         ", >=15 = ", round(row.adult, digits = 3),
     )
 end
 
 println()
 println(
-    "Mean implied detection: 0-14 = ",
+    "Mean implied detection: 0-4 = ",
+    round(mean(implied_detection.infant), digits = 3),
+    ", 5-14 = ",
     round(mean(implied_detection.child), digits = 3),
     ", >=15 = ",
     round(mean(implied_detection.adult), digits = 3),

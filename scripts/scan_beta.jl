@@ -10,7 +10,7 @@ times = tinit:1.0:tfinal
 
 # contact = default_contact_matrix()
 params = make_parameters(CONTACT)
-population = get_population(STATIC_YEAR)    
+population = get_population(EQUILIBRIUM_YEAR)    
 u0 = initial_state(population)
 prob = ODEProblem(tb_rhs!, u0, tspan, params)
 cb = CB.PresetTimeCallback(times, apply_demography!)
@@ -37,7 +37,7 @@ end
 
 # β = 0.593 gives 335 / 1e5 incidence
 
-population = get_population(STATIC_YEAR) 
+population = get_population(EQUILIBRIUM_YEAR) 
 beta = 0.75
 params.beta = beta
 prob = ODEProblem(tb_rhs!, u0, tspan, params)
