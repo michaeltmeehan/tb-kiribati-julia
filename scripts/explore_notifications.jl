@@ -23,6 +23,7 @@ const AGE_LABELS = [
     "65+",
 ]
 
+# Exclude 2024 because 0-4 and 5-14 are not separately available
 const YEARS = 2013.:2023.
 
 
@@ -38,7 +39,6 @@ rates = DataFrame(
 
 for year in YEARS
 
-    # Age-specific population for this year
     population = get_population(year)
 
     population_grouped = aggregate_age_groups(
@@ -64,8 +64,7 @@ for year in YEARS
 
         ismissing(cases) && continue
 
-        rate =
-            1e5 * cases / population_grouped[g]
+        rate = 1e5 * cases / population_grouped[g]
 
         push!(
             rates,
@@ -80,49 +79,43 @@ end
 
 
 # ---------------------------------------------------------------------------
-# Average across years
+# Box plot
 # ---------------------------------------------------------------------------
 
-mean_rates = combine(
-    groupby(rates, :age_group),
-    :notification_rate => mean => :mean_rate,
-    :notification_rate => std => :sd_rate,
-)
+# Convert age groups to plotting positions
+age_index = Dict(label => i for (i, label) in enumerate(AGE_LABELS))
 
-# Preserve age order
-mean_rates.order = [
-    findfirst(==(x), AGE_LABELS)
-    for x in mean_rates.age_group
-]
+x = [age_index[a] for a in rates.age_group]
+y = rates.notification_rate
 
-sort!(mean_rates, :order)
-
-
-println(mean_rates)
-
-
-# ---------------------------------------------------------------------------
-# Plot
-# ---------------------------------------------------------------------------
-
-fig = Figure(size = (900, 550))
+fig = Figure(size = (1000, 600))
 
 ax = Axis(
     fig[1, 1],
     xlabel = "Age group",
     ylabel = "TB notifications per 100,000",
-    title = "Mean age-specific TB notification rate, Kiribati 2013–2023",
+    title = "Age-specific TB notification rates, Kiribati 2013–2023",
+    xticks = (1:length(AGE_LABELS), AGE_LABELS),
 )
 
-barplot!(
+CairoMakie.boxplot!(
     ax,
-    1:nrow(mean_rates),
-    mean_rates.mean_rate,
+    x,
+    y,
 )
 
-ax.xticks = (
-    1:nrow(mean_rates),
-    mean_rates.age_group,
+# Optional: overlay the annual observations as points
+jitter_width = 0.12
+
+x_jittered =
+    x .+
+    jitter_width .* (2 .* rand(length(x)) .- 1)
+
+CairoMakie.scatter!(
+    ax,
+    x_jittered,
+    y,
+    markersize = 8,
 )
 
 fig

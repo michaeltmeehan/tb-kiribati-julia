@@ -15,11 +15,11 @@ projection_times = projection_start:1.0:projection_end
 
 params = make_parameters(
     CONTACT;
-    beta = 0.8,
-    progression_child = 3.0,
-    progression_5_14 = 0.1,
-    progression_15_64 = 0.25,
-    progression_65_plus = 0.5,
+    beta = 1.1,
+    progression_child = 0.5,
+    progression_5_14 = 0.3,
+    progression_15_64 = 0.15,
+    progression_65_plus = 0.3,
     infectiousness_weights = (0.2, 0.5, 0.4, 1.0),
 
     # TB-related mortality
@@ -102,7 +102,7 @@ using Plots
 
 # Overall TB incidence --------------------------------------------------------
 
-plot(
+Plots.plot(
            equilibrium_summary.years,
            equilibrium_summary.incidence_per_100k;
            label = "Equilibrium demography",
@@ -112,7 +112,7 @@ plot(
            ylims = (0, 1_000),
        )
 
-plot!(
+Plots.plot!(
            dynamic_summary.years,
            dynamic_summary.incidence_per_100k;
            label = "Dynamic demography",
@@ -128,7 +128,7 @@ incidence_relative_difference = 100 .* (
     equilibrium_summary.incidence_per_100k .- 1
 )
 
-plot(
+Plots.plot(
     equilibrium_summary.years,
     incidence_relative_difference;
     label = false,
@@ -138,12 +138,12 @@ plot(
     legend = false,
 )
 
-hline!([0]; linestyle = :dash, label = false)
+Plots.hline!([0]; linestyle = :dash, label = false)
 
 
 # Median age ------------------------------------------------------------------
 
-plot(
+Plots.plot(
     equilibrium_demography.years,
     equilibrium_demography.median_age;
     label = "Equilibrium demography",
@@ -153,7 +153,7 @@ plot(
     ylims = (0, 50),
 )
 
-plot!(
+Plots.plot!(
     dynamic_demography.years,
     dynamic_demography.median_age;
     label = "Dynamic demography",
@@ -163,7 +163,7 @@ plot!(
 
 # Proportion aged 65+ ---------------------------------------------------------
 
-plot(
+Plots.plot(
     equilibrium_demography.years,
     100 .* equilibrium_demography.prop_65_plus;
     label = "Equilibrium demography",
@@ -173,7 +173,7 @@ plot(
     ylims = (0, 17)
 )
 
-plot!(
+Plots.plot!(
     dynamic_demography.years,
     100 .* dynamic_demography.prop_65_plus;
     label = "Dynamic demography",
@@ -183,7 +183,7 @@ plot!(
 
 # TB mortality ---------------------------------------------------------------
 
-plot(
+Plots.plot(
     equilibrium_summary.years,
     equilibrium_summary.deaths_per_100k;
     label = "Equilibrium demography",
@@ -193,7 +193,7 @@ plot(
     ylim = (0, 100)
 )
 
-plot!(
+Plots.plot!(
     dynamic_summary.years,
     dynamic_summary.deaths_per_100k;
     label = "Dynamic demography",

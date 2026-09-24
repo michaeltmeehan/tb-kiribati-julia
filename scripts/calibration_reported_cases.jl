@@ -45,9 +45,9 @@ const CALIBRATION_AGE_LABELS = [
 # Only this relative detection rate is needed for the age-composition
 # likelihood; the absolute child/adult rates are derived afterwards from the
 # WHO overall notification/incidence ratio.
-const INFANT_TO_ADULT_DETECTION_RATIO = 0.5
+const INFANT_TO_ADULT_DETECTION_RATIO = 1.0
 
-const CHILD_TO_ADULT_DETECTION_RATIO = 0.75
+const CHILD_TO_ADULT_DETECTION_RATIO = 1.0
 
 const RELATIVE_DETECTION = [
     INFANT_TO_ADULT_DETECTION_RATIO,   # 0-4
