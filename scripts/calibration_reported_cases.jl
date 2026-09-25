@@ -4,6 +4,13 @@ using Optim
 using Distributions
 using Statistics
 
+const CALIBRATION_PARAMETERS = (
+    :beta,
+    :progression_child,
+    :progression_5_14,
+    :progression_15_64,
+    :progression_65_plus,
+)
 
 # ---------------------------------------------------------------------------
 # Calibration data
@@ -88,22 +95,16 @@ times = tinit:1.0:tfinal
 # ---------------------------------------------------------------------------
 
 function model_incidence_by_age_group(
-    beta,
-    progression_child,
-    progression_5_14,
-    progression_15_64,
-    progression_65_plus;
-    infectiousness_weights = (0.2, 0.5, 0.4, 1.0),
+    model_parameters::NamedTuple;
+    fixed_parameters::NamedTuple = (
+        infectiousness_weights = (0.2, 0.5, 0.4, 1.0),
+    ),
 )
+    parameter_kwargs = merge(fixed_parameters, model_parameters)
 
     params = make_parameters(
         CONTACT;
-        beta = beta,
-        progression_child = progression_child,
-        progression_5_14 = progression_5_14,
-        progression_15_64 = progression_15_64,
-        progression_65_plus = progression_65_plus,
-        infectiousness_weights = infectiousness_weights,
+        parameter_kwargs...,
     )
 
     population = get_population(EQUILIBRIUM_YEAR)
@@ -282,24 +283,13 @@ function incidence_loglikelihood(predicted_incidence)
 end
 
 
-function calibration_loss(
-    beta,
-    progression_child,
-    progression_5_14,
-    progression_15_64,
-    progression_65_plus,
-)
+function calibration_loglikelihood(model_parameters::NamedTuple)
 
-    predicted_incidence = model_incidence_by_age_group(
-        beta,
-        progression_child,
-        progression_5_14,
-        progression_15_64,
-        progression_65_plus,
-    )
+    predicted_incidence =
+        model_incidence_by_age_group(model_parameters)
 
     if any(x -> !isfinite(x) || x <= 0, predicted_incidence)
-        return Inf
+        return -Inf
     end
 
     notification_ll =
@@ -309,22 +299,31 @@ function calibration_loss(
         incidence_loglikelihood(predicted_incidence)
 
     if !isfinite(notification_ll) || !isfinite(incidence_ll)
-        return Inf
+        return -Inf
     end
 
-    return -(notification_ll + incidence_ll)
+    return notification_ll + incidence_ll
+end
+
+
+function calibration_loss(model_parameters::NamedTuple)
+    return -calibration_loglikelihood(model_parameters)
+end
+
+
+function parameter_namedtuple(x)
+
+    length(x) == length(CALIBRATION_PARAMETERS) ||
+        error("Parameter vector has incorrect length")
+
+    return NamedTuple{
+        CALIBRATION_PARAMETERS
+    }(Tuple(x))
 end
 
 
 function objective(x)
-
-    return calibration_loss(
-        x[1],   # beta
-        x[2],   # progression_child
-        x[3],   # progression_5_14
-        x[4],   # progression_15_64
-        x[5],   # progression_65_plus
-    )
+    return calibration_loss(parameter_namedtuple(x))
 end
 
 
@@ -386,6 +385,8 @@ result = optimize(
 
 xhat = Optim.minimizer(result)
 
+fitted_parameters = parameter_namedtuple(xhat)
+
 beta_hat = xhat[1]
 progression_child_hat = xhat[2]
 progression_5_14_hat = xhat[3]
@@ -397,21 +398,16 @@ println("Converged: ", Optim.converged(result))
 println("Minimum negative log-likelihood: ", Optim.minimum(result))
 println()
 
+println()
 println("Fitted parameters:")
-println("beta                  = ", beta_hat)
-println("progression_child     = ", progression_child_hat)
-println("progression_5_14      = ", progression_5_14_hat)
-println("progression_15_64     = ", progression_15_64_hat)
-println("progression_65_plus   = ", progression_65_plus_hat)
+
+for (parameter, value) in pairs(fitted_parameters)
+    println(rpad(string(parameter), 25), " = ", value)
+end
 
 
-fitted_incidence = model_incidence_by_age_group(
-    beta_hat,
-    progression_child_hat,
-    progression_5_14_hat,
-    progression_15_64_hat,
-    progression_65_plus_hat,
-)
+fitted_incidence =
+    model_incidence_by_age_group(fitted_parameters)
 
 fitted_total_rate =
     model_total_incidence_rate(fitted_incidence)
