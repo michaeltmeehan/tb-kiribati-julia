@@ -21,10 +21,10 @@ params = make_parameters(
     progression_65_plus = 0.3,
     infectiousness_weights = (0.2, 0.5, 0.4, 1.0),
 
-    # TB-related mortality remains off during burn-in
-    pct_neg_tx_death = 0.0,
-    disease_mortality_clin_lowinf = 0.0,
-    disease_mortality_clin_inf = 0.0,
+    # TB-related mortality
+    pct_neg_tx_death = 0.4,
+    disease_mortality_clin_lowinf = 0.025,
+    disease_mortality_clin_inf = 0.4,
 )
 
 
@@ -176,7 +176,7 @@ Plots.hline!([0]; linestyle = :dash, label = false)
 
 # Summary table ---------------------------------------------------------------
 
-summary_years = [2050, 2075, projection_end]
+summary_years = [2050.0, 2075.0, projection_end]
 
 rows = DataFrame(
     year = Float64[],
@@ -193,7 +193,7 @@ for year in summary_years
     i_dyn = findfirst(==(year), dynamic_summary.years)
 
     push!(rows, (
-        year = Float64(year),
+        year = year,
         scenario = "Equilibrium",
         incidence_per_100k = equilibrium_summary.incidence_per_100k[i_eq],
         deaths_per_100k = equilibrium_summary.deaths_per_100k[i_eq],
@@ -203,7 +203,7 @@ for year in summary_years
     ))
 
     push!(rows, (
-        year = Float64(year),
+        year = year,
         scenario = "Dynamic",
         incidence_per_100k = dynamic_summary.incidence_per_100k[i_dyn],
         deaths_per_100k = dynamic_summary.deaths_per_100k[i_dyn],
