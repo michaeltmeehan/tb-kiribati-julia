@@ -173,3 +173,39 @@ isapprox(
     end
     return u
 end
+
+
+function with_tb_mortality(
+    params::TBParams;
+    tx_period::Real = 0.5,
+    tx_success_prop::Real = 0.8,
+    pct_neg_tx_death::Real = 0.4,
+    disease_mortality_clin_lowinf::Real = 0.025,
+    disease_mortality_clin_inf::Real = 0.4,
+)
+    out = deepcopy(params)
+
+    tx_rate = 1 / Float64(tx_period)
+    tx_failure_prop = 1 - Float64(tx_success_prop)
+
+    out.tx_recovery_rate =
+        Float64(tx_success_prop) * tx_rate
+
+    out.tx_death_rate =
+        tx_failure_prop *
+        Float64(pct_neg_tx_death) *
+        tx_rate
+
+    out.tx_relapse_rate =
+        tx_failure_prop *
+        (1 - Float64(pct_neg_tx_death)) *
+        tx_rate
+
+    out.disease_mortality_clin_lowinf =
+        Float64(disease_mortality_clin_lowinf)
+
+    out.disease_mortality_clin_inf =
+        Float64(disease_mortality_clin_inf)
+
+    return out
+end

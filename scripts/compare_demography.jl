@@ -1,4 +1,6 @@
 using TBKiribatiJulia
+using Plots
+using DataFrames
 
 
 # Simulation settings ---------------------------------------------------------
@@ -6,9 +8,6 @@ using TBKiribatiJulia
 burnin_start = 1800.0
 projection_start = 2025.0
 projection_end = 2100.0
-
-burnin_times = burnin_start:1.0:projection_start
-projection_times = projection_start:1.0:projection_end
 
 
 # Model parameters ------------------------------------------------------------
@@ -22,68 +21,25 @@ params = make_parameters(
     progression_65_plus = 0.3,
     infectiousness_weights = (0.2, 0.5, 0.4, 1.0),
 
-    # TB-related mortality
+    # TB-related mortality remains off during burn-in
     pct_neg_tx_death = 0.0,
     disease_mortality_clin_lowinf = 0.0,
     disease_mortality_clin_inf = 0.0,
 )
 
 
-# Common burn-in --------------------------------------------------------------
+# Run paired demographic projections -----------------------------------------
 
-population0 = get_population(EQUILIBRIUM_YEAR)
-
-u0 = seeded_initial_state(population0)
-
-burnin_sol = simulate(
+result = run_demography_comparison(
     params;
-    tspan = (burnin_start, projection_start),
-    u0 = u0,
-    saveat = burnin_times,
-    demography = :equilibrium,
+    burnin_start = burnin_start,
+    projection_start = projection_start,
+    projection_end = projection_end,
 )
 
-# Both projection scenarios start from exactly the same epidemiological state.
-projection_u0 = copy(burnin_sol.u[end])
-
-
-# Re-introduce TB deaths ------------------------------------------------------
-params = make_parameters(
-    CONTACT;
-    beta = 0.8,
-    progression_child = 3.0,
-    progression_5_14 = 0.1,
-    progression_15_64 = 0.25,
-    progression_65_plus = 0.5,
-    infectiousness_weights = (0.2, 0.5, 0.4, 1.0),
-
-    # TB-related mortality
-    pct_neg_tx_death = 0.4,
-    disease_mortality_clin_lowinf = 0.025,
-    disease_mortality_clin_inf = 0.4,
-)
-
-
-# Equilibrium-demography projection -------------------------------------------
-
-equilibrium_sol = simulate(
-    params;
-    tspan = (projection_start, projection_end),
-    u0 = copy(projection_u0),
-    saveat = projection_times,
-    demography = :equilibrium,
-)
-
-
-# Dynamic-demography projection -----------------------------------------------
-
-dynamic_sol = simulate(
-    params;
-    tspan = (projection_start, projection_end),
-    u0 = copy(projection_u0),
-    saveat = projection_times,
-    demography = :dynamic,
-)
+burnin_sol = result.burnin
+equilibrium_sol = result.equilibrium
+dynamic_sol = result.dynamic
 
 
 # Epidemiological summaries ---------------------------------------------------
@@ -98,27 +54,24 @@ equilibrium_demography = demographic_summary(equilibrium_summary)
 dynamic_demography = demographic_summary(dynamic_summary)
 
 
-using Plots
-
 # Overall TB incidence --------------------------------------------------------
 
 Plots.plot(
-           equilibrium_summary.years,
-           equilibrium_summary.incidence_per_100k;
-           label = "Equilibrium demography",
-           xlabel = "Year",
-           ylabel = "TB incidence per 100,000",
-           linewidth = 2,
-           ylims = (0, 1_000),
-       )
+    equilibrium_summary.years,
+    equilibrium_summary.incidence_per_100k;
+    label = "Equilibrium demography",
+    xlabel = "Year",
+    ylabel = "TB incidence per 100,000",
+    linewidth = 2,
+    ylims = (0, 1_000),
+)
 
 Plots.plot!(
-           dynamic_summary.years,
-           dynamic_summary.incidence_per_100k;
-           label = "Dynamic demography",
-           linewidth = 2,
-       )
-
+    dynamic_summary.years,
+    dynamic_summary.incidence_per_100k;
+    label = "Dynamic demography",
+    linewidth = 2,
+)
 
 
 # Relative difference in TB incidence -----------------------------------------
@@ -170,7 +123,7 @@ Plots.plot(
     xlabel = "Year",
     ylabel = "Population aged 65+ (%)",
     linewidth = 2,
-    ylims = (0, 17)
+    ylims = (0, 17),
 )
 
 Plots.plot!(
@@ -181,7 +134,7 @@ Plots.plot!(
 )
 
 
-# TB mortality ---------------------------------------------------------------
+# TB mortality ----------------------------------------------------------------
 
 Plots.plot(
     equilibrium_summary.years,
@@ -190,7 +143,7 @@ Plots.plot(
     xlabel = "Year",
     ylabel = "TB deaths per 100,000",
     linewidth = 2,
-    ylim = (0, 100)
+    ylims = (0, 100),
 )
 
 Plots.plot!(
@@ -201,36 +154,62 @@ Plots.plot!(
 )
 
 
+# Relative difference in TB mortality -----------------------------------------
 
-using DataFrames
+mortality_relative_difference = 100 .* (
+    dynamic_summary.deaths_per_100k ./
+    equilibrium_summary.deaths_per_100k .- 1
+)
+
+Plots.plot(
+    equilibrium_summary.years,
+    mortality_relative_difference;
+    label = false,
+    xlabel = "Year",
+    ylabel = "Difference in TB mortality (%)",
+    linewidth = 2,
+    legend = false,
+)
+
+Plots.hline!([0]; linestyle = :dash, label = false)
+
 
 # Summary table ---------------------------------------------------------------
 
 summary_years = [2050, 2075, projection_end]
 
-rows = DataFrame()
-
-    push!(rows, (
-        year = projection_end,
-        scenario = "Equilibrium",
-        incidence_per_100k = equilibrium_summary.incidence_per_100k[end],
-        deaths_per_100k = equilibrium_summary.deaths_per_100k[end],
-        median_age = equilibrium_demography.median_age[end],
-        prop_65_plus = 100 * equilibrium_demography.prop_65_plus[end],
-        prop_under_5 = 100 * equilibrium_demography.prop_under_5[end],
-    ))
+rows = DataFrame(
+    year = Float64[],
+    scenario = String[],
+    incidence_per_100k = Float64[],
+    deaths_per_100k = Float64[],
+    median_age = Float64[],
+    prop_65_plus = Float64[],
+    prop_under_5 = Float64[],
+)
 
 for year in summary_years
-    i = findfirst(==(year), equilibrium_summary.years)
+    i_eq = findfirst(==(year), equilibrium_summary.years)
+    i_dyn = findfirst(==(year), dynamic_summary.years)
 
     push!(rows, (
-        year = year,
+        year = Float64(year),
+        scenario = "Equilibrium",
+        incidence_per_100k = equilibrium_summary.incidence_per_100k[i_eq],
+        deaths_per_100k = equilibrium_summary.deaths_per_100k[i_eq],
+        median_age = equilibrium_demography.median_age[i_eq],
+        prop_65_plus = 100 * equilibrium_demography.prop_65_plus[i_eq],
+        prop_under_5 = 100 * equilibrium_demography.prop_under_5[i_eq],
+    ))
+
+    push!(rows, (
+        year = Float64(year),
         scenario = "Dynamic",
-        incidence_per_100k = dynamic_summary.incidence_per_100k[i],
-        deaths_per_100k = dynamic_summary.deaths_per_100k[i],
-        median_age = dynamic_demography.median_age[i],
-        prop_65_plus = 100 * dynamic_demography.prop_65_plus[i],
-        prop_under_5 = 100 * dynamic_demography.prop_under_5[i],
+        incidence_per_100k = dynamic_summary.incidence_per_100k[i_dyn],
+        deaths_per_100k = dynamic_summary.deaths_per_100k[i_dyn],
+        median_age = dynamic_demography.median_age[i_dyn],
+        prop_65_plus = 100 * dynamic_demography.prop_65_plus[i_dyn],
+        prop_under_5 = 100 * dynamic_demography.prop_under_5[i_dyn],
     ))
 end
 
