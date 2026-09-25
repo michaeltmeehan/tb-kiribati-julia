@@ -108,6 +108,11 @@ function _apply_demography!(u, t)
     end
     u[MtbNaive] = newborns
 
+    _reconcile_population!(
+    u,
+    get_population(t),
+)
+
     return nothing
 end
 

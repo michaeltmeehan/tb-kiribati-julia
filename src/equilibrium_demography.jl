@@ -77,6 +77,45 @@ function _apply_equilibrium_demography!(u)
 
     # Introduce newborn
     u[MtbNaive] = EQUILIBRIUM_NEWBORNS
+
+    _reconcile_population!(
+    u,
+    EQUILIBRIUM_POPULATION,
+)
     
     return
+end
+
+
+function _reconcile_population!(
+    u,
+    target_population::AbstractVector{<:Real},
+)
+    length(target_population) == NAGE ||
+        error("target population vector must have length $NAGE")
+
+    for a in 1:NAGE
+        base = (a - 1) * NSTATE
+
+        age_pop = 0.0
+        for c in 1:NEPI
+            age_pop += u[base + c]
+        end
+
+        target = Float64(target_population[a])
+
+        if age_pop > 0.0
+            scale = target / age_pop
+
+            for c in 1:NEPI
+                u[base + c] *= scale
+            end
+
+        elseif target > 0.0
+            # Defensive fallback if an age group has somehow become empty.
+            u[base + MtbNaive] = target
+        end
+    end
+
+    return nothing
 end
