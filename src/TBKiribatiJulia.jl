@@ -22,6 +22,6 @@ export reset_cumulative_counters!, make_annual_callback, simulate
 export raw_annual_incidence_by_age, raw_annual_deaths_by_age, annual_incidence_per_100k, aggregate_age_groups, median_age, demographic_summary
 export simulation_summary
 export with_tb_mortality
-export run_demography_comparison
+export run_demography_comparison, comparison_summary
 
 end # module

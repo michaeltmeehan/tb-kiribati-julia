@@ -47,6 +47,8 @@ dynamic_sol = result.dynamic
 equilibrium_summary = simulation_summary(equilibrium_sol)
 dynamic_summary = simulation_summary(dynamic_sol)
 
+comparison = comparison_summary(result)
+
 
 # Demographic summaries -------------------------------------------------------
 
@@ -76,10 +78,8 @@ Plots.plot!(
 
 # Relative difference in TB incidence -----------------------------------------
 
-incidence_relative_difference = 100 .* (
-    dynamic_summary.incidence_per_100k ./
-    equilibrium_summary.incidence_per_100k .- 1
-)
+incidence_relative_difference =
+    comparison.incidence_relative_difference
 
 Plots.plot(
     equilibrium_summary.years,
@@ -156,10 +156,8 @@ Plots.plot!(
 
 # Relative difference in TB mortality -----------------------------------------
 
-mortality_relative_difference = 100 .* (
-    dynamic_summary.deaths_per_100k ./
-    equilibrium_summary.deaths_per_100k .- 1
-)
+mortality_relative_difference =
+    comparison.mortality_relative_difference
 
 Plots.plot(
     equilibrium_summary.years,

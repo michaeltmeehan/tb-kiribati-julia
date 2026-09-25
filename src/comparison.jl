@@ -42,3 +42,46 @@ function run_demography_comparison(
         dynamic = dynamic_sol,
     )
 end
+
+
+function comparison_summary(result)
+    equilibrium = simulation_summary(result.equilibrium)
+    dynamic = simulation_summary(result.dynamic)
+
+    equilibrium.years == dynamic.years ||
+        error("equilibrium and dynamic summaries use different years")
+
+    incidence_ratio =
+        dynamic.incidence_per_100k ./
+        equilibrium.incidence_per_100k
+
+    mortality_ratio =
+        dynamic.deaths_per_100k ./
+        equilibrium.deaths_per_100k
+
+    return (
+        years = equilibrium.years,
+
+        equilibrium_incidence_per_100k =
+            equilibrium.incidence_per_100k,
+        dynamic_incidence_per_100k =
+            dynamic.incidence_per_100k,
+
+        incidence_ratio = incidence_ratio,
+        incidence_relative_difference =
+            100 .* (incidence_ratio .- 1),
+        incidence_log_ratio =
+            log.(incidence_ratio),
+
+        equilibrium_deaths_per_100k =
+            equilibrium.deaths_per_100k,
+        dynamic_deaths_per_100k =
+            dynamic.deaths_per_100k,
+
+        mortality_ratio = mortality_ratio,
+        mortality_relative_difference =
+            100 .* (mortality_ratio .- 1),
+        mortality_log_ratio =
+            log.(mortality_ratio),
+    )
+end
