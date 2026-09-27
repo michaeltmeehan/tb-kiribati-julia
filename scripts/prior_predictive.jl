@@ -8,6 +8,7 @@ using CairoMakie
 using CSV
 using StatsBase
 
+include("calibration_data.jl")
 
 # ---------------------------------------------------------------------------
 # Prior specification
@@ -24,10 +25,10 @@ const PRIORS = (
         LogNormal(log(1.0), 0.5),
 
     progression_child =
-        LogNormal(log(2.4), 0.7),
+        LogNormal(log(1.5), 0.7),
 
     progression_5_14 =
-        LogNormal(log(0.05), 0.8),
+        LogNormal(log(0.1), 0.8),
 
     progression_15_64 =
         LogNormal(log(0.2), 0.8),
@@ -35,41 +36,6 @@ const PRIORS = (
     progression_65_plus =
         LogNormal(log(0.4), 0.7),
 )
-
-
-# ---------------------------------------------------------------------------
-# Model settings
-# ---------------------------------------------------------------------------
-
-const CALIBRATION_AGE_BREAKS = [
-    0,
-    5,
-    15,
-    25,
-    35,
-    45,
-    55,
-    65,
-    96,
-]
-
-const CALIBRATION_AGE_LABELS = [
-    "0-4",
-    "5-14",
-    "15-24",
-    "25-34",
-    "35-44",
-    "45-54",
-    "55-64",
-    "65+",
-]
-
-const FIXED_PARAMETERS = (
-    infectiousness_weights = (0.2, 0.5, 0.4, 1.0),
-)
-
-const TINIT = 1800.0
-const TFINAL = 2024.0
 
 
 # ---------------------------------------------------------------------------
@@ -136,19 +102,8 @@ population_by_group =
 incidence_rates =
     1e5 .* incidence ./ population_by_group
 
-    relative_detection = [
-    1.0,   # 0-4
-    1.0,   # 5-14
-    1.0,   # 15-24
-    1.0,   # 25-34
-    1.0,   # 35-44
-    1.0,   # 45-54
-    1.0,   # 55-64
-    1.0,   # 65+
-]
-
 notification_weights =
-    relative_detection .* incidence
+    RELATIVE_DETECTION .* incidence
 
 notification_proportions =
     notification_weights ./ sum(notification_weights)
@@ -600,3 +555,157 @@ save(
 )
 
 fig
+
+
+# ---------------------------------------------------------------------------
+# Prior predictive notification age-composition check
+# ---------------------------------------------------------------------------
+
+incidence_columns = [
+    Symbol(
+        "incidence_",
+        replace(label, "-" => "_", "+" => "plus"),
+    )
+    for label in CALIBRATION_AGE_LABELS
+]
+
+
+println()
+println("Prior predictive notification age-composition check:")
+
+
+for observation in NOTIFICATION_OBSERVATIONS
+
+    observed_proportions =
+        observation.counts ./ sum(observation.counts)
+
+    n_categories =
+        length(observation.labels)
+
+    predictive_proportions =
+        zeros(
+            nrow(valid_results),
+            n_categories,
+        )
+
+
+    for (i, row) in enumerate(eachrow(valid_results))
+
+        incidence = Float64[
+            row[column]
+            for column in incidence_columns
+        ]
+
+        weights =
+            observation.design * incidence
+
+        predictive_proportions[i, :] .=
+            weights ./ sum(weights)
+    end
+
+
+    println()
+    println(observation.year)
+
+    for j in eachindex(observation.labels)
+
+        values =
+            predictive_proportions[:, j]
+
+        println(
+            "  ",
+            rpad(observation.labels[j], 8),
+            " observed = ",
+            round(
+                observed_proportions[j],
+                digits = 3,
+            ),
+            ", prior 95% = [",
+            round(
+                quantile(values, 0.025),
+                digits = 3,
+            ),
+            ", ",
+            round(
+                quantile(values, 0.975),
+                digits = 3,
+            ),
+            "]",
+            ", median = ",
+            round(
+                median(values),
+                digits = 3,
+            ),
+        )
+    end
+end
+
+
+# ---------------------------------------------------------------------------
+# Pooled 2013-2023 notification age-composition check
+# ---------------------------------------------------------------------------
+
+pooled_observations = [
+    obs
+    for obs in NOTIFICATION_OBSERVATIONS
+    if obs.year <= 2023
+]
+
+pooled_counts =
+    reduce(
+        +,
+        (
+            obs.counts
+            for obs in pooled_observations
+        ),
+    )
+
+observed_pooled =
+    pooled_counts ./ sum(pooled_counts)
+
+
+predictive_pooled =
+    zeros(
+        nrow(valid_results),
+        length(observed_pooled),
+    )
+
+
+for (i, row) in enumerate(eachrow(valid_results))
+
+    incidence = Float64[
+        row[column]
+        for column in incidence_columns
+    ]
+
+    # 2013-2023 all use the same notification categories/design.
+    weights =
+        pooled_observations[1].design * incidence
+
+    predictive_pooled[i, :] .=
+        weights ./ sum(weights)
+end
+
+
+println()
+println("Pooled 2013-2023 notification composition:")
+
+for j in eachindex(pooled_observations[1].labels)
+
+    values =
+        predictive_pooled[:, j]
+
+    println(
+        "  ",
+        rpad(pooled_observations[1].labels[j], 8),
+        " observed = ",
+        round(observed_pooled[j], digits = 3),
+        ", prior 95% = [",
+        round(quantile(values, 0.025), digits = 3),
+        ", ",
+        round(quantile(values, 0.975), digits = 3),
+        "]",
+        ", median = ",
+        round(median(values), digits = 3),
+    )
+end
