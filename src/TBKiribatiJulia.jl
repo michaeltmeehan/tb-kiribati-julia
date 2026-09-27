@@ -11,6 +11,7 @@ include("equilibrium_demography.jl")
 include("simulation.jl")
 include("incidence.jl")
 include("summary.jl")
+include("calibration.jl")
 include("comparison.jl")
 
 export fertility_rate, mortality_rate, migration_flow
@@ -23,5 +24,6 @@ export raw_annual_incidence_by_age, raw_annual_deaths_by_age, annual_incidence_p
 export simulation_summary
 export with_tb_mortality
 export run_demography_comparison, comparison_summary
+export model_incidence_by_age_group, model_total_incidence_rate, notification_loglikelihood, incidence_loglikelihood, calibration_loglikelihood, calibration_loss
 
 end # module

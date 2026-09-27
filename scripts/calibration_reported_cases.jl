@@ -1,8 +1,14 @@
+using TBKiribatiJulia
+
 using CSV
 using DataFrames
 using Optim
-using Distributions
 using Statistics
+
+
+# ---------------------------------------------------------------------------
+# Parameters included in this calibration
+# ---------------------------------------------------------------------------
 
 const CALIBRATION_PARAMETERS = (
     :beta,
@@ -12,17 +18,20 @@ const CALIBRATION_PARAMETERS = (
     :progression_65_plus,
 )
 
+
 # ---------------------------------------------------------------------------
 # Calibration data
 # ---------------------------------------------------------------------------
 
-const DATA_DIR = normpath(joinpath(@__DIR__, "..", "data"))
+const DATA_DIR =
+    normpath(joinpath(@__DIR__, "..", "data"))
 
 const NOTIFICATION_FILE =
     joinpath(DATA_DIR, "tb_notifications_by_age.csv")
 
 const INCIDENCE_FILE =
     joinpath(DATA_DIR, "tb_incidence.csv")
+
 
 const NOTIFICATIONS = CSV.read(
     NOTIFICATION_FILE,
@@ -34,8 +43,22 @@ const INCIDENCE = CSV.read(
     DataFrame,
 )
 
-# Model age groups used in the calibration likelihood.
-const CALIBRATION_AGE_BREAKS = [0, 5, 15, 25, 35, 45, 55, 65, 96]
+
+# ---------------------------------------------------------------------------
+# Calibration age groups
+# ---------------------------------------------------------------------------
+
+const CALIBRATION_AGE_BREAKS = [
+    0,
+    5,
+    15,
+    25,
+    35,
+    45,
+    55,
+    65,
+    96,
+]
 
 const CALIBRATION_AGE_LABELS = [
     "0-4",
@@ -48,95 +71,71 @@ const CALIBRATION_AGE_LABELS = [
     "65+",
 ]
 
-# Children are assumed to be detected at one fifth the adult rate.
-# Only this relative detection rate is needed for the age-composition
-# likelihood; the absolute child/adult rates are derived afterwards from the
-# WHO overall notification/incidence ratio.
+
+# ---------------------------------------------------------------------------
+# Relative detection assumptions
+# ---------------------------------------------------------------------------
+
+# Only relative detection rates matter for the age-composition likelihood.
+#
+# These are currently both one, but are retained separately so that the
+# childhood detection assumptions can be modified without changing the
+# likelihood code.
+
 const INFANT_TO_ADULT_DETECTION_RATIO = 1.0
 
 const CHILD_TO_ADULT_DETECTION_RATIO = 1.0
 
 const RELATIVE_DETECTION = [
     INFANT_TO_ADULT_DETECTION_RATIO,   # 0-4
-    CHILD_TO_ADULT_DETECTION_RATIO,   # 5-14
-    1.0,                              # 15-24
-    1.0,                              # 25-34
-    1.0,                              # 35-44
-    1.0,                              # 45-54
-    1.0,                              # 55-64
-    1.0,                              # 65+
+    CHILD_TO_ADULT_DETECTION_RATIO,    # 5-14
+    1.0,                               # 15-24
+    1.0,                               # 25-34
+    1.0,                               # 35-44
+    1.0,                               # 45-54
+    1.0,                               # 55-64
+    1.0,                               # 65+
 ]
+
+
+# ---------------------------------------------------------------------------
+# Calibration years
+# ---------------------------------------------------------------------------
 
 # Notification data are available from 2013 onwards. Restrict the incidence
 # likelihood to the same period so that both components describe the same
 # calibration era.
-const CALIBRATION_YEARS = sort(intersect(
-    unique(Int.(NOTIFICATIONS.year)),
-    unique(Int.(INCIDENCE.year)),
-))
+
+const CALIBRATION_YEARS = sort(
+    intersect(
+        unique(Int.(NOTIFICATIONS.year)),
+        unique(Int.(INCIDENCE.year)),
+    ),
+)
 
 
 # ---------------------------------------------------------------------------
 # Simulation settings
 # ---------------------------------------------------------------------------
 
-# The current calibration model uses equilibrium demography and constant
-# epidemiological parameters. The annual WHO observations are therefore
-# treated as repeated observations of a common equilibrium process rather than
-# as targets for year-to-year model fluctuations.
+# The calibration model uses equilibrium demography and constant
+# epidemiological parameters. Annual observations are therefore treated as
+# repeated observations of a common equilibrium process.
 
-tinit = 1800.0
-tfinal = 2024.0
-times = tinit:1.0:tfinal
+const TINIT = 1800.0
+const TFINAL = 2024.0
 
 
-# ---------------------------------------------------------------------------
-# Model-predicted true incidence
-# ---------------------------------------------------------------------------
+# Parameters that differ from make_parameters defaults but are not currently
+# varied during calibration.
 
-function model_incidence_by_age_group(
-    model_parameters::NamedTuple;
-    fixed_parameters::NamedTuple = (
-        infectiousness_weights = (0.2, 0.5, 0.4, 1.0),
-    ),
+const FIXED_PARAMETERS = (
+    infectiousness_weights = (0.2, 0.5, 0.4, 1.0),
 )
-    parameter_kwargs = merge(fixed_parameters, model_parameters)
-
-    params = make_parameters(
-        CONTACT;
-        parameter_kwargs...,
-    )
-
-    population = get_population(EQUILIBRIUM_YEAR)
-    u0 = seeded_initial_state(population)
-
-    sol = simulate(
-        params;
-        tspan = (times[1], times[end]),
-        u0 = u0,
-        saveat = times,
-        demography = :equilibrium,
-    )
-
-    _, incidence_by_age = raw_annual_incidence_by_age(sol)
-
-    return aggregate_age_groups(
-        incidence_by_age[end, :],
-        CALIBRATION_AGE_BREAKS,
-    )
-end
-
-
-function model_total_incidence_rate(predicted_incidence)
-
-    population = get_population(EQUILIBRIUM_YEAR)
-
-    return 1e5 * sum(predicted_incidence) / sum(population)
-end
 
 
 # ---------------------------------------------------------------------------
-# Notification-data helpers
+# Notification-data preprocessing
 # ---------------------------------------------------------------------------
 
 function case_count(year_data, age_group)
@@ -152,164 +151,197 @@ function case_count(year_data, age_group)
 end
 
 
-function notification_observation(year, predicted_incidence)
+"""
+Construct one notification observation.
+
+The design matrix maps the model's eight calibration-age incidence counts
+onto expected relative notification counts.
+
+This allows the generic likelihood code to handle either:
+
+    0-4 + 5-14
+
+or the aggregated
+
+    0-14
+
+childhood observation without knowing anything about the raw CSV structure.
+"""
+function build_notification_observation(year)
 
     year_data = NOTIFICATIONS[
         NOTIFICATIONS.year .== year,
         :,
     ]
 
-    isempty(year_data) && error("No notification data for year $year")
+    isempty(year_data) &&
+        error("No notification data for year $year")
 
     counts = Int[]
-    expected_weights = Float64[]
+    rows = Vector{Vector{Float64}}()
     labels = String[]
 
-    # Prefer the separate 0-4 and 5-14 observations whenever both are
-    # available. Fall back to the 0-14 aggregate otherwise. Never use both,
-    # because that would double-count the same childhood notifications.
+    n_age_groups =
+        length(CALIBRATION_AGE_LABELS)
+
+
+    # -----------------------------------------------------------------------
+    # Childhood observations
+    # -----------------------------------------------------------------------
+
     y04 = case_count(year_data, "0-4")
     y514 = case_count(year_data, "5-14")
     y014 = case_count(year_data, "0-14")
 
+
     if !ismissing(y04) && !ismissing(y514)
 
+        row = zeros(Float64, n_age_groups)
+        row[1] = INFANT_TO_ADULT_DETECTION_RATIO
+
         push!(counts, Int(y04))
-        push!(expected_weights,
-            INFANT_TO_ADULT_DETECTION_RATIO * predicted_incidence[1])
+        push!(rows, row)
         push!(labels, "0-4")
 
+
+        row = zeros(Float64, n_age_groups)
+        row[2] = CHILD_TO_ADULT_DETECTION_RATIO
+
         push!(counts, Int(y514))
-        push!(expected_weights,
-            CHILD_TO_ADULT_DETECTION_RATIO * predicted_incidence[2])
+        push!(rows, row)
         push!(labels, "5-14")
+
 
     elseif !ismissing(y014)
 
+        row = zeros(Float64, n_age_groups)
+
+        row[1] =
+            INFANT_TO_ADULT_DETECTION_RATIO
+
+        row[2] =
+            CHILD_TO_ADULT_DETECTION_RATIO
+
         push!(counts, Int(y014))
-        push!(expected_weights,
-            INFANT_TO_ADULT_DETECTION_RATIO * predicted_incidence[1] +
-            CHILD_TO_ADULT_DETECTION_RATIO * predicted_incidence[2])
+        push!(rows, row)
         push!(labels, "0-14")
 
+
     else
-        error("No usable childhood notification data for year $year")
+
+        error(
+            "No usable childhood notification data for year $year",
+        )
     end
 
-    # Adult age groups.
-    for g in 3:length(CALIBRATION_AGE_LABELS)
 
-        age_group = CALIBRATION_AGE_LABELS[g]
-        y = case_count(year_data, age_group)
+    # -----------------------------------------------------------------------
+    # Adult observations
+    # -----------------------------------------------------------------------
+
+    for g in 3:n_age_groups
+
+        age_group =
+            CALIBRATION_AGE_LABELS[g]
+
+        y =
+            case_count(year_data, age_group)
 
         if !ismissing(y)
+
+            row = zeros(Float64, n_age_groups)
+            row[g] = RELATIVE_DETECTION[g]
+
             push!(counts, Int(y))
-            push!(expected_weights,
-                RELATIVE_DETECTION[g] * predicted_incidence[g])
+            push!(rows, row)
             push!(labels, age_group)
         end
     end
 
-    return counts, expected_weights, labels
+
+    # Rows correspond to observed notification categories.
+    design = reduce(vcat, permutedims.(rows))
+
+
+    return (
+        year = year,
+        counts = counts,
+        design = design,
+        labels = labels,
+    )
 end
 
 
-# ---------------------------------------------------------------------------
-# Likelihood components
-# ---------------------------------------------------------------------------
-
-function notification_loglikelihood(predicted_incidence)
-
-    loglik = 0.0
-
+const NOTIFICATION_OBSERVATIONS = [
+    build_notification_observation(year)
     for year in CALIBRATION_YEARS
-
-        counts, weights, _ =
-            notification_observation(year, predicted_incidence)
-
-        if any(x -> !isfinite(x) || x <= 0, weights)
-            return -Inf
-        end
-
-        probabilities = weights ./ sum(weights)
-        total_cases = sum(counts)
-
-        loglik += logpdf(
-            Multinomial(total_cases, probabilities),
-            counts,
-        )
-    end
-
-    return loglik
-end
+]
 
 
-function incidence_loglikelihood(predicted_incidence)
+# ---------------------------------------------------------------------------
+# Incidence-data preprocessing
+# ---------------------------------------------------------------------------
 
-    predicted_rate = model_total_incidence_rate(predicted_incidence)
+const INCIDENCE_OBSERVATIONS = [
 
-    if !isfinite(predicted_rate) || predicted_rate <= 0
-        return -Inf
-    end
-
-    loglik = 0.0
+    (
+        year = Int(row.year),
+        observed = Float64(row.incidence_rate),
+        lower = Float64(row.incidence_lower),
+        upper = Float64(row.incidence_upper),
+    )
 
     for row in eachrow(INCIDENCE)
 
-        year = Int(row.year)
-        year in CALIBRATION_YEARS || continue
+    if Int(row.year) in CALIBRATION_YEARS
+]
 
-        observed = Float64(row.incidence_rate)
-        lower = Float64(row.incidence_lower)
-        upper = Float64(row.incidence_upper)
 
-        if observed <= 0 || lower <= 0 || upper <= 0
-            continue
-        end
+# ---------------------------------------------------------------------------
+# Model and likelihood wrappers
+# ---------------------------------------------------------------------------
 
-        # Approximate the WHO uncertainty interval by a log-normal sampling
-        # distribution. The central WHO estimate is treated as the median.
-        sigma =
-            (log(upper) - log(lower)) /
-            (2 * 1.96)
+function model_predictions(model_parameters)
 
-        loglik += logpdf(
-            LogNormal(log(predicted_rate), sigma),
-            observed,
-        )
-    end
-
-    return loglik
+    return model_incidence_by_age_group(
+        model_parameters;
+        age_breaks = CALIBRATION_AGE_BREAKS,
+        fixed_parameters = FIXED_PARAMETERS,
+        tinit = TINIT,
+        tfinal = TFINAL,
+    )
 end
 
 
-function calibration_loglikelihood(model_parameters::NamedTuple)
+function loglikelihood(model_parameters)
 
-    predicted_incidence =
-        model_incidence_by_age_group(model_parameters)
-
-    if any(x -> !isfinite(x) || x <= 0, predicted_incidence)
-        return -Inf
-    end
-
-    notification_ll =
-        notification_loglikelihood(predicted_incidence)
-
-    incidence_ll =
-        incidence_loglikelihood(predicted_incidence)
-
-    if !isfinite(notification_ll) || !isfinite(incidence_ll)
-        return -Inf
-    end
-
-    return notification_ll + incidence_ll
+    return calibration_loglikelihood(
+        model_parameters;
+        notification_observations =
+            NOTIFICATION_OBSERVATIONS,
+        incidence_observations =
+            INCIDENCE_OBSERVATIONS,
+        age_breaks =
+            CALIBRATION_AGE_BREAKS,
+        fixed_parameters =
+            FIXED_PARAMETERS,
+        tinit =
+            TINIT,
+        tfinal =
+            TFINAL,
+    )
 end
 
 
-function calibration_loss(model_parameters::NamedTuple)
-    return -calibration_loglikelihood(model_parameters)
+function loss(model_parameters)
+
+    return -loglikelihood(model_parameters)
 end
 
+
+# ---------------------------------------------------------------------------
+# Optim interface
+# ---------------------------------------------------------------------------
 
 function parameter_namedtuple(x)
 
@@ -323,7 +355,10 @@ end
 
 
 function objective(x)
-    return calibration_loss(parameter_namedtuple(x))
+
+    return loss(
+        parameter_namedtuple(x),
+    )
 end
 
 
@@ -383,36 +418,52 @@ result = optimize(
 # Results
 # ---------------------------------------------------------------------------
 
-xhat = Optim.minimizer(result)
+xhat =
+    Optim.minimizer(result)
 
-fitted_parameters = parameter_namedtuple(xhat)
+fitted_parameters =
+    parameter_namedtuple(xhat)
 
-beta_hat = xhat[1]
-progression_child_hat = xhat[2]
-progression_5_14_hat = xhat[3]
-progression_15_64_hat = xhat[4]
-progression_65_plus_hat = xhat[5]
 
 println()
-println("Converged: ", Optim.converged(result))
-println("Minimum negative log-likelihood: ", Optim.minimum(result))
-println()
+
+println(
+    "Converged: ",
+    Optim.converged(result),
+)
+
+println(
+    "Minimum negative log-likelihood: ",
+    Optim.minimum(result),
+)
 
 println()
+
 println("Fitted parameters:")
 
 for (parameter, value) in pairs(fitted_parameters)
-    println(rpad(string(parameter), 25), " = ", value)
+
+    println(
+        rpad(string(parameter), 25),
+        " = ",
+        value,
+    )
 end
 
 
+# ---------------------------------------------------------------------------
+# Fitted incidence
+# ---------------------------------------------------------------------------
+
 fitted_incidence =
-    model_incidence_by_age_group(fitted_parameters)
+    model_predictions(fitted_parameters)
 
 fitted_total_rate =
     model_total_incidence_rate(fitted_incidence)
 
+
 println()
+
 println(
     "Fitted equilibrium total incidence rate = ",
     round(fitted_total_rate, digits = 2),
@@ -423,6 +474,7 @@ println()
 println("Fitted true incidence by age group:")
 
 for g in eachindex(CALIBRATION_AGE_LABELS)
+
     println(
         CALIBRATION_AGE_LABELS[g],
         ": ",
@@ -435,14 +487,20 @@ end
 # Implied absolute detection probabilities
 # ---------------------------------------------------------------------------
 
-infant_incidence = fitted_incidence[1]
-child_incidence = fitted_incidence[2]
-adult_incidence = sum(fitted_incidence[3:end])
+infant_incidence =
+    fitted_incidence[1]
+
+child_incidence =
+    fitted_incidence[2]
+
+adult_incidence =
+    sum(fitted_incidence[3:end])
 
 total_incidence =
     infant_incidence +
     child_incidence +
     adult_incidence
+
 
 implied_detection = DataFrame(
     year = Int[],
@@ -452,26 +510,36 @@ implied_detection = DataFrame(
     adult = Float64[],
 )
 
+
 for row in eachrow(INCIDENCE)
 
     year = Int(row.year)
-    year in CALIBRATION_YEARS || continue
 
-    q_overall = Float64(row.detection_fraction)
+    year in CALIBRATION_YEARS ||
+        continue
+
+    q_overall =
+        Float64(row.detection_fraction)
 
     q_adult =
         q_overall * total_incidence /
         (
-            INFANT_TO_ADULT_DETECTION_RATIO * infant_incidence +
-            CHILD_TO_ADULT_DETECTION_RATIO * child_incidence +
+            INFANT_TO_ADULT_DETECTION_RATIO *
+            infant_incidence +
+
+            CHILD_TO_ADULT_DETECTION_RATIO *
+            child_incidence +
+
             adult_incidence
         )
 
     q_infant =
-        INFANT_TO_ADULT_DETECTION_RATIO * q_adult
+        INFANT_TO_ADULT_DETECTION_RATIO *
+        q_adult
 
     q_child =
-        CHILD_TO_ADULT_DETECTION_RATIO * q_adult
+        CHILD_TO_ADULT_DETECTION_RATIO *
+        q_adult
 
     push!(
         implied_detection,
@@ -485,27 +553,49 @@ for row in eachrow(INCIDENCE)
     )
 end
 
+
 println()
 println("Implied detection probabilities:")
 
 for row in eachrow(implied_detection)
+
     println(
         row.year,
-        ": overall = ", round(row.overall, digits = 3),
-        ", 0-4 = ", round(row.infant, digits = 3),
-        ", 5-14 = ", round(row.child, digits = 3),
-        ", >=15 = ", round(row.adult, digits = 3),
+        ": overall = ",
+        round(row.overall, digits = 3),
+
+        ", 0-4 = ",
+        round(row.infant, digits = 3),
+
+        ", 5-14 = ",
+        round(row.child, digits = 3),
+
+        ", >=15 = ",
+        round(row.adult, digits = 3),
     )
 end
 
+
 println()
+
 println(
     "Mean implied detection: 0-4 = ",
-    round(mean(implied_detection.infant), digits = 3),
+    round(
+        mean(implied_detection.infant),
+        digits = 3,
+    ),
+
     ", 5-14 = ",
-    round(mean(implied_detection.child), digits = 3),
+    round(
+        mean(implied_detection.child),
+        digits = 3,
+    ),
+
     ", >=15 = ",
-    round(mean(implied_detection.adult), digits = 3),
+    round(
+        mean(implied_detection.adult),
+        digits = 3,
+    ),
 )
 
 
@@ -516,22 +606,39 @@ println(
 println()
 println("Notification age-composition fit:")
 
-for year in CALIBRATION_YEARS
 
-    counts, weights, labels =
-        notification_observation(year, fitted_incidence)
+for observation in NOTIFICATION_OBSERVATIONS
 
-    probabilities = weights ./ sum(weights)
-    expected = sum(counts) .* probabilities
+    weights =
+        observation.design *
+        fitted_incidence
+
+    probabilities =
+        weights ./ sum(weights)
+
+    expected =
+        sum(observation.counts) .*
+        probabilities
+
 
     println()
-    println(year)
+    println(observation.year)
 
-    for i in eachindex(labels)
+
+    for i in eachindex(observation.labels)
+
         println(
-            "  ", labels[i],
-            ": observed = ", counts[i],
-            ", expected = ", round(expected[i], digits = 1),
+            "  ",
+            observation.labels[i],
+
+            ": observed = ",
+            observation.counts[i],
+
+            ", expected = ",
+            round(
+                expected[i],
+                digits = 1,
+            ),
         )
     end
 end
