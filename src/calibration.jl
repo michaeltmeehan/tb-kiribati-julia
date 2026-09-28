@@ -15,11 +15,8 @@ using Distributions
     )
 
 Run the equilibrium-demography TB model for a supplied set of model parameters
-and return true annual incidence aggregated into the requested age groups.
-
-`model_parameters` contains the parameters varied by the calibration or
-uncertainty analysis. `fixed_parameters` contains any non-default parameters
-that should remain fixed.
+and return true annual incident case counts aggregated into the requested age
+groups.
 """
 function model_incidence_by_age_group(
     model_parameters::NamedTuple;
@@ -28,7 +25,6 @@ function model_incidence_by_age_group(
     tinit::Real = 1800.0,
     tfinal::Real = 2024.0,
 )
-
     parameter_kwargs = merge(fixed_parameters, model_parameters)
 
     params = make_parameters(
@@ -38,7 +34,6 @@ function model_incidence_by_age_group(
 
     population = get_population(EQUILIBRIUM_YEAR)
     u0 = seeded_initial_state(population)
-
     times = Float64(tinit):1.0:Float64(tfinal)
 
     sol = simulate(
@@ -65,119 +60,168 @@ Convert annual incident case counts into an incidence rate per 100,000 using
 the equilibrium-year population.
 """
 function model_total_incidence_rate(predicted_incidence)
-
     population = get_population(EQUILIBRIUM_YEAR)
-
     return 1e5 * sum(predicted_incidence) / sum(population)
 end
 
 
 # ---------------------------------------------------------------------------
-# Notification likelihood
+# Detection model
 # ---------------------------------------------------------------------------
 
 """
-    notification_loglikelihood(
+    age_specific_detection(
         predicted_incidence,
-        notification_observations,
+        overall_detection,
+        relative_detection,
     )
 
-Evaluate the multinomial likelihood for observed notification age
-compositions.
+Construct age-specific detection probabilities while preserving the supplied
+overall (incidence-weighted) detection fraction exactly.
 
-Each element of `notification_observations` must contain:
+`relative_detection` specifies only the relative age pattern. A vector of ones
+therefore gives the same detection probability in every age group.
 
-    year
-    counts
-    design
-    labels
-
-where `design * predicted_incidence` gives the expected relative notification
-weight for each observed age category.
+Returns `nothing` if the requested relative pattern implies an invalid
+age-specific detection probability outside (0, 1].
 """
-function notification_loglikelihood(
+function age_specific_detection(
     predicted_incidence,
-    notification_observations,
+    overall_detection::Real,
+    relative_detection,
 )
-
-    loglik = 0.0
-
-    for observation in notification_observations
-
-        weights =
-            observation.design * predicted_incidence
-
-        if any(x -> !isfinite(x) || x <= 0, weights)
-            return -Inf
-        end
-
-        probabilities = weights ./ sum(weights)
-        total_cases = sum(observation.counts)
-
-        loglik += logpdf(
-            Multinomial(total_cases, probabilities),
-            observation.counts,
-        )
+    if !isfinite(overall_detection) ||
+       overall_detection <= 0 ||
+       overall_detection > 1
+        return nothing
     end
 
-    return loglik
+    if length(relative_detection) != length(predicted_incidence) ||
+       any(x -> !isfinite(x) || x <= 0, relative_detection)
+        return nothing
+    end
+
+    denominator = sum(relative_detection .* predicted_incidence)
+    total_incidence = sum(predicted_incidence)
+
+    if !isfinite(denominator) || denominator <= 0 ||
+       !isfinite(total_incidence) || total_incidence <= 0
+        return nothing
+    end
+
+    scale = overall_detection * total_incidence / denominator
+    detection = scale .* relative_detection
+
+    if any(x -> !isfinite(x) || x <= 0 || x > 1, detection)
+        return nothing
+    end
+
+    return detection
+end
+
+
+"""
+    expected_notification_counts(
+        predicted_incidence,
+        observation;
+        relative_detection,
+    )
+
+Calculate expected notification counts in the observed age categories for one
+year. Detection is applied to the model age groups first; `observation.design`
+then performs only age-category aggregation.
+"""
+function expected_notification_counts(
+    predicted_incidence,
+    observation;
+    relative_detection,
+)
+    detection = age_specific_detection(
+        predicted_incidence,
+        observation.overall_detection,
+        relative_detection,
+    )
+
+    isnothing(detection) && return nothing
+
+    detected_incidence = detection .* predicted_incidence
+    expected = observation.design * detected_incidence
+
+    if any(x -> !isfinite(x) || x <= 0, expected)
+        return nothing
+    end
+
+    return expected
 end
 
 
 # ---------------------------------------------------------------------------
-# WHO incidence likelihood
+# Negative-binomial notification likelihood
 # ---------------------------------------------------------------------------
 
 """
-    incidence_loglikelihood(
+    negative_binomial_mu_phi(mu, phi)
+
+Construct an NB2 distribution with mean `mu` and dispersion `phi`, such that
+
+    Var(Y) = mu + mu^2 / phi.
+
+Julia's `NegativeBinomial(r, p)` uses `r = phi` and
+`p = phi / (phi + mu)` under this parameterisation.
+"""
+function negative_binomial_mu_phi(
+    mu::Real,
+    phi::Real,
+)
+    if !isfinite(mu) || mu <= 0 ||
+       !isfinite(phi) || phi <= 0
+        return nothing
+    end
+
+    p = phi / (phi + mu)
+    return NegativeBinomial(phi, p)
+end
+
+
+"""
+    notification_loglikelihood(
         predicted_incidence,
-        incidence_observations,
+        notification_observations;
+        sigma_obs,
+        relative_detection,
     )
 
-Evaluate the likelihood for WHO incidence estimates.
-
-Each observation must contain:
-
-    year
-    observed
-    lower
-    upper
-
-The reported uncertainty interval is approximated by a log-normal
-distribution, with the reported central estimate treated as the median.
+Evaluate the negative-binomial likelihood for observed age-specific
+notification counts. `sigma_obs` is the extra-Poisson coefficient of variation
+parameter, with `phi = 1 / sigma_obs^2`.
 """
-function incidence_loglikelihood(
+function notification_loglikelihood(
     predicted_incidence,
-    incidence_observations,
+    notification_observations;
+    sigma_obs::Real,
+    relative_detection,
 )
-
-    predicted_rate =
-        model_total_incidence_rate(predicted_incidence)
-
-    if !isfinite(predicted_rate) || predicted_rate <= 0
+    if !isfinite(sigma_obs) || sigma_obs <= 0
         return -Inf
     end
 
+    phi = inv(sigma_obs^2)
     loglik = 0.0
 
-    for observation in incidence_observations
-
-        observed = observation.observed
-        lower = observation.lower
-        upper = observation.upper
-
-        if observed <= 0 || lower <= 0 || upper <= 0
-            continue
-        end
-
-        sigma =
-            (log(upper) - log(lower)) /
-            (2 * 1.96)
-
-        loglik += logpdf(
-            LogNormal(log(predicted_rate), sigma),
-            observed,
+    for observation in notification_observations
+        expected = expected_notification_counts(
+            predicted_incidence,
+            observation;
+            relative_detection = relative_detection,
         )
+
+        isnothing(expected) && return -Inf
+
+        for (observed, mu) in zip(observation.counts, expected)
+            dist = negative_binomial_mu_phi(mu, phi)
+            isnothing(dist) && return -Inf
+            loglik += logpdf(dist, observed)
+        end
     end
 
     return loglik
@@ -191,58 +235,47 @@ end
 """
     calibration_loglikelihood(
         model_parameters;
+        sigma_obs,
         notification_observations,
-        incidence_observations,
+        relative_detection,
         age_breaks,
         fixed_parameters = NamedTuple(),
         tinit = 1800.0,
         tfinal = 2024.0,
     )
 
-Run the transmission model and evaluate the combined calibration likelihood.
+Run the transmission model and evaluate the negative-binomial notification
+likelihood. WHO incidence estimates enter only through the fixed annual overall
+detection fractions stored in `notification_observations`.
 """
 function calibration_loglikelihood(
     model_parameters::NamedTuple;
+    sigma_obs::Real,
     notification_observations,
-    incidence_observations,
+    relative_detection,
     age_breaks,
     fixed_parameters::NamedTuple = NamedTuple(),
     tinit::Real = 1800.0,
     tfinal::Real = 2024.0,
 )
-
-    predicted_incidence =
-        model_incidence_by_age_group(
-            model_parameters;
-            age_breaks = age_breaks,
-            fixed_parameters = fixed_parameters,
-            tinit = tinit,
-            tfinal = tfinal,
-        )
+    predicted_incidence = model_incidence_by_age_group(
+        model_parameters;
+        age_breaks = age_breaks,
+        fixed_parameters = fixed_parameters,
+        tinit = tinit,
+        tfinal = tfinal,
+    )
 
     if any(x -> !isfinite(x) || x <= 0, predicted_incidence)
         return -Inf
     end
 
-    notification_ll =
-        notification_loglikelihood(
-            predicted_incidence,
-            notification_observations,
-        )
-
-    incidence_ll =
-        incidence_loglikelihood(
-            predicted_incidence,
-            incidence_observations,
-        )
-
-    if !isfinite(notification_ll) ||
-       !isfinite(incidence_ll)
-
-        return -Inf
-    end
-
-    return notification_ll + incidence_ll
+    return notification_loglikelihood(
+        predicted_incidence,
+        notification_observations;
+        sigma_obs = sigma_obs,
+        relative_detection = relative_detection,
+    )
 end
 
 
@@ -255,7 +288,6 @@ function calibration_loss(
     model_parameters::NamedTuple;
     kwargs...,
 )
-
     return -calibration_loglikelihood(
         model_parameters;
         kwargs...,

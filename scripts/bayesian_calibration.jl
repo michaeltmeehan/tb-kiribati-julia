@@ -15,20 +15,26 @@ include("calibration_data.jl")
 
 const PRIORS = (
     beta =
-        LogNormal(log(1.0), 0.5),
+        LogNormal(log(1.0), 0.3),
 
     progression_child =
-        LogNormal(log(1.5), 0.7),
+        LogNormal(log(1.5), 0.5),
 
     progression_5_14 =
-        LogNormal(log(0.1), 0.8),
+        LogNormal(log(0.1), 0.5),
 
     progression_15_64 =
-        LogNormal(log(0.2), 0.8),
+        LogNormal(log(0.2), 0.5),
 
     progression_65_plus =
-        LogNormal(log(0.4), 0.7),
+        LogNormal(log(0.4), 0.5),
 )
+
+
+# Observation-model prior. sigma_obs controls extra-Poisson variation in the
+# NB2 likelihood, with phi = 1 / sigma_obs^2.
+const SIGMA_OBS_PRIOR =
+    truncated(Normal(0.0, 0.3), 0.0, Inf)
 
 
 # ---------------------------------------------------------------------------
@@ -50,6 +56,9 @@ const PRIORS = (
 
     progression_65_plus ~
         PRIORS.progression_65_plus
+
+    sigma_obs ~
+        SIGMA_OBS_PRIOR
 
 
     model_parameters = (
@@ -74,11 +83,14 @@ const PRIORS = (
         calibration_loglikelihood(
             model_parameters;
 
+            sigma_obs =
+                sigma_obs,
+
             notification_observations =
                 NOTIFICATION_OBSERVATIONS,
 
-            incidence_observations =
-                INCIDENCE_OBSERVATIONS,
+            relative_detection =
+                RELATIVE_DETECTION,
 
             age_breaks =
                 CALIBRATION_AGE_BREAKS,
@@ -96,7 +108,10 @@ const PRIORS = (
 
     @addlogprob! ll
 
-    return model_parameters
+    return (
+        model_parameters...,
+        sigma_obs = sigma_obs,
+    )
 end
 
 
@@ -112,11 +127,14 @@ test_parameters = (
     progression_65_plus = 0.4,
 )
 
+test_sigma_obs = 0.3
+
 ll =
     calibration_loglikelihood(
         test_parameters;
+        sigma_obs = test_sigma_obs,
         notification_observations = NOTIFICATION_OBSERVATIONS,
-        incidence_observations = INCIDENCE_OBSERVATIONS,
+        relative_detection = RELATIVE_DETECTION,
         age_breaks = CALIBRATION_AGE_BREAKS,
         fixed_parameters = FIXED_PARAMETERS,
         tinit = TINIT,
@@ -127,7 +145,8 @@ lp =
     sum(
         logpdf(prior, test_parameters[name])
         for (name, prior) in pairs(PRIORS)
-    )
+    ) +
+    logpdf(SIGMA_OBS_PRIOR, test_sigma_obs)
 
 println()
 println("Test parameter point:")
@@ -135,22 +154,27 @@ println("  log-likelihood = ", ll)
 println("  log-prior      = ", lp)
 println("  log-posterior  = ", ll + lp)
 
+test_parameters_turing = (
+    test_parameters...,
+    sigma_obs = test_sigma_obs,
+)
+
 turing_ll =
     StatsAPI.loglikelihood(
         model,
-        test_parameters,
+        test_parameters_turing,
     )
 
 turing_lp =
     DynamicPPL.logprior(
         model,
-        test_parameters,
+        test_parameters_turing,
     )
 
 turing_joint =
     DynamicPPL.logjoint(
         model,
-        test_parameters,
+        test_parameters_turing,
     )
 
 
@@ -174,7 +198,7 @@ println("  joint      = ", turing_joint - (ll + lp))
 using Random
 
 const N_WALKERS = 10
-const N_SAMPLES = 5_000
+const N_SAMPLES = 50
 
 rng = Xoshiro(1234)
 
@@ -186,8 +210,6 @@ chain = sample(
     progress = true,
 )
 
-println()
-println(chain)
 
 println()
 println("Pilot-chain summary:")

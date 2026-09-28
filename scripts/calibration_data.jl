@@ -65,14 +65,13 @@ const CALIBRATION_AGE_LABELS = [
 # Relative detection assumptions
 # ---------------------------------------------------------------------------
 
-# Only relative detection rates matter for the notification age-composition
-# likelihood.
-#
-# These are retained separately so that infant and older-child detection
-# assumptions can be modified independently if required.
+# Relative age-specific detection multipliers. These specify only the shape of
+# age-specific detection. For each year they are normalised against the model-
+# predicted age distribution so that the incidence-weighted overall detection
+# fraction exactly matches the WHO-derived value for that year.
 
 const INFANT_TO_ADULT_DETECTION_RATIO =
-    1.0
+    0.75
 
 const CHILD_TO_ADULT_DETECTION_RATIO =
     1.0
@@ -94,9 +93,9 @@ const RELATIVE_DETECTION = [
 # Calibration years
 # ---------------------------------------------------------------------------
 
-# Notification data are available from 2013 onwards. Restrict the incidence
-# likelihood to the same period so that both likelihood components describe
-# the same calibration era.
+# Notification data are available from 2013 onwards. WHO incidence data are
+# required for the same years because they provide the fixed overall detection
+# fraction used by the notification observation model.
 
 const CALIBRATION_YEARS = sort(
     intersect(
@@ -151,15 +150,44 @@ function case_count(
 end
 
 
+function overall_detection_fraction(year)
+
+    rows = INCIDENCE[
+        INCIDENCE.year .== year,
+        :,
+    ]
+
+    isempty(rows) &&
+        error("No WHO incidence data for year $year")
+
+    row = only(eachrow(rows))
+
+    incidence_rate = Float64(row.incidence_rate)
+    notification_rate = Float64(row.notification_rate)
+
+    if !isfinite(incidence_rate) || incidence_rate <= 0 ||
+       !isfinite(notification_rate) || notification_rate <= 0
+        error("Invalid WHO incidence/notification rate for year $year")
+    end
+
+    q = notification_rate / incidence_rate
+
+    if !isfinite(q) || q <= 0 || q > 1
+        error("Invalid overall detection fraction for year $year: $q")
+    end
+
+    return q
+end
+
+
 """
     build_notification_observation(year)
 
-Construct the notification observation used by the age-composition
+Construct the notification observation used by the negative-binomial count
 likelihood for one year.
 
-The returned `design` matrix maps model-predicted incidence in the eight
-calibration age groups onto the notification categories available in that
-year.
+The returned `design` matrix performs only age-category aggregation. Detection
+is applied separately before this matrix is used.
 
 Separate 0-4 and 5-14 observations are used where both are available.
 Otherwise, an observed 0-14 category is represented by a design-matrix row
@@ -225,7 +253,7 @@ function build_notification_observation(
             )
 
         row[1] =
-            INFANT_TO_ADULT_DETECTION_RATIO
+            1.0
 
         push!(
             counts,
@@ -250,7 +278,7 @@ function build_notification_observation(
             )
 
         row[2] =
-            CHILD_TO_ADULT_DETECTION_RATIO
+            1.0
 
         push!(
             counts,
@@ -277,10 +305,10 @@ function build_notification_observation(
             )
 
         row[1] =
-            INFANT_TO_ADULT_DETECTION_RATIO
+            1.0
 
         row[2] =
-            CHILD_TO_ADULT_DETECTION_RATIO
+            1.0
 
         push!(
             counts,
@@ -330,7 +358,7 @@ function build_notification_observation(
                 )
 
             row[g] =
-                RELATIVE_DETECTION[g]
+                1.0
 
             push!(
                 counts,
@@ -360,6 +388,7 @@ function build_notification_observation(
 
     return (
         year = year,
+        overall_detection = overall_detection_fraction(year),
         counts = counts,
         design = design,
         labels = labels,
@@ -377,26 +406,5 @@ const NOTIFICATION_OBSERVATIONS = [
 ]
 
 
-# ---------------------------------------------------------------------------
-# Processed WHO incidence observations
-# ---------------------------------------------------------------------------
-
-const INCIDENCE_OBSERVATIONS = [
-    (
-        year =
-            Int(row.year),
-
-        observed =
-            Float64(row.incidence_rate),
-
-        lower =
-            Float64(row.incidence_lower),
-
-        upper =
-            Float64(row.incidence_upper),
-    )
-
-    for row in eachrow(INCIDENCE)
-
-    if Int(row.year) in CALIBRATION_YEARS
-]
+# WHO incidence estimates are not separate likelihood observations. Their
+# central estimates are used only through `overall_detection_fraction(year)`.
