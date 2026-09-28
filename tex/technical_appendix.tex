@@ -1,0 +1,632 @@
+\documentclass[11pt]{article}
+\usepackage[a4paper,margin=25mm]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs,longtable,array}
+\usepackage{enumitem}
+\usepackage[hidelinks]{hyperref}
+\usepackage{microtype}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\setlength{\emergencystretch}{3em}
+
+\newcommand{\repo}{\texttt{tb-kiribati-julia}}
+\newcommand{\code}[1]{\texttt{#1}}
+\newcommand{\dd}{\mathrm{d}}
+\newcommand{\ind}{\mathbb{1}}
+
+\title{Technical Appendix: Age-structured Tuberculosis Transmission Model for Kiribati}
+\author{Methods reconstructed from the \repo\ codebase}
+\date{Code audit: 28 September 2026}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+This appendix documents the mathematical and computational methods implemented in the \repo\ Julia codebase. The description was reconstructed directly from the active package source and analysis scripts on the \code{main} branch and then cross-checked against the implementation. The model is a deterministic, age-structured tuberculosis (TB) transmission model with 96 single-year age classes, ten epidemiological states, seven cumulative event counters, annual discrete demographic updates, equilibrium and time-varying demographic regimes, and likelihood-based calibration to age-specific notifications and WHO incidence estimates. Where the implementation contains choices that are easy to overlook---for example, exclusion of infectious sources younger than 15 years from the force of infection, inclusion of relapse in the primary incidence summaries, and exact annual reconciliation to externally supplied age-specific population targets---these are stated explicitly. A final audit section records implementation inconsistencies or reproducibility issues that should be resolved before this appendix is treated as a frozen methods specification.
+\end{abstract}
+
+\tableofcontents
+\clearpage
+
+\section{Scope and code basis}
+
+The model is implemented as a Julia package, with the active package module loading \code{demography.jl}, \code{parameters.jl}, \code{model.jl}, \code{equilibrium\_demography.jl}, \code{simulation.jl}, \code{incidence.jl}, \code{summary.jl}, \code{calibration.jl}, and \code{comparison.jl}. Analysis scripts provide deterministic and Bayesian calibration workflows, prior-predictive checks, and demographic scenario comparisons. The equations below describe the code as implemented rather than an idealised or literature-standard TB model.
+
+The audit was performed against the public \code{main} branch at
+\begin{center}
+\url{https://github.com/michaeltmeehan/tb-kiribati-julia}
+\end{center}
+on 28 September 2026. Because the repository is under active development, this appendix should be versioned with the code for any eventual analysis or manuscript release.
+
+\section{Population and state space}
+
+\subsection{Age structure}
+
+The population is divided into $A=96$ age classes,
+\[
+a\in\{0,1,\ldots,95\},
+\]
+where classes $0$--$94$ correspond to one-year intervals $[a,a+1)$ and the final class represents ages $95+$.
+
+For each age class, the model tracks ten epidemiological states. We use the following notation, chosen to map one-to-one onto the code constants.
+
+\begin{longtable}{>{\raggedright\arraybackslash}p{0.15\textwidth}>{\raggedright\arraybackslash}p{0.22\textwidth}>{\raggedright\arraybackslash}p{0.53\textwidth}}
+\toprule
+Symbol & Code state & Interpretation \\
+\midrule
+$S_a$ & \code{MtbNaive} & Mycobacterium tuberculosis-naive population \\
+$K_a$ & \code{Contained} & Infection contained \\
+$C_a$ & \code{Cleared} & Cleared infection \\
+$R_a$ & \code{Recovered} & Recovered from active disease or treatment \\
+$E_a$ & \code{Incipient} & Incipient infection / pre-active state \\
+$U_a$ & \code{SubClinLow} & Subclinical, lower infectiousness \\
+$V_a$ & \code{SubClinInf} & Subclinical, higher infectiousness \\
+$D_a$ & \code{ClinLow} & Clinical disease, lower infectiousness \\
+$I_a$ & \code{ClinInf} & Clinical disease, higher infectiousness \\
+$T_a$ & \code{Treatment} & On treatment \\
+\bottomrule
+\end{longtable}
+
+The epidemiological population in age class $a$ is therefore
+\begin{equation}
+N_a=S_a+K_a+C_a+R_a+E_a+U_a+V_a+D_a+I_a+T_a.
+\label{eq:agepop}
+\end{equation}
+
+Seven additional state variables per age class accumulate event flows within each simulation year: infection of naive/cleared/recovered individuals, reinfection of contained individuals, progression to active TB, treatment initiation, treatment completion, relapse, and TB death. These counters are reset to zero at each annual demographic callback.
+
+\subsection{Initial epidemiological state}
+
+The convenience initialisation routine \code{seeded\_initial\_state} allocates, by default, 99\% of every age class to $S_a$ and 1\% to $I_a$, with all other epidemiological states zero:
+\begin{align}
+S_a(0)&=0.99N_a(0),\\
+I_a(0)&=0.01N_a(0).
+\end{align}
+This artificial seed is not intended to represent the projection start directly. The principal workflows first run a long equilibrium-demography burn-in and use its terminal state as the epidemiological initial condition for subsequent analyses.
+
+\section{Age-specific mixing and force of infection}
+
+\subsection{Contact matrix}
+
+The runtime model reads a fixed $96\times 96$ contact matrix $\mathbf{C}$ from \code{data/contact}. The force-of-infection implementation uses the orientation
+\[
+C_{aj}=\text{contact contribution from source age }j\text{ to recipient age }a.
+\]
+Existing contact regression tests compare the stored 96-age matrix to a reference expansion of a 16-band Prem-style Solomon Islands contact matrix and explicitly test this recipient--source orientation. The active runtime, however, loads the already-prepared matrix rather than reconstructing it.
+
+\subsection{Infectious prevalence by source age}
+
+Only four disease states contribute to infectiousness. Their relative infectiousness weights are
+\begin{equation}
+\mathbf{w}=(w_U,w_V,w_D,w_I),
+\end{equation}
+with default values
+\begin{equation}
+(0.2,0.5,0.4,1.0).
+\end{equation}
+
+For a source age $j\ge 15$, the weighted infectious prevalence is
+\begin{equation}
+q_j=\frac{w_UU_j+w_VV_j+w_DD_j+w_II_j}{N_j}.
+\label{eq:q}
+\end{equation}
+For source ages younger than 15 years the implementation sets
+\begin{equation}
+q_j=0,\qquad j<15,
+\label{eq:childsource}
+\end{equation}
+regardless of the numbers occupying infectious disease states. Thus children may acquire and progress through TB states but do not contribute to transmission in the current code.
+
+\subsection{Force of infection}
+
+The age-specific force of infection is
+\begin{equation}
+\lambda_a=\beta\sum_{j=0}^{95}C_{aj}q_j,
+\label{eq:foi}
+\end{equation}
+where $\beta$ is the transmission-intensity parameter.
+
+Four states are susceptible to new infection or reinfection: $S$, $K$, $C$, and $R$. Their infection flows are
+\begin{align}
+F^S_a &= \lambda_a s^S_a S_a,\\
+F^K_a &= \lambda_a s^K_a K_a,\\
+F^C_a &= \lambda_a s^C_a C_a,\\
+F^R_a &= \lambda_a s^R_a R_a.
+\end{align}
+The current parameter constructor sets
+\begin{equation}
+s^S_a=1,\qquad s^K_a=0.2,\qquad s^C_a=s^R_a=1
+\end{equation}
+for all ages. Consequently, prior containment reduces susceptibility to reinfection, whereas cleared and recovered individuals have the same susceptibility as M.~tuberculosis-naive individuals.
+
+\section{TB natural-history model}
+
+\subsection{Transition flows}
+
+To state the ODEs compactly, define the following age-specific flows. Containment, clearance, and breakdown are
+\begin{align}
+H_a &= \kappa_aE_a,\\
+G_a &= \gamma_KK_a,\\
+B_a &= \rho_KK_a.
+\end{align}
+The incipient state progresses to lower- and higher-infectiousness subclinical disease at
+\begin{align}
+P^U_a &=(1-p_I)\alpha_aE_a,\\
+P^V_a &=p_I\alpha_aE_a,
+\end{align}
+where $p_I$ is the fraction entering the higher-infectiousness subclinical state and $\alpha_a$ is age-specific progression.
+
+Subclinical-to-clinical progression and clinical-to-subclinical regression are
+\begin{align}
+Q^U_a&=\gamma_cU_a,& Q^V_a&=\gamma_cV_a,\\
+Z^D_a&=\rho_cD_a,& Z^I_a&=\rho_cI_a.
+\end{align}
+Transitions between lower and higher infectiousness are
+\begin{align}
+J^U_a&=\eta_+U_a,& J^D_a&=\eta_+D_a,\\
+J^V_a&=\eta_-V_a,& J^I_a&=\eta_-I_a.
+\end{align}
+Spontaneous recovery from subclinical disease is
+\begin{equation}
+A^U_a=\omega U_a,\qquad A^V_a=\omega V_a.
+\end{equation}
+
+Detection sends subclinical and clinical disease states to treatment at
+\begin{align}
+X^U_a&=r_{\mathrm{sub}}\delta U_a,&
+X^V_a&=r_{\mathrm{sub}}\delta V_a,\\
+X^D_a&=\delta D_a,&
+X^I_a&=\delta I_a,
+\end{align}
+where $r_{\mathrm{sub}}$ is detection in subclinical disease relative to clinical disease.
+
+Treatment exits are
+\begin{align}
+Y^R_a&=\tau_R T_a,\\
+Y^L_a&=\tau_L T_a,\\
+Y^M_a&=\tau_M T_a,
+\end{align}
+corresponding to treatment completion/recovery, relapse, and treatment-associated death. Clinical TB mortality outside treatment is
+\begin{equation}
+M^D_a=\mu_DD_a,\qquad M^I_a=\mu_II_a.
+\end{equation}
+
+\subsection{Compartmental differential equations}
+
+Between annual demographic updates, age is fixed and the epidemiological state follows
+\begin{align}
+\dot S_a &= -F^S_a,\\
+\dot K_a &= H_a-G_a-B_a-F^K_a,\\
+\dot C_a &= G_a-F^C_a,\\
+\dot R_a &= A^U_a+A^V_a+Y^R_a-F^R_a,\\
+\dot E_a &= F^S_a+F^K_a+F^C_a+F^R_a-H_a-P^U_a-P^V_a+B_a,\\
+\dot U_a &= P^U_a+Z^D_a+J^V_a+Y^L_a-Q^U_a-J^U_a-A^U_a-X^U_a,\\
+\dot V_a &= P^V_a+Z^I_a+J^U_a-Q^V_a-J^V_a-A^V_a-X^V_a,\\
+\dot D_a &= Q^U_a+J^I_a-Z^D_a-J^D_a-X^D_a-M^D_a,\\
+\dot I_a &= Q^V_a+J^D_a-Z^I_a-J^I_a-X^I_a-M^I_a,\\
+\dot T_a &= X^U_a+X^V_a+X^D_a+X^I_a-Y^R_a-Y^L_a-Y^M_a.
+\label{eq:odes}
+\end{align}
+Every term above maps directly to a flow in \code{tb\_rhs!}. In particular, relapse returns from treatment to the lower-infectiousness subclinical state $U_a$, not directly to either clinical state.
+
+\subsection{Age-dependent rates}
+
+The current parameter constructor uses two broad age bands for containment,
+\begin{equation}
+\kappa_a=\begin{cases}
+\kappa_{<15}, & a<15,\\
+\kappa_{\ge15}, & a\ge15,
+\end{cases}
+\end{equation}
+and four for progression,
+\begin{equation}
+\alpha_a=\begin{cases}
+\alpha_{0-4},&a<5,\\
+\alpha_{5-14},&5\le a<15,\\
+\alpha_{15-64},&15\le a<65,\\
+\alpha_{65+},&a\ge65.
+\end{cases}
+\label{eq:progressionage}
+\end{equation}
+
+\subsection{Treatment parameterisation}
+
+If explicit treatment-exit rates are not supplied, the total treatment exit rate is
+\begin{equation}
+\tau=\frac{1}{d_T},
+\end{equation}
+where $d_T$ is the mean treatment period. With treatment success probability $p_T$ and proportion $p_M$ of unsuccessful treatment exits assigned to death,
+\begin{align}
+\tau_R &=p_T\tau,\\
+\tau_M &=(1-p_T)p_M\tau,\\
+\tau_L &=(1-p_T)(1-p_M)\tau.
+\end{align}
+The package defaults are $d_T=0.5$ years and $p_T=0.8$. TB mortality parameters are zero by default and must be activated explicitly. The demographic comparison script currently uses $p_M=0.4$, $\mu_D=0.025$ y$^{-1}$, and $\mu_I=0.4$ y$^{-1}$.
+
+\section{Cumulative event counters and reported outcomes}
+
+For each age $a$, the code integrates seven cumulative counters between annual resets. Their derivatives are
+\begin{align}
+\dot C^{\mathrm{inf,other}}_a &=F^S_a+F^C_a+F^R_a,\\
+\dot C^{\mathrm{inf,contained}}_a &=F^K_a,\\
+\dot C^{\mathrm{prog}}_a &=P^U_a+P^V_a,\\
+\dot C^{\mathrm{tx,start}}_a &=X^U_a+X^V_a+X^D_a+X^I_a,\\
+\dot C^{\mathrm{tx,complete}}_a &=Y^R_a,\\
+\dot C^{\mathrm{relapse}}_a &=Y^L_a,\\
+\dot C^{\mathrm{death}}_a &=M^D_a+M^I_a+Y^M_a.
+\end{align}
+
+The principal annual incidence extractor defines age-specific incident TB events as
+\begin{equation}
+\mathcal I_a(t)=C^{\mathrm{prog}}_a(t^-)+C^{\mathrm{relapse}}_a(t^-),
+\label{eq:incidence}
+\end{equation}
+where $t^-$ denotes the solution immediately before the annual callback resets the counters. Thus the main simulation summaries and the calibration both count new progression to active disease plus relapse as incident TB.
+
+Annual TB deaths are
+\begin{equation}
+\mathcal D_a(t)=C^{\mathrm{death}}_a(t^-),
+\end{equation}
+which includes deaths from both clinical disease states and treatment-associated deaths.
+
+Population-normalised rates are
+\begin{align}
+I(t)&=10^5\frac{\sum_a\mathcal I_a(t)}{\sum_aN_a(t^-)},\\
+D(t)&=10^5\frac{\sum_a\mathcal D_a(t)}{\sum_aN_a(t^-)}.
+\end{align}
+
+A separate helper, \code{annual\_incidence\_per\_100k}, uses only $C^{\mathrm{prog}}$ and therefore excludes relapse. This differs from \code{simulation\_summary} and from the calibration pathway; the latter two provide the operative incidence definition for the project analyses described here.
+
+\section{Demographic model}
+
+Demographic change is not included continuously in the epidemiological ODEs. Instead, it is applied as a discrete callback once per integer year. Two demographic regimes are implemented.
+
+\subsection{Dynamic demography}
+
+The dynamic update uses preprocessed time-varying population, fertility, mortality, and migration inputs covering 1950--2100. Requests outside this interval are currently clamped to the nearest endpoint year.
+
+For age $a$, let $m_a(t)$ denote the annual mortality rate. Annual survival is implemented as
+\begin{equation}
+s_a(t)=\exp[-m_a(t)].
+\label{eq:demogsurvival}
+\end{equation}
+The same survival multiplier is applied proportionally to every epidemiological state within the age group.
+
+Fertility is defined for ages 10--54. If $f_a^{\mathrm{raw}}(t)$ is the stored fertility rate, the model applies a fixed female fraction of 0.485,
+\begin{equation}
+f_a(t)=0.485f_a^{\mathrm{raw}}(t),
+\end{equation}
+and computes newborns before the demographic mortality and migration updates as
+\begin{equation}
+B(t)=\sum_{a=0}^{95}f_a(t)N_a(t^-).
+\label{eq:births}
+\end{equation}
+
+The stored migration input is a scalar annual net flow, converted to persons by multiplication by $10^3$. After mortality, this flow is distributed proportionally across all age--epidemiological cells. If $M(t)$ is the net flow and $N^{s}(t)$ the total post-survival population, each cell is multiplied by
+\begin{equation}
+1+\frac{M(t)}{N^{s}(t)}.
+\label{eq:migration}
+\end{equation}
+This operation preserves the age and epidemiological composition immediately before ageing.
+
+Ageing is then applied discretely. Ages 1--94 receive the complete immediately younger cohort, while the 95+ class retains its existing members and also receives age 94. Age 0 is cleared and populated with $B(t)$ newborns, all assigned to $S_0$.
+
+Finally, and critically, the implementation reconciles every age class exactly to the externally supplied target population $N_a^*(t)$ for that calendar year. If $\widetilde N_a(t)$ denotes the age-class total after survival, migration, ageing, and births, each epidemiological state in age $a$ is multiplied by
+\begin{equation}
+r_a(t)=\frac{N_a^*(t)}{\widetilde N_a(t)}.
+\label{eq:reconcile}
+\end{equation}
+If an age class is empty but its target is positive, the target population is placed in the naive state. Consequently, the dynamic model reproduces the external age-specific population projection exactly at each annual update; fertility, mortality, and scalar migration determine the pre-reconciliation transition and within-age epidemiological composition, while the final age totals are imposed by $N_a^*(t)$.
+
+\subsection{Equilibrium demography}
+
+The equilibrium regime fixes the demographic target at the 2025 age distribution,
+\begin{equation}
+N_a^*=N_a^{\mathrm{WPP}}(2025).
+\end{equation}
+Age-specific 2025 mortality rates are converted to annual survival using Eq.~\eqref{eq:demogsurvival}. The age-0 target population is used directly as the annual newborn count. A balancing migration vector is precomputed so that, after survival and ageing, each age class can be restored to the 2025 target. For ages 1--94,
+\begin{equation}
+M_a^*=N_a^*-s_{a-1}N_{a-1}^*,
+\end{equation}
+and for the open 95+ class,
+\begin{equation}
+M_{95+}^*=N_{95+}^*-s_{95+}N_{95+}^*-s_{94}N_{94}^*.
+\end{equation}
+The balancing flow is applied proportionally within each age class, newborns are placed in $S_0$, and the same final age-specific reconciliation in Eq.~\eqref{eq:reconcile} restores the 2025 target exactly.
+
+This regime is therefore a discrete annual demographic operator that preserves a fixed 2025 age structure, rather than a continuous demographic equilibrium derived solely from fertility and mortality rates.
+
+\subsection{Annual callback order}
+
+For either demographic regime, the annual callback executes in the order
+\begin{enumerate}[label=(\roman*)]
+\item apply the selected demographic update; then
+\item reset all cumulative event counters to zero.
+\end{enumerate}
+Annual incidence and death outputs are deliberately evaluated at the left limit $t^-$, so they represent events accumulated during the preceding simulation year before the reset.
+
+\section{Numerical solution}
+
+The continuous epidemiological dynamics are constructed as an \code{ODEProblem} and solved using \code{Vern7()} by default. The demographic changes are implemented with \code{PresetTimeCallback} at integer years. Unless explicitly supplied, callback times begin at the first integer year strictly after the start of the simulation and continue through the final integer year.
+
+The core calibration simulations run from 1800 to 2024 under equilibrium demography, with yearly output, and use only the final annual incidence vector after the long burn-in. The demographic comparison uses a common equilibrium-demography burn-in from 1800 to 2025, followed by paired projections from 2025 to 2100.
+
+\section{Calibration targets and model prediction}
+
+\subsection{Parameters varied in calibration}
+
+The current calibration varies five parameters,
+\begin{equation}
+\theta=(\beta,\alpha_{0-4},\alpha_{5-14},\alpha_{15-64},\alpha_{65+}).
+\end{equation}
+The infectiousness weights are fixed at $(0.2,0.5,0.4,1.0)$. All other parameters take the defaults from \code{make\_parameters}; in particular, TB mortality is zero in the calibration unless explicitly changed outside the audited scripts.
+
+The model is run under equilibrium demography from 1800 to 2024. Let
+\begin{equation}
+\mathbf z(\theta)=(z_1,\ldots,z_8)
+\end{equation}
+denote the final model-predicted annual incident case counts aggregated into
+\[
+0\!\! -\!\!4,\ 5\!\! -\!\!14,\ 15\!\! -\!\!24,\ 25\!\! -\!\!34,\ 35\!\! -\!\!44,\ 45\!\! -\!\!54,\ 55\!\! -\!\!64,\ 65+.
+\]
+Because \code{raw\_annual\_incidence\_by\_age} is used, $\mathbf z$ includes both first progression to active TB and relapse as defined in Eq.~\eqref{eq:incidence}.
+
+The corresponding total rate is
+\begin{equation}
+r(\theta)=10^5\frac{\sum_g z_g(\theta)}{\sum_aN_a^{2025}}.
+\label{eq:modelrate}
+\end{equation}
+The 2025 equilibrium population is used as the denominator even though the terminal calibration time is 2024; under the equilibrium demographic regime this is also the imposed age structure throughout the burn-in.
+
+\subsection{Calibration years}
+
+Calibration years are the sorted intersection of years available in the age-specific notification data and the WHO incidence data. The code comments identify the notification series as beginning in 2013, and the WHO incidence likelihood is intentionally restricted to the same era. The equilibrium model prediction $\mathbf z(\theta)$ and $r(\theta)$ are common across all these years; observed years are therefore treated as repeated observations of a single equilibrium process rather than as a time-varying epidemic trajectory.
+
+\section{Notification age-composition likelihood}
+
+The notification likelihood uses annual case counts to constrain the age distribution of true incidence, not its absolute scale.
+
+For year $t$, let $\mathbf y_t=(y_{t1},\ldots,y_{tK_t})$ be the observed counts in the available notification categories and let $\mathbf D_t$ be the design matrix that maps the eight model age groups onto those categories. Separate 0--4 and 5--14 rows are used when both are available; otherwise a single 0--14 row combines the first two model groups. Adult age groups are mapped directly when observed.
+
+Relative detection multipliers enter through the design matrix. The current code sets both the 0--4-to-adult and 5--14-to-adult detection ratios to 1, with all adult ratios also 1. Thus, at present, relative notification weights reduce to the model-predicted age-specific incidence counts (apart from category aggregation).
+
+Define
+\begin{align}
+\mathbf w_t(\theta)&=\mathbf D_t\mathbf z(\theta),\\
+p_{tk}(\theta)&=\frac{w_{tk}(\theta)}{\sum_jw_{tj}(\theta)}.
+\end{align}
+Conditional on the observed annual total $n_t=\sum_ky_{tk}$,
+\begin{equation}
+\mathbf y_t\mid n_t,\theta\sim\operatorname{Multinomial}\left(n_t,\mathbf p_t(\theta)\right).
+\label{eq:notiflike}
+\end{equation}
+The log-likelihood contribution is summed independently across calibration years,
+\begin{equation}
+\ell_{\mathrm{notif}}(\theta)=\sum_t\log \Pr\{\mathbf y_t\mid n_t,\mathbf p_t(\theta)\}.
+\end{equation}
+Any non-finite or non-positive expected category weight causes the likelihood to return $-\infty$.
+
+Because the probabilities are normalised, an unknown common absolute detection probability cancels from Eq.~\eqref{eq:notiflike}. The incidence level is instead constrained by the WHO likelihood below.
+
+\section{WHO incidence likelihood}
+
+For each calibration year $t$, the WHO input provides a central incidence estimate $y_t^{\mathrm{WHO}}$ and lower and upper uncertainty bounds $(L_t,U_t)$. The code converts the width of the reported interval to a log-scale standard deviation
+\begin{equation}
+\sigma_t=\frac{\log U_t-\log L_t}{2\times1.96}.
+\label{eq:whosigma}
+\end{equation}
+It then treats the observed WHO central estimate as a draw from a log-normal distribution whose median is the model-predicted equilibrium rate,
+\begin{equation}
+y_t^{\mathrm{WHO}}\mid\theta\sim
+\operatorname{LogNormal}\left(\log r(\theta),\sigma_t\right).
+\label{eq:wholike}
+\end{equation}
+The resulting contribution is
+\begin{equation}
+\ell_{\mathrm{WHO}}(\theta)=\sum_t
+\log f_{\mathrm{LN}}\!\left(y_t^{\mathrm{WHO}};\log r(\theta),\sigma_t\right).
+\end{equation}
+Observations with non-positive central estimates or interval bounds are skipped.
+
+The combined calibration log-likelihood is simply
+\begin{equation}
+\ell(\theta)=\ell_{\mathrm{notif}}(\theta)+\ell_{\mathrm{WHO}}(\theta).
+\label{eq:combinedlike}
+\end{equation}
+This construction treats annual WHO estimates as conditionally independent repeated measurements of a common equilibrium incidence rate. It does not model temporal correlation in the WHO estimates, temporal variation in detection, or non-equilibrium TB dynamics during the calibration period.
+
+\section{Deterministic maximum-likelihood calibration}
+
+The deterministic calibration script minimises $-\ell(\theta)$ using \code{Optim.jl} with a box-constrained Nelder--Mead search, \code{Fminbox(NelderMead())}, with at most 500 iterations. The audited starting values and bounds are
+
+\begin{center}
+\begin{tabular}{lrrr}
+\toprule
+Parameter & Start & Lower & Upper\\
+\midrule
+$\beta$ & 0.75 & 0.01 & 5.0\\
+$\alpha_{0-4}$ & 2.4 & 0.01 & 10.0\\
+$\alpha_{5-14}$ & 0.05 & 0.01 & 10.0\\
+$\alpha_{15-64}$ & 0.10 & 0.01 & 10.0\\
+$\alpha_{65+}$ & 2.4 & 0.01 & 10.0\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+After fitting, the script calculates implied absolute detection probabilities from the WHO-provided overall detection fraction and the assumed relative age-specific detection ratios. These quantities are diagnostic/post-processing calculations and are not parameters in the likelihood.
+
+\section{Bayesian calibration}
+
+\subsection{Prior specification}
+
+The current \code{bayesian\_calibration.jl} script assigns independent log-normal priors,
+\begin{align}
+\beta &\sim \operatorname{LogNormal}(\log 1.0,0.5),\\
+\alpha_{0-4} &\sim \operatorname{LogNormal}(\log 1.5,0.7),\\
+\alpha_{5-14} &\sim \operatorname{LogNormal}(\log 0.1,0.8),\\
+\alpha_{15-64} &\sim \operatorname{LogNormal}(\log 0.2,0.8),\\
+\alpha_{65+} &\sim \operatorname{LogNormal}(\log 0.4,0.7).
+\label{eq:priors}
+\end{align}
+Here the first argument is the mean of the natural logarithm, so the quantities $1.0$, $1.5$, $0.1$, $0.2$, and $0.4$ are prior medians.
+
+The posterior is
+\begin{equation}
+p(\theta\mid\mathcal D)\propto
+\exp\{\ell(\theta)\}\prod_kp(\theta_k),
+\end{equation}
+using exactly the combined likelihood in Eq.~\eqref{eq:combinedlike}. The script explicitly checks the standalone log-likelihood and prior calculation against the corresponding Turing/DynamicPPL evaluations at a test parameter point before sampling.
+
+\subsection{MCMC implementation}
+
+The current pilot sampler uses Turing's ensemble sampler interface,
+\begin{equation}
+\code{Emcee(10)},
+\end{equation}
+with 10 walkers and 5,000 samples, using an \code{Xoshiro(1234)} random-number generator. No burn-in removal, thinning, convergence threshold, posterior predictive simulation, or final inferential summary is imposed by the script itself; those remain analysis decisions outside this pilot sampler.
+
+\section{Prior-predictive analysis}
+
+The repository also contains a prior-predictive script that draws parameter sets independently from log-normal priors, simulates the equilibrium model, and summarises total and age-specific incidence. It performs 500 draws with a fixed random seed, records failed simulations, calculates quantiles, computes Spearman rank correlations between parameters and outputs, and compares the prior-predictive total incidence distribution against the envelope of WHO incidence uncertainty intervals.
+
+The script additionally computes relative notification proportions by weighting predicted age-specific incident counts by relative detection multipliers and normalising them. In the audited version all detection multipliers are 1.
+
+A material implementation discrepancy is that the priors in \code{prior\_predictive.jl} are not currently identical to those in \code{bayesian\_calibration.jl}: the former uses prior medians 2.4 for $\alpha_{0-4}$ and 0.05 for $\alpha_{5-14}$, whereas the Bayesian calibration uses 1.5 and 0.1, respectively. Therefore the existing prior-predictive results are not a prior-predictive check of the exact current Bayesian model unless these scripts are synchronised.
+
+\section{Demographic scenario comparison}
+
+The principal demographic experiment first simulates a common burn-in under equilibrium demography,
+\begin{equation}
+1800\longrightarrow 2025,
+\end{equation}
+and copies the terminal state. Two projections then start from that identical state:
+\begin{enumerate}[label=(\alph*)]
+\item equilibrium demography, which retains the 2025 age structure; and
+\item dynamic demography, which reconciles the population annually to the time-varying demographic projection.
+\end{enumerate}
+Both projections run from 2025 to 2100 with unchanged epidemiological parameters.
+
+For any outcome rate $R(t)$, the comparison helper reports the dynamic-to-equilibrium ratio
+\begin{equation}
+\mathcal R_R(t)=\frac{R_{\mathrm{dynamic}}(t)}{R_{\mathrm{equilibrium}}(t)},
+\end{equation}
+the relative percentage difference
+\begin{equation}
+100\{\mathcal R_R(t)-1\},
+\end{equation}
+and the log ratio $\log\mathcal R_R(t)$. These are implemented for incidence and mortality per 100,000.
+
+The current demonstration script uses
+\[
+\beta=1.1,\quad
+(\alpha_{0-4},\alpha_{5-14},\alpha_{15-64},\alpha_{65+})=(0.5,0.3,0.15,0.3),
+\]
+with infectiousness weights $(0.2,0.5,0.4,1.0)$ and TB mortality activated with the values stated above. These are analysis-script values, not package defaults and not automatically linked to the Bayesian posterior.
+
+\section{Demographic summary measures}
+
+For each annual population vector, the code defines median age as the first integer age $a$ for which the cumulative population reaches at least one half of the total. The proportion younger than 5 is
+\begin{equation}
+\frac{\sum_{a=0}^{4}N_a}{\sum_{a=0}^{95}N_a},
+\end{equation}
+and the proportion aged 65+ is
+\begin{equation}
+\frac{\sum_{a=65}^{95}N_a}{\sum_{a=0}^{95}N_a}.
+\end{equation}
+
+\section{Parameter defaults in the active constructor}
+
+Table~\ref{tab:defaults} records defaults that materially determine model behaviour. Calibration and analysis scripts may override them.
+
+\begin{longtable}{>{\raggedright\arraybackslash}p{0.36\textwidth}rr>{\raggedright\arraybackslash}p{0.33\textwidth}}
+\caption{Selected defaults in \code{make\_parameters}.}\label{tab:defaults}\\
+\toprule
+Parameter & Default & Units & Role\\
+\midrule
+\endfirsthead
+\toprule
+Parameter & Default & Units & Role\\
+\midrule
+\endhead
+$\beta$ & 0.001 & scale & transmission intensity\\
+$\kappa_{<15}$ & 4.4 & y$^{-1}$ & incipient containment, age $<15$\\
+$\kappa_{\ge15}$ & 2.0 & y$^{-1}$ & incipient containment, age $\ge15$\\
+$\gamma_K$ & 0.02 & y$^{-1}$ & contained $\to$ cleared\\
+$\rho_K$ & 0.1 & y$^{-1}$ & contained $\to$ incipient\\
+$p_I$ & 0.5 & proportion & share of progression entering $V$\\
+$\alpha_{0-4}$ & 2.4 & y$^{-1}$ & progression\\
+$\alpha_{5-14}$ & 2.0 & y$^{-1}$ & progression\\
+$\alpha_{15-64}$ & 0.1 & y$^{-1}$ & progression\\
+$\alpha_{65+}$ & 2.4 & y$^{-1}$ & progression\\
+$\gamma_c$ & 1.0 & y$^{-1}$ & subclinical $\to$ clinical\\
+$\rho_c$ & 1.0 & y$^{-1}$ & clinical $\to$ subclinical\\
+$\eta_+$ & 1.0 & y$^{-1}$ & gain higher infectiousness\\
+$\eta_-$ & 1.0 & y$^{-1}$ & lose higher infectiousness\\
+$\omega$ & 0.4 & y$^{-1}$ & spontaneous subclinical recovery\\
+$\delta$ & 1.0 & y$^{-1}$ & clinical detection\\
+$r_{\mathrm{sub}}$ & 0.0 & relative & subclinical detection multiplier\\
+$d_T$ & 0.5 & y & treatment period\\
+$p_T$ & 0.8 & proportion & treatment success\\
+$p_M$ & 0.0 & proportion & death share among unsuccessful treatment exits\\
+$\mu_D$ & 0.0 & y$^{-1}$ & mortality in clinical low-infectiousness state\\
+$\mu_I$ & 0.0 & y$^{-1}$ & mortality in clinical high-infectiousness state\\
+\bottomrule
+\end{longtable}
+
+\section{Code-to-method crosswalk}
+
+\begin{longtable}{>{\raggedright\arraybackslash}p{0.27\textwidth}>{\raggedright\arraybackslash}p{0.30\textwidth}>{\raggedright\arraybackslash}p{0.34\textwidth}}
+\toprule
+Method component & Primary implementation & Cross-check target\\
+\midrule
+State encoding & \code{src/model.jl} & 10 epidemiological + 7 cumulative states\\
+Force of infection & \code{compute\_force\_of\_infection!} & Eqs.~\eqref{eq:q}--\eqref{eq:foi}; child source infectiousness zero\\
+Natural-history ODEs & \code{tb\_rhs!} & Eq.~\eqref{eq:odes} and all transition-flow definitions\\
+Parameter construction & \code{src/parameters.jl} & age bands, susceptibilities, treatment rates, defaults\\
+Dynamic demography & \code{\_apply\_demography!} & Eqs.~\eqref{eq:demogsurvival}--\eqref{eq:reconcile}\\
+Equilibrium demography & \code{\_apply\_equilibrium\_demography!} & fixed 2025 target, balancing migration, reconciliation\\
+Annual timing & \code{make\_annual\_callback}, \code{simulate} & discrete annual update and counter reset\\
+Incidence/deaths & \code{src/incidence.jl}, \code{src/summary.jl} & left-limit counters; Eq.~\eqref{eq:incidence}\\
+Calibration prediction & \code{model\_incidence\_by\_age\_group} & final equilibrium annual incidence vector\\
+Notification likelihood & \code{notification\_loglikelihood} & Eq.~\eqref{eq:notiflike}\\
+WHO likelihood & \code{incidence\_loglikelihood} & Eqs.~\eqref{eq:whosigma}--\eqref{eq:wholike}\\
+Combined likelihood & \code{calibration\_loglikelihood} & Eq.~\eqref{eq:combinedlike}\\
+Maximum likelihood & \code{scripts/calibration\_reported\_cases.jl} & box-constrained Nelder--Mead\\
+Bayesian calibration & \code{scripts/bayesian\_calibration.jl} & Eq.~\eqref{eq:priors}; Turing + Emcee\\
+Prior predictive checks & \code{scripts/prior\_predictive.jl} & 500 prior draws; incidence and age-composition summaries\\
+Demographic comparison & \code{src/comparison.jl}, \code{scripts/compare\_demography.jl} & common burn-in and paired projections\\
+\bottomrule
+\end{longtable}
+
+\section{Audit findings requiring attention before a frozen release}
+\label{sec:audit}
+
+The following points are not reinterpretations of the model; they are discrepancies or implementation details identified while cross-checking the methods against the current repository.
+
+\begin{enumerate}[leftmargin=*,label=\textbf{A\arabic*.}]
+\item \textbf{Prior-predictive priors differ from the current Bayesian priors.} As noted above, \code{prior\_predictive.jl} uses medians 2.4 and 0.05 for $\alpha_{0-4}$ and $\alpha_{5-14}$, whereas \code{bayesian\_calibration.jl} uses 1.5 and 0.1. The scripts should share one prior definition before posterior results are interpreted alongside the existing prior-predictive diagnostics.
+
+\item \textbf{Incidence has two code definitions.} \code{raw\_annual\_incidence\_by\_age} and therefore \code{simulation\_summary} and calibration include progression plus relapse. \code{annual\_incidence\_per\_100k} includes progression only. The project should retain one explicit scientific definition or rename the latter helper to avoid accidental inconsistency.
+
+\item \textbf{The Bayesian script dependencies are not declared in the audited \code{Project.toml}.} The script imports Turing, DynamicPPL, StatsAPI, and FlexiChains, whereas these packages are absent from the project dependency list. A clean environment created solely from \code{Project.toml} is therefore not sufficient to reproduce the Bayesian workflow as written.
+
+\item \textbf{The automated tests appear out of synchrony with the active package interface.} For example, current tests pass a \code{demography} keyword into \code{make\_parameters} and refer to demographic fields/types that are absent from the current \code{TBParams} definition. The active package should be tested after the test suite is reconciled with the discrete-callback demographic architecture.
+
+\item \textbf{The \code{ageing\_enabled} field is currently inert in the active simulation pathway.} It is stored in \code{TBParams}, but ageing is controlled by the selected demographic callback rather than this flag. Retaining the field may imply configurability that the current implementation does not use.
+
+\item \textbf{Calibration assumes zero TB mortality unless explicitly overridden.} Neither the deterministic nor current Bayesian calibration fixed-parameter tuple activates treatment-associated or clinical TB mortality, so the default zero values apply. The demographic comparison script, by contrast, turns TB mortality on. This may be intentional, but it should be made an explicit modelling decision if calibrated parameters are carried into mortality-enabled projections.
+
+\item \textbf{The dynamic demographic inputs are followed by exact population reconciliation.} Consequently, annual age-specific population totals are ultimately imposed by the supplied population projection. Fertility, mortality, and migration are not free-running determinants of the population trajectory. This is scientifically defensible for a projection-driven demographic scenario but should be described as such, as done in this appendix.
+
+\item \textbf{The calibration is equilibrium and time-invariant.} All calibration years share the same model prediction. Multiple years contribute repeated likelihood terms rather than representing a simulated time series. This is a strong assumption and is the principal reason the present likelihood cannot reproduce non-monotonic year-to-year WHO incidence estimates.
+
+\item \textbf{README calibration text lags the current code.} The README still characterises explicit uncertainty propagation through the calibration likelihood as a future refinement, whereas the active calibration code already uses WHO uncertainty intervals to construct the log-normal likelihood and contains a Bayesian calibration script.
+\end{enumerate}
+
+\section{Interpretive summary}
+
+The active implementation is best characterised as a hybrid continuous--discrete model. TB natural history and transmission evolve continuously within years according to the ODE system in Eq.~\eqref{eq:odes}; demographic ageing and population projection are imposed annually through discrete callbacks. The equilibrium regime provides a fixed-2025-age-structure reference and burn-in environment, while the dynamic regime forces the model age distribution to follow the external demographic projection. Calibration currently estimates transmission intensity and four age-specific progression rates from a likelihood that combines notification age composition with WHO total incidence, under the assumption that the calibration period represents repeated observations of one equilibrium process. The Bayesian implementation places positive log-normal priors on those five parameters and samples the same likelihood with an ensemble MCMC method.
+
+The equations in this document have been checked term-by-term against the active source files listed in the code-to-method crosswalk. Section~\ref{sec:audit} should be resolved or consciously accepted before the document is treated as a definitive frozen appendix for publication.
+
+\end{document}

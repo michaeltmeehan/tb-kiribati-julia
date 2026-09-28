@@ -188,3 +188,7 @@ chain = sample(
 
 println()
 println(chain)
+
+println()
+println("Pilot-chain summary:")
+summarystats(chain)
