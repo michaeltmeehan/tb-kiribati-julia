@@ -198,7 +198,7 @@ println("  joint      = ", turing_joint - (ll + lp))
 using Random
 
 const N_WALKERS = 10
-const N_SAMPLES = 50
+const N_SAMPLES = 500
 
 rng = Xoshiro(1234)
 

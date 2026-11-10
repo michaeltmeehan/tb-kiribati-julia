@@ -1,4 +1,5 @@
 using Distributions
+using LinearAlgebra: eigen, SymTridiagonal
 
 
 # ---------------------------------------------------------------------------
@@ -183,6 +184,86 @@ function negative_binomial_mu_phi(
 end
 
 
+
+# ---------------------------------------------------------------------------
+# Quadrature for shared annual random effects
+# ---------------------------------------------------------------------------
+
+"""
+    normal_quadrature(n)
+
+Return nodes and weights for n-point Gauss-Hermite integration
+with respect to the standard normal distribution.
+
+The weights sum to one.
+"""
+function normal_quadrature(n::Integer)
+    n >= 1 || throw(ArgumentError("n must be positive"))
+
+    # Golub-Welsch algorithm for standard-normal quadrature.
+    offdiag = sqrt.(Float64.(1:n-1))
+    E = eigen(SymTridiagonal(zeros(n), offdiag))
+
+    nodes = E.values
+    weights = E.vectors[1, :].^2
+
+    return nodes, weights
+end
+
+
+# Stable log(sum(exp(x))) calculation.
+function calibration_logsumexp(x)
+    m = maximum(x)
+    isfinite(m) || return m
+    return m + log(sum(exp(v - m) for v in x))
+end
+
+
+"""
+    annual_random_effect_loglikelihood(
+        observed, expected, phi, tau_year, nodes, weights
+    )
+
+Marginal log-likelihood for one year's age-specific counts,
+integrating over a shared normal annual random effect.
+
+The lognormal multiplier is centred to have expectation one.
+"""
+function annual_random_effect_loglikelihood(
+    observed,
+    expected,
+    phi,
+    tau_year,
+    nodes,
+    weights,
+)
+    contributions = Vector{Float64}(undef, length(nodes))
+
+    for k in eachindex(nodes)
+
+        multiplier = exp(
+            tau_year * nodes[k] - tau_year^2 / 2
+        )
+
+        ll = 0.0
+
+        for (y, mu) in zip(observed, expected)
+            dist = negative_binomial_mu_phi(
+                mu * multiplier, phi
+            )
+
+            isnothing(dist) && return -Inf
+            ll += logpdf(dist, y)
+        end
+
+        contributions[k] = log(weights[k]) + ll
+    end
+
+    return calibration_logsumexp(contributions)
+end
+
+
+
 """
     notification_loglikelihood(
         predicted_incidence,
@@ -195,20 +276,32 @@ Evaluate the negative-binomial likelihood for observed age-specific
 notification counts. `sigma_obs` is the extra-Poisson coefficient of variation
 parameter, with `phi = 1 / sigma_obs^2`.
 """
+
 function notification_loglikelihood(
     predicted_incidence,
     notification_observations;
     sigma_obs::Real,
     relative_detection,
+    tau_year::Real = 0.0,
+    quadrature_order::Int = 30,
 )
-    if !isfinite(sigma_obs) || sigma_obs <= 0
+    if !isfinite(sigma_obs) || sigma_obs <= 0 ||
+       !isfinite(tau_year) || tau_year < 0
         return -Inf
     end
 
     phi = inv(sigma_obs^2)
     loglik = 0.0
 
+    # Only construct quadrature when the annual effect is active.
+    nodes, weights = if tau_year > 0
+        normal_quadrature(quadrature_order)
+    else
+        (nothing, nothing)
+    end
+
     for observation in notification_observations
+
         expected = expected_notification_counts(
             predicted_incidence,
             observation;
@@ -217,15 +310,37 @@ function notification_loglikelihood(
 
         isnothing(expected) && return -Inf
 
-        for (observed, mu) in zip(observation.counts, expected)
-            dist = negative_binomial_mu_phi(mu, phi)
-            isnothing(dist) && return -Inf
-            loglik += logpdf(dist, observed)
+        if tau_year == 0.0
+
+            # Original likelihood: preserve existing behaviour.
+            for (observed, mu) in zip(
+                observation.counts, expected
+            )
+                dist = negative_binomial_mu_phi(mu, phi)
+                isnothing(dist) && return -Inf
+
+                loglik += logpdf(dist, observed)
+            end
+
+        else
+
+            # Extended likelihood: integrate the common
+            # annual effect jointly across all age groups.
+            loglik += annual_random_effect_loglikelihood(
+                observation.counts,
+                expected,
+                phi,
+                tau_year,
+                nodes,
+                weights,
+            )
+
         end
     end
 
     return loglik
 end
+
 
 
 # ---------------------------------------------------------------------------
@@ -248,6 +363,7 @@ Run the transmission model and evaluate the negative-binomial notification
 likelihood. WHO incidence estimates enter only through the fixed annual overall
 detection fractions stored in `notification_observations`.
 """
+
 function calibration_loglikelihood(
     model_parameters::NamedTuple;
     sigma_obs::Real,
@@ -257,6 +373,8 @@ function calibration_loglikelihood(
     fixed_parameters::NamedTuple = NamedTuple(),
     tinit::Real = 1800.0,
     tfinal::Real = 2024.0,
+    tau_year::Real = 0.0,
+    quadrature_order::Int = 30,
 )
     predicted_incidence = model_incidence_by_age_group(
         model_parameters;
@@ -275,8 +393,11 @@ function calibration_loglikelihood(
         notification_observations;
         sigma_obs = sigma_obs,
         relative_detection = relative_detection,
+        tau_year = tau_year,
+        quadrature_order = quadrature_order,
     )
 end
+
 
 
 """

@@ -25,5 +25,6 @@ export simulation_summary
 export with_tb_mortality
 export run_demography_comparison, comparison_summary
 export model_incidence_by_age_group, model_total_incidence_rate, notification_loglikelihood, incidence_loglikelihood, calibration_loglikelihood, calibration_loss
+export age_specific_detection, expected_notification_counts
 
 end # module
