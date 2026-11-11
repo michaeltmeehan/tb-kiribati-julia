@@ -18,8 +18,8 @@ function DoddDetection(;
     0 < K < 1 ||
         throw(ArgumentError("K must lie in (0, 1)"))
 
-    0 < maximum <= 1 ||
-        throw(ArgumentError("maximum must lie in (0, 1]"))
+    0 < maximum < 1 ||
+        throw(ArgumentError("maximum must lie in (0, 1)"))
 
     return DoddDetection(
         Float64(K),

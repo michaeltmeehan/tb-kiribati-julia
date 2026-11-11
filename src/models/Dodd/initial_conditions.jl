@@ -87,7 +87,7 @@ function initial_state(
     population::AbstractVector,
     Λ0::Real,
     params::DoddTBParameters;
-    year::Real = 2023,
+    year::Real,
 )
     weights = population ./ sum(population)
 

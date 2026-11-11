@@ -18,6 +18,7 @@ include("models/dodd/model.jl")
 include("models/dodd/parameters.jl")
 include("models/dodd/dynamics.jl")
 include("models/dodd/initial_conditions.jl")
+include("models/dodd/priors.jl")
 
 include("simulation/simulate.jl")
 include("simulation/equilibrium.jl")
@@ -38,6 +39,7 @@ export DemographicData,
        ProjectedDemography,
        target_population
 export DoddTBModel, DoddTBParameters, DoddDetection
+export dodd_priors
 export make_parameters, initial_state, simulate
 export equilibrate
 
