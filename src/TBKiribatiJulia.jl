@@ -1,30 +1,44 @@
 module TBKiribatiJulia
 
-const DATA_DIR = normpath(joinpath(@__DIR__, "..", "data"))
+using LinearAlgebra
+using DifferentialEquations
 
-data_path(filename) = joinpath(DATA_DIR, filename)
+include("data/contacts.jl")
 
-include("demography.jl")
-include("parameters.jl")
-include("model.jl")
-include("equilibrium_demography.jl")
-include("simulation.jl")
-include("incidence.jl")
-include("summary.jl")
-include("calibration.jl")
-include("comparison.jl")
+include("models/abstract.jl")
 
-export fertility_rate, mortality_rate, migration_flow
-export get_population, seeded_initial_state, _apply_demography!, apply_demography!, get_age_distribution, aggregate_age_bands
-export tb_rhs!
-export _apply_equilibrium_demography!
-export CONTACT, EQUILIBRIUM_YEAR
-export reset_cumulative_counters!, make_annual_callback, simulate
-export raw_annual_incidence_by_age, raw_annual_deaths_by_age, annual_incidence_per_100k, aggregate_age_groups, median_age, demographic_summary
-export simulation_summary
-export with_tb_mortality
-export run_demography_comparison, comparison_summary
-export model_incidence_by_age_group, model_total_incidence_rate, notification_loglikelihood, incidence_loglikelihood, calibration_loglikelihood, calibration_loss
-export age_specific_detection, expected_notification_counts
+include("demography/data.jl")
+include("demography/operators.jl")
+include("demography/equilibrium.jl")
+include("demography/projected.jl")
 
-end # module
+include("simulation/context.jl")
+
+include("models/dodd/model.jl")
+include("models/dodd/parameters.jl")
+include("models/dodd/dynamics.jl")
+include("models/dodd/initial_conditions.jl")
+
+include("simulation/simulate.jl")
+include("simulation/equilibrium.jl")
+
+export load_contact_matrix,
+       validate_contact_matrix,
+       aggregate_contact_matrix
+export AbstractTBModel
+export StateLayout, state_layout, nstates, state_index
+export DemographicData,
+       load_demographic_data,
+       get_population,
+       fertility_rate,
+       mortality_rate,
+       migration_flow,
+       EquilibriumDemography,
+       apply_demography!,
+       ProjectedDemography,
+       target_population
+export DoddTBModel, DoddTBParameters, DoddDetection
+export make_parameters, initial_state, simulate
+export equilibrate
+
+end
