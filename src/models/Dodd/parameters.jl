@@ -12,8 +12,8 @@ end
 function DoddDetection(;
     K::Real,
     trend::Real,
-    reference_year::Real = 1970.0,
-    maximum::Real = 0.9,
+    reference_year::Real=1970.0,
+    maximum::Real=0.9,
 )
     0 < K < 1 ||
         throw(ArgumentError("K must lie in (0, 1)"))
@@ -49,6 +49,7 @@ end
 # ------------------------------------------------------------
 
 struct DoddTBParameters
+    Lambda0::Float64
     beta::Float64
     psi::Float64
     kappa::Float64
@@ -74,6 +75,7 @@ end
 
 function make_parameters(
     model::DoddTBModel;
+    Lambda0::Real,
     beta::Real,
     psi::Real,
     kappa::Real,
@@ -83,7 +85,7 @@ function make_parameters(
     duration::AbstractVector,
     fatality::AbstractVector,
     relative_detection::AbstractVector,
-    treatment_rate::Real = 2.0,
+    treatment_rate::Real=2.0,
     treatment_cfr::Real,
     detection::DoddDetection,
 )
@@ -110,7 +112,7 @@ function make_parameters(
         throw(ArgumentError("Fatality proportions must lie in [0, 1]"))
 
     all(x -> isfinite(x) && x >= 0,
-        (beta, psi, kappa, treatment_rate)) ||
+        (Lambda0, beta, psi, kappa, treatment_rate)) ||
         throw(ArgumentError("Rates and multipliers must be nonnegative"))
 
     0 <= treatment_cfr <= 1 ||
@@ -129,6 +131,7 @@ function make_parameters(
     detection_multiplier = Float64.(relative_detection) ./ D
 
     return DoddTBParameters(
+        Float64(Lambda0),
         Float64(beta),
         Float64(psi),
         Float64(kappa),
@@ -143,6 +146,109 @@ function make_parameters(
         detection,
     )
 end
+
+
+
+"""
+    make_parameters(model::DoddTBModel, draw::NamedTuple)
+
+Convert a draw of the Dodd model's free parameters into
+the complete age-specific parameter structure.
+
+The input parameters follow the naming conventions
+established in priors(model).
+
+Age-specific modifications follow Dodd et al. (2023),
+Supplementary Methods, and the original implementation.
+"""
+function make_parameters(
+    model::DoddTBModel,
+    draw::NamedTuple,
+)
+    nages = state_layout(model).nages
+
+    # --------------------------------------------------------
+    # Age-specific progression rates
+    # --------------------------------------------------------
+
+    epsilon = [
+        age < 5 ? draw.epsilon_child : draw.epsilon
+        for age in 0:(nages-1)
+    ]
+
+    nu = fill(draw.nu, nages)
+    omega = fill(draw.omega, nages)
+
+    # --------------------------------------------------------
+    # Untreated disease duration
+    # --------------------------------------------------------
+
+    # Dodd assumes a six-month untreated duration
+    # for children younger than 15 years.
+
+    duration = [
+        age < 15 ? 0.5 : draw.duration
+        for age in 0:(nages-1)
+    ]
+
+    fatality = fill(draw.untreated_cfr, nages)
+
+    # --------------------------------------------------------
+    # Age-specific detection odds ratios
+    # --------------------------------------------------------
+
+    relative_detection = [
+        age < 5 ? draw.detection_or_0_4 :
+        age < 15 ? draw.detection_or_5_14 :
+        1.0
+        for age in 0:(nages-1)
+    ]
+
+    # --------------------------------------------------------
+    # Detection trajectory
+    # --------------------------------------------------------
+
+    # Convert the sampled logit-scale parameter into
+    # the logistic-scale K expected by DoddDetection.
+
+    z = draw.detection_logitK
+
+    K = if z >= 0
+        inv(1 + exp(-z))
+    else
+        ez = exp(z)
+        ez / (1 + ez)
+    end
+
+    detection = DoddDetection(
+        K=K,
+        trend=draw.detection_trend,
+        reference_year=1970.0,
+        maximum=0.9,
+    )
+
+    # --------------------------------------------------------
+    # Construct deterministic parameters
+    # --------------------------------------------------------
+
+    return make_parameters(
+        model;
+        Lambda0=draw.Lambda0,
+        beta=draw.beta,
+        psi=draw.psi,
+        kappa=draw.kappa,
+        epsilon=epsilon,
+        nu=nu,
+        omega=omega,
+        duration=duration,
+        fatality=fatality,
+        relative_detection=relative_detection,
+        treatment_rate=2.0,
+        treatment_cfr=draw.treatment_cfr,
+        detection=detection,
+    )
+end
+
 
 
 # ------------------------------------------------------------

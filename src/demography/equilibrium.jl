@@ -16,12 +16,12 @@ end
 function EquilibriumDemography(
     data::DemographicData,
     reference_year::Integer;
-    nages::Int = 96,
+    nages::Int=96,
 )
     target = get_population(
         data,
         reference_year;
-        nages = nages,
+        nages=nages,
     )
 
     return EquilibriumDemography(
@@ -39,3 +39,11 @@ target_population(
     demography::EquilibriumDemography,
     year::Real,
 ) = demography.target_population
+
+
+function get_population(
+    demography::EquilibriumDemography,
+    year::Real,
+)
+    return copy(demography.target_population)
+end

@@ -13,7 +13,7 @@ end
 
 function ProjectedDemography(
     data::DemographicData;
-    nages::Int = 96,
+    nages::Int=96,
 )
     2 <= nages <= size(data.population, 1) ||
         throw(ArgumentError("Invalid number of age classes"))
@@ -33,6 +33,18 @@ function target_population(
     return get_population(
         demography.data,
         year + 1;
-        nages = demography.nages,
+        nages=demography.nages,
+    )
+end
+
+
+function get_population(
+    demography::ProjectedDemography,
+    year::Real,
+)
+    return get_population(
+        demography.data,
+        year;
+        nages=demography.nages,
     )
 end

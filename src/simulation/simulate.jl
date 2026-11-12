@@ -23,10 +23,10 @@ function simulate(
     demography::AbstractDemography;
     u0::AbstractVector,
     tspan::Tuple{<:Real,<:Real},
-    saveat = nothing,
-    solver = Tsit5(),
-    abstol::Real = 1e-8,
-    reltol::Real = 1e-6,
+    saveat=nothing,
+    solver=Tsit5(),
+    abstol::Real=1e-8,
+    reltol::Real=1e-6,
 )
     layout = state_layout(model)
 
@@ -69,7 +69,7 @@ function simulate(
     # An update at year y advances the population from y-1 to y.
 
     update_times = collect(
-        (t0 + 1.0):1.0:floor(t1)
+        (t0+1.0):1.0:floor(t1)
     )
 
     function demographic_affect!(integrator)
@@ -90,7 +90,7 @@ function simulate(
     callback = PresetTimeCallback(
         update_times,
         demographic_affect!;
-        save_positions = (true, true),
+        save_positions=(true, true),
     )
 
     # --------------------------------------------------------
@@ -104,18 +104,74 @@ function simulate(
         context,
     )
 
-        # --------------------------------------------------------
+    # --------------------------------------------------------
     # Solve
     # --------------------------------------------------------
 
     return solve(
         problem,
         solver;
-        callback = callback,
-        save_start = true,
-        save_everystep = false,
-        save_end = false,
-        abstol = abstol,
-        reltol = reltol,
+        callback=callback,
+        save_start=true,
+        save_everystep=false,
+        save_end=false,
+        abstol=abstol,
+        reltol=reltol,
+    )
+end
+
+
+
+"""
+    simulate_from_draw(
+        model::AbstractTBModel,
+        draw::NamedTuple,
+        demography::AbstractDemography;
+        start_year,
+        end_year,
+        kwargs...
+    )
+
+Transform a set of free model parameters, construct initial
+conditions, and simulate the model.
+
+Model-specific operations are handled through dispatch:
+- `make_parameters(model, draw)`
+- `initial_state(model, params, demography; year)`
+
+Additional keyword arguments are forwarded to `simulate`.
+"""
+function simulate_from_draw(
+    model::AbstractTBModel,
+    draw::NamedTuple,
+    demography::AbstractDemography;
+    start_year::Real,
+    end_year::Real,
+    kwargs...,
+)
+    start_year < end_year ||
+        throw(ArgumentError(
+            "start_year must precede end_year"
+        ))
+
+    # Transform sampled parameters.
+    params = make_parameters(model, draw)
+
+    # Construct model-specific initial conditions.
+    u0 = initial_state(
+        model,
+        params,
+        demography;
+        year=start_year,
+    )
+
+    # Execute generic deterministic simulation.
+    return simulate(
+        model,
+        params,
+        demography;
+        u0=u0,
+        tspan=(start_year, end_year),
+        kwargs...,
     )
 end

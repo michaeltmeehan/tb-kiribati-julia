@@ -2,6 +2,7 @@
 using TBKiribatiJulia
 using Test
 using Statistics
+using LinearAlgebra: norm
 
 # ============================================================
 # 1. Configuration
@@ -20,8 +21,8 @@ const AGE_LABELS = [
     "35-44", "45-54", "55-64", "65+"
 ]
 
-ages = collect(0:(NAGES - 1))
-years = START_YEAR:(END_YEAR - 1)
+ages = collect(0:(NAGES-1))
+years = START_YEAR:(END_YEAR-1)
 
 # ============================================================
 # 2. Synthetic demography
@@ -53,7 +54,7 @@ demographic_data = DemographicData(
 demography = EquilibriumDemography(
     demographic_data,
     START_YEAR;
-    nages = NAGES,
+    nages=NAGES,
 )
 
 # ============================================================
@@ -76,17 +77,17 @@ layout = state_layout(model)
 println("Model age classes: ", layout.nages)
 println("States per age: ", nstates(layout))
 println("Total state dimension: ",
-        layout.nages * nstates(layout))
+    layout.nages * nstates(layout))
 
 # ============================================================
 # 4. Epidemiological parameters
 # ============================================================
 
 detection = DoddDetection(
-    K = 0.5,
-    trend = 0.02,
-    reference_year = START_YEAR,
-    maximum = 0.9,
+    K=0.5,
+    trend=0.02,
+    reference_year=START_YEAR,
+    maximum=0.9,
 )
 
 # Illustrative parameter values, not a calibrated estimate.
@@ -102,32 +103,30 @@ duration = [
 
 params = make_parameters(
     model;
-    beta = 10.0,
-    psi = 0.21,
-    kappa = exp(0.62),
-    epsilon = epsilon,
-    nu = fill(exp(-6.89), NAGES),
-    omega = fill(exp(-3.95), NAGES),
-    duration = duration,
-    fatality = fill(0.43, NAGES),
-    relative_detection = ones(NAGES),
-    treatment_rate = 2.0,
-    treatment_cfr = 0.03,
-    detection = detection,
+    Lambda0=0.03,
+    beta=10.0,
+    psi=0.21,
+    kappa=exp(0.62),
+    epsilon=epsilon,
+    nu=fill(exp(-6.89), NAGES),
+    omega=fill(exp(-3.95), NAGES),
+    duration=duration,
+    fatality=fill(0.43, NAGES),
+    relative_detection=ones(NAGES),
+    treatment_rate=2.0,
+    treatment_cfr=0.03,
+    detection=detection,
 )
 
 # ============================================================
 # 5. Initial conditions
 # ============================================================
 
-Lambda0 = 0.03
-
 u0 = initial_state(
     model,
-    population,
-    Lambda0,
-    params;
-    year = START_YEAR,
+    params,
+    demography;
+    year=START_YEAR,
 )
 
 # Initial population conservation by age.
@@ -150,8 +149,8 @@ sol = simulate(
     model,
     params,
     demography;
-    u0 = u0,
-    tspan = (START_YEAR, END_YEAR),
+    u0=u0,
+    tspan=(START_YEAR, END_YEAR),
 )
 
 println("\nSimulation completed")
@@ -166,9 +165,9 @@ println("\nSaved solution times:")
 println(sol.t)
 
 # Internal demographic updates should have two states.
-for year in (START_YEAR + 1):(END_YEAR - 1)
+for year in (START_YEAR+1):(END_YEAR-1)
     indices = findall(t -> isapprox(t, year; atol=1e-8),
-                      sol.t)
+        sol.t)
 
     @test length(indices) >= 2
 
@@ -178,7 +177,7 @@ for year in (START_YEAR + 1):(END_YEAR - 1)
     # Cumulative event counters must be unaffected
     # by the demographic operator.
     for a in 1:NAGES
-        for c in (layout.nepi + 1):nstates(layout)
+        for c in (layout.nepi+1):nstates(layout)
             i = state_index(layout, a, c)
             @test before[i] ≈ after[i] atol=1e-8
         end
@@ -192,8 +191,8 @@ end
 out = model_outputs(
     model,
     sol;
-    years = years,
-    age_breaks = AGE_BREAKS,
+    years=years,
+    age_breaks=AGE_BREAKS,
 )
 
 println("\nAnnual expected TB outcomes")
@@ -221,8 +220,8 @@ eta = model.pulmonary_fraction
 # Dodd output components are pulmonary-only.
 @test out.incidence ≈ (
     out.fast_progression .+
-    out.slow_progression .+
-    out.relapse
+        out.slow_progression .+
+        out.relapse
 ) ./ eta
 
 # Compare notification output with the raw
@@ -231,7 +230,7 @@ treatment_counts = annual_events(
     sol,
     model,
     12;  # CumTreatmentInitiation
-    years = years,
+    years=years,
 )
 
 aggregated_treatment = aggregate_age_groups(

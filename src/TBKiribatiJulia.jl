@@ -28,6 +28,11 @@ include("outputs/aggregation.jl")
 
 include("models/dodd/outputs.jl")
 
+include("inference/sampling.jl")
+
+include("simulation/ensemble.jl")
+include("outputs/summary.jl")
+
 export load_contact_matrix,
     validate_contact_matrix,
     aggregate_contact_matrix
@@ -44,9 +49,13 @@ export DemographicData,
     ProjectedDemography,
     target_population
 export DoddTBModel, DoddTBParameters, DoddDetection
-export dodd_priors
+export priors
 export make_parameters, initial_state, simulate
 export equilibrate
 export annual_events, aggregate_age_groups, model_outputs
+export sample_prior
+export simulate_from_draw
+export simulate_ensemble
+export summarise_ensemble
 
 end
