@@ -90,7 +90,7 @@ function simulate(
     callback = PresetTimeCallback(
         update_times,
         demographic_affect!;
-        save_positions = (false, true),
+        save_positions = (true, true),
     )
 
     # --------------------------------------------------------
