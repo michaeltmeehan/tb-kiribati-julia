@@ -4,6 +4,9 @@
 using TBKiribatiJulia
 using Random
 using Distributions: Normal, truncated
+using CSV
+using DataFrames
+using CairoMakie
 
 include(joinpath(
     @__DIR__,
@@ -94,6 +97,51 @@ output_dir = save_calibration(
         national=fig_national,
         age=fig_age,
     ),
+)
+
+
+# ------------------------------------------------------------
+# Quadrature convergence at the MAP estimate
+# ------------------------------------------------------------
+
+quadrature_check = quadrature_convergence(
+    fit;
+    orders=(30, 50, 70, 100),
+)
+
+println("\nQuadrature convergence:")
+show(stdout, MIME"text/plain"(), DataFrame(quadrature_check))
+println()
+
+CSV.write(
+    joinpath(output_dir, "quadrature_convergence.csv"),
+    DataFrame(quadrature_check),
+)
+
+# ------------------------------------------------------------
+# Conditional posterior annual notification effects
+# ------------------------------------------------------------
+
+annual_effects = posterior_annual_effects(
+    fit;
+    quadrature_order=100,
+    level=0.95,
+)
+
+println("\nConditional annual effects:")
+show(stdout, MIME"text/plain"(), DataFrame(annual_effects))
+println()
+
+CSV.write(
+    joinpath(output_dir, "annual_effects.csv"),
+    DataFrame(annual_effects),
+)
+
+fig_annual_effects = plot_annual_effects(annual_effects)
+
+save(
+    joinpath(output_dir, "annual_effects.png"),
+    fig_annual_effects,
 )
 
 # ------------------------------------------------------------

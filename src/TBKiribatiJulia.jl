@@ -44,6 +44,9 @@ include("inference/optimisation.jl")
 include("inference/diagnostics.jl")
 include("visualisation/calibration.jl")
 include("inference/reporting.jl")
+include("inference/annual_effects.jl")
+include("visualisation/annual_effects.jl")
+
 
 export load_contact_matrix,
     validate_contact_matrix,
@@ -83,5 +86,8 @@ export AnnualRandomEffectNB2Observation
 export observation_priors
 export observation_variance
 export observation_year_loglikelihood
+export quadrature_convergence
+export posterior_annual_effects
+export plot_annual_effects
 
 end
