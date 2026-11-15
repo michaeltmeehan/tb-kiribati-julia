@@ -22,9 +22,9 @@ groups.
 function model_incidence_by_age_group(
     model_parameters::NamedTuple;
     age_breaks,
-    fixed_parameters::NamedTuple = NamedTuple(),
-    tinit::Real = 1800.0,
-    tfinal::Real = 2024.0,
+    fixed_parameters::NamedTuple=NamedTuple(),
+    tinit::Real=1800.0,
+    tfinal::Real=2024.0,
 )
     parameter_kwargs = merge(fixed_parameters, model_parameters)
 
@@ -39,10 +39,10 @@ function model_incidence_by_age_group(
 
     sol = simulate(
         params;
-        tspan = (Float64(tinit), Float64(tfinal)),
-        u0 = u0,
-        saveat = times,
-        demography = :equilibrium,
+        tspan=(Float64(tinit), Float64(tfinal)),
+        u0=u0,
+        saveat=times,
+        demography=:equilibrium,
     )
 
     _, incidence_by_age = raw_annual_incidence_by_age(sol)
@@ -92,13 +92,13 @@ function age_specific_detection(
     relative_detection,
 )
     if !isfinite(overall_detection) ||
-       overall_detection <= 0 ||
-       overall_detection > 1
+        overall_detection <= 0 ||
+        overall_detection > 1
         return nothing
     end
 
     if length(relative_detection) != length(predicted_incidence) ||
-       any(x -> !isfinite(x) || x <= 0, relative_detection)
+        any(x -> !isfinite(x) || x <= 0, relative_detection)
         return nothing
     end
 
@@ -106,7 +106,7 @@ function age_specific_detection(
     total_incidence = sum(predicted_incidence)
 
     if !isfinite(denominator) || denominator <= 0 ||
-       !isfinite(total_incidence) || total_incidence <= 0
+        !isfinite(total_incidence) || total_incidence <= 0
         return nothing
     end
 
@@ -175,7 +175,7 @@ function negative_binomial_mu_phi(
     phi::Real,
 )
     if !isfinite(mu) || mu <= 0 ||
-       !isfinite(phi) || phi <= 0
+        !isfinite(phi) || phi <= 0
         return nothing
     end
 
@@ -201,11 +201,11 @@ function normal_quadrature(n::Integer)
     n >= 1 || throw(ArgumentError("n must be positive"))
 
     # Golub-Welsch algorithm for standard-normal quadrature.
-    offdiag = sqrt.(Float64.(1:n-1))
+    offdiag = sqrt.(Float64.(1:(n-1)))
     E = eigen(SymTridiagonal(zeros(n), offdiag))
 
     nodes = E.values
-    weights = E.vectors[1, :].^2
+    weights = E.vectors[1, :] .^ 2
 
     return nodes, weights
 end
@@ -276,17 +276,16 @@ Evaluate the negative-binomial likelihood for observed age-specific
 notification counts. `sigma_obs` is the extra-Poisson coefficient of variation
 parameter, with `phi = 1 / sigma_obs^2`.
 """
-
 function notification_loglikelihood(
     predicted_incidence,
     notification_observations;
     sigma_obs::Real,
     relative_detection,
-    tau_year::Real = 0.0,
-    quadrature_order::Int = 30,
+    tau_year::Real=0.0,
+    quadrature_order::Int=30,
 )
     if !isfinite(sigma_obs) || sigma_obs <= 0 ||
-       !isfinite(tau_year) || tau_year < 0
+        !isfinite(tau_year) || tau_year < 0
         return -Inf
     end
 
@@ -305,7 +304,7 @@ function notification_loglikelihood(
         expected = expected_notification_counts(
             predicted_incidence,
             observation;
-            relative_detection = relative_detection,
+            relative_detection=relative_detection,
         )
 
         isnothing(expected) && return -Inf
@@ -363,25 +362,24 @@ Run the transmission model and evaluate the negative-binomial notification
 likelihood. WHO incidence estimates enter only through the fixed annual overall
 detection fractions stored in `notification_observations`.
 """
-
 function calibration_loglikelihood(
     model_parameters::NamedTuple;
     sigma_obs::Real,
     notification_observations,
     relative_detection,
     age_breaks,
-    fixed_parameters::NamedTuple = NamedTuple(),
-    tinit::Real = 1800.0,
-    tfinal::Real = 2024.0,
-    tau_year::Real = 0.0,
-    quadrature_order::Int = 30,
+    fixed_parameters::NamedTuple=NamedTuple(),
+    tinit::Real=1800.0,
+    tfinal::Real=2024.0,
+    tau_year::Real=0.0,
+    quadrature_order::Int=30,
 )
     predicted_incidence = model_incidence_by_age_group(
         model_parameters;
-        age_breaks = age_breaks,
-        fixed_parameters = fixed_parameters,
-        tinit = tinit,
-        tfinal = tfinal,
+        age_breaks=age_breaks,
+        fixed_parameters=fixed_parameters,
+        tinit=tinit,
+        tfinal=tfinal,
     )
 
     if any(x -> !isfinite(x) || x <= 0, predicted_incidence)
@@ -391,10 +389,10 @@ function calibration_loglikelihood(
     return notification_loglikelihood(
         predicted_incidence,
         notification_observations;
-        sigma_obs = sigma_obs,
-        relative_detection = relative_detection,
-        tau_year = tau_year,
-        quadrature_order = quadrature_order,
+        sigma_obs=sigma_obs,
+        relative_detection=relative_detection,
+        tau_year=tau_year,
+        quadrature_order=quadrature_order,
     )
 end
 

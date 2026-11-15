@@ -1,0 +1,8 @@
+metric,value
+log_prior,20.860146976133112
+log_likelihood,-408.73079929892464
+log_posterior,-387.8706523227915
+converged,1.0
+n_observations,95.0
+mean_pearson,0.032812740131056305
+sd_pearson,1.0258962503151865
