@@ -3,7 +3,7 @@
 
 using TBKiribatiJulia
 using Random
-using Distributions
+using Distributions: Normal, truncated
 using DataFrames
 using CSV
 using CairoMakie
