@@ -9,7 +9,7 @@ The epidemiological model is simulated only once.
 Parameters are held fixed at their MAP estimates.
 """
 function quadrature_convergence(
-    fit::MAPFit;
+    fit::AbstractCalibrationFit;
     orders=(30, 50, 70, 100),
 )
     obsmodel = fit.problem.observation_model
@@ -158,7 +158,7 @@ and expected notification counts conditional on the
 posterior mean multiplier.
 """
 function posterior_annual_effects(
-    fit::MAPFit;
+    fit::AbstractCalibrationFit;
     quadrature_order::Int=100,
     level::Real=0.95,
 )

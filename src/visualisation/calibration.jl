@@ -1,7 +1,10 @@
 using CairoMakie
 
 """Plot predicted and observed national notification totals."""
-function plot_calibration_national(fit::MAPFit; diagnostics=calibration_diagnostics(fit))
+function plot_calibration_national(
+    fit::AbstractCalibrationFit;
+    diagnostics=calibration_diagnostics(fit),
+)
     fig = Figure(size=(850, 480))
     ax = Axis(fig[1, 1], xlabel="Year", ylabel="Annual notifications",
         title="MAP calibration: national notifications")
@@ -15,7 +18,10 @@ function plot_calibration_national(fit::MAPFit; diagnostics=calibration_diagnost
 end
 
 """Age-group notification fit, respecting 2024's combined childhood observation."""
-function plot_calibration_by_age(fit::MAPFit; diagnostics=calibration_diagnostics(fit))
+function plot_calibration_by_age(
+    fit::AbstractCalibrationFit;
+    diagnostics=calibration_diagnostics(fit),
+)
     # One panel per observed label, including any aggregate such as 0-14.
     labels = unique([r.age_group for r in diagnostics.age])
     fig = Figure(size=(1100, 350*cld(length(labels), 3)))
@@ -27,6 +33,15 @@ function plot_calibration_by_age(fit::MAPFit; diagnostics=calibration_diagnostic
         lines!(ax, [r.year for r in group], [r.expected for r in group],
             color=:steelblue, linewidth=2)
         scatter!(ax, [r.year for r in group], [r.observed for r in group], color=:black)
+        all_years = [
+            obs.year for obs in fit.problem.observations
+        ]
+
+        xlims!(
+            ax,
+            minimum(all_years) - 0.5,
+            maximum(all_years) + 0.5,
+        )
     end
     return fig
 end

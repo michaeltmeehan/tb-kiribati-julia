@@ -36,16 +36,20 @@ include("outputs/summary.jl")
 
 include("inference/likelihoods.jl")
 include("inference/calibration.jl")
+include("inference/optimisation.jl")
+include("inference/profiles.jl")
+include("inference/model_comparison.jl")
+include("inference/diagnostics.jl")
+include("inference/annual_effects.jl")
 
 include("analysis/sensitivity.jl")
 include("visualisation/sensitivity.jl")
 
-include("inference/optimisation.jl")
-include("inference/diagnostics.jl")
 include("visualisation/calibration.jl")
-include("inference/reporting.jl")
-include("inference/annual_effects.jl")
 include("visualisation/annual_effects.jl")
+include("visualisation/profiles.jl")
+
+include("inference/reporting.jl")
 
 
 export load_contact_matrix,
@@ -89,5 +93,9 @@ export observation_year_loglikelihood
 export quadrature_convergence
 export posterior_annual_effects
 export plot_annual_effects
+export AbstractCalibrationFit, MLEFit, fit_mle
+export profile_likelihood, profile_likelihoods
+export compare_calibrations, likelihood_ratio
+export plot_profile_likelihood
 
 end

@@ -1,8 +1,11 @@
+
 using Random
-using Distributions: Normal, cdf, quantile
+using Distributions: median, quantile
 using Optim
 
-struct MAPFit{P,T,R}
+abstract type AbstractCalibrationFit end
+
+struct MAPFit{P,T,R} <: AbstractCalibrationFit
     problem::P
     parameters::T
     log_prior::Float64
@@ -13,45 +16,298 @@ struct MAPFit{P,T,R}
     runs::Vector{Any}
 end
 
-"""
-    fit_map(problem; rng, nstarts=3, iterations=2000)
+struct MLEFit{P,T,F,R} <: AbstractCalibrationFit
+    problem::P
+    parameters::T
+    fixed::F
+    log_likelihood::Float64
+    converged::Bool
+    optim_result::R
+    runs::Vector{Any}
+    n_parameters::Int
+end
 
-Multi-start MAP in normal-quantile coordinates. The objective is the posterior
-DENSITY IN ORIGINAL PARAMETERS; the coordinate transform introduces no Jacobian.
-"""
-function fit_map(problem::CalibrationProblem; rng=Random.default_rng(),
-    nstarts::Int=3, iterations::Int=2000, show_trace::Bool=false)
-    nstarts > 0 && iterations > 0 || throw(ArgumentError("Invalid optimisation settings"))
-    names = keys(problem.prior)
-    ds = values(problem.prior)
-    stdnormal = Normal()
+# ------------------------------------------------------------
+# Parameter transformations
+# ------------------------------------------------------------
+
+# Transform a parameter from its natural support to R.
+function _to_unconstrained(x, dist)
+    lo = minimum(dist)
+    hi = maximum(dist)
+
+    if isfinite(lo) && isfinite(hi)
+        lo < x < hi ||
+            throw(ArgumentError(
+                "Initial value outside open parameter support"
+            ))
+        return log((x - lo) / (hi - x))
+
+    elseif isfinite(lo)
+        x > lo || throw(ArgumentError(
+            "Initial value must exceed $lo"
+        ))
+        return log(x - lo)
+
+    elseif isfinite(hi)
+        x < hi || throw(ArgumentError(
+            "Initial value must be below $hi"
+        ))
+        return log(hi - x)
+
+    else
+        return Float64(x)
+    end
+end
+
+function _from_unconstrained(z, dist)
+    lo = minimum(dist)
+    hi = maximum(dist)
+
+    if isfinite(lo) && isfinite(hi)
+        # Stable logistic transformation.
+        s = z >= 0 ?
+            inv(1 + exp(-z)) :
+            exp(z) / (1 + exp(z))
+
+        return lo + (hi - lo) * s
+
+    elseif isfinite(lo)
+        return lo + exp(z)
+
+    elseif isfinite(hi)
+        return hi - exp(z)
+
+    else
+        return z
+    end
+end
+
+# ------------------------------------------------------------
+# Parameter assembly
+# ------------------------------------------------------------
+
+function _complete_parameters(
+    prior::NamedTuple,
+    fixed::NamedTuple,
+    free::NamedTuple,
+)
+    # Preserve the ordering of the original calibration prior.
+    names = keys(prior)
+
+    return NamedTuple{names}(
+        Tuple(
+            haskey(fixed, name) ?
+            getproperty(fixed, name) :
+            getproperty(free, name)
+            for name in names
+        )
+    )
+end
+
+function _free_priors(
+    prior::NamedTuple,
+    fixed::NamedTuple,
+)
+    all(k -> haskey(prior, k), keys(fixed)) ||
+        throw(ArgumentError("Unknown fixed parameter"))
+
+    names = Tuple(
+        k for k in keys(prior) if !haskey(fixed, k)
+    )
+
+    isempty(names) &&
+        throw(ArgumentError(
+            "At least one parameter must remain free"
+        ))
+
+    return NamedTuple{names}(
+        Tuple(getproperty(prior, k) for k in names)
+    )
+end
+
+# ------------------------------------------------------------
+# Unified optimisation
+# ------------------------------------------------------------
+
+function _fit_calibration(
+    problem::CalibrationProblem;
+    method::Symbol,
+    fixed::NamedTuple=NamedTuple(),
+    initial=nothing,
+    rng::AbstractRNG=Random.default_rng(),
+    nstarts::Int=3,
+    iterations::Int=3000,
+    show_trace::Bool=false,
+)
+    method in (:map, :mle) ||
+        throw(ArgumentError("Unknown fitting method"))
+
+    nstarts >= 1 ||
+        throw(ArgumentError("nstarts must be positive"))
+
+    iterations >= 1 ||
+        throw(ArgumentError("iterations must be positive"))
+
+    all(k -> haskey(problem.prior, k), keys(fixed)) ||
+        throw(ArgumentError("Unknown fixed parameter"))
+
+    free_priors = _free_priors(problem.prior, fixed)
+    names = keys(free_priors)
+    distributions = values(free_priors)
+
     function unpack(z)
-        theta = ntuple(j -> quantile(ds[j], clamp(cdf(stdnormal, z[j]), 1e-10, 1-1e-10)), length(ds))
-        return NamedTuple{names}(theta)
+        free = NamedTuple{names}(
+            ntuple(
+                j -> _from_unconstrained(
+                    z[j], distributions[j]
+                ),
+                length(names),
+            )
+        )
+
+        return _complete_parameters(
+            problem.prior, fixed, free
+        )
     end
-    objective(z) = begin
-        lp = calibration_logposterior(problem, unpack(z))
-        isfinite(lp) ? -lp : 1e100
+
+    function pack(theta)
+        return [
+            _to_unconstrained(
+                getproperty(theta, name),
+                getproperty(free_priors, name),
+            )
+            for name in names
+        ]
     end
+
+    function objective(z)
+        theta = unpack(z)
+
+        value = if method == :map
+            calibration_logposterior(problem, theta)
+        else
+            calibration_loglikelihood(problem, theta)
+        end
+
+        return isfinite(value) ? -value : 1e100
+    end
+
+    # Prior-based starts are a numerical convenience only.
+    # The MLE objective never evaluates the prior density.
+    starting_points = Any[]
+
+    if !isnothing(initial)
+        push!(starting_points, pack(initial))
+    else
+        centre = map(median, free_priors)
+        push!(starting_points, pack(centre))
+    end
+
+    for _ in 2:nstarts
+        draw = map(d -> rand(rng, d), free_priors)
+        push!(starting_points, pack(draw))
+    end
+
     runs = Any[]
     best = nothing
-    for k in 1:nstarts
-        z0 = k == 1 ? zeros(length(ds)) : randn(rng, length(ds))
-        result = Optim.optimize(objective, z0, Optim.NelderMead(),
-            Optim.Options(iterations=iterations, show_trace=show_trace))
+
+    for z0 in starting_points
+        result = Optim.optimize(
+            objective,
+            z0,
+            Optim.NelderMead(),
+            Optim.Options(
+                iterations=iterations,
+                show_trace=show_trace,
+            ),
+        )
+
         push!(runs, result)
+
         if isfinite(Optim.minimum(result)) &&
-            (isnothing(best) || Optim.minimum(result) < Optim.minimum(best))
+            Optim.minimum(result) < 1e100 &&
+            (isnothing(best) ||
+                Optim.minimum(result) < Optim.minimum(best))
             best = result
         end
     end
-    isnothing(best) && error("No finite MAP optimisation result")
+
+    isnothing(best) &&
+        error("No finite optimisation result")
+
     theta = unpack(Optim.minimizer(best))
-    lp = calibration_logprior(problem, theta)
     ll = calibration_loglikelihood(problem, theta)
-    isfinite(lp+ll) || error("MAP optimisation did not find a finite posterior")
-    return MAPFit(problem, theta, lp, ll, lp+ll, Optim.converged(best), best, runs)
+
+    isfinite(ll) ||
+        error("Optimiser returned invalid likelihood")
+
+    if method == :map
+        lp = calibration_logprior(problem, theta)
+
+        return MAPFit(
+            problem,
+            theta,
+            lp,
+            ll,
+            lp + ll,
+            Optim.converged(best),
+            best,
+            runs,
+        )
+    else
+        return MLEFit(
+            problem,
+            theta,
+            fixed,
+            ll,
+            Optim.converged(best),
+            best,
+            runs,
+            length(names),
+        )
+    end
 end
 
-"""Predict annual incidence, notification and mortality trajectories at a MAP fit."""
-predict(fit::MAPFit) = predict(fit.problem, fit.parameters)
+# ------------------------------------------------------------
+# Public API
+# ------------------------------------------------------------
+
+"""
+    fit_map(problem; fixed=NamedTuple(), kwargs...)
+
+Maximise the log posterior in original parameter
+coordinates, optionally fixing selected parameters.
+"""
+function fit_map(
+    problem::CalibrationProblem;
+    kwargs...,
+)
+    return _fit_calibration(
+        problem;
+        method=:map,
+        kwargs...,
+    )
+end
+
+"""
+    fit_mle(problem; fixed=NamedTuple(), kwargs...)
+
+Maximise the likelihood. Priors determine parameter
+supports and starting points, but do not contribute
+to the objective.
+"""
+function fit_mle(
+    problem::CalibrationProblem;
+    kwargs...,
+)
+    return _fit_calibration(
+        problem;
+        method=:mle,
+        kwargs...,
+    )
+end
+
+# Shared prediction dispatch.
+predict(fit::AbstractCalibrationFit) =
+    predict(fit.problem, fit.parameters)

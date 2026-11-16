@@ -7,7 +7,9 @@ using Statistics: mean, std
 Return the fitted predictions, detailed observation
 records, annual national totals and Pearson residuals.
 """
-function calibration_diagnostics(fit::MAPFit)
+function calibration_diagnostics(
+    fit::AbstractCalibrationFit,
+)
 
     output = predict(fit)
 
