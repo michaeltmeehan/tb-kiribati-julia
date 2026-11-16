@@ -22,7 +22,7 @@ function save_calibration(
 
     parameter_table = DataFrame(
         parameter=string.(collect(keys(fit.parameters))),
-        estimate=Float64.(collect(values(fit.parameters))),
+        estimate=Float64.(collect(Base.values(fit.parameters))),
     )
 
     CSV.write(

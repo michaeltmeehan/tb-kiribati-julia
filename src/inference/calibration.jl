@@ -18,7 +18,7 @@ Generic calibration configuration.
 Model-specific simulation, parameter mapping and output
 extraction are provided by existing model dispatch.
 """
-struct CalibrationProblem{M,D,O,A,Q,P}
+struct CalibrationProblem{M,D,O,A,Q,P,T,R}
     model::M
     demography::D
     observations::O
@@ -27,7 +27,11 @@ struct CalibrationProblem{M,D,O,A,Q,P}
     prior::P
     start_year::Int
     end_year::Int
+
+    treatment_deaths::T
+    recurrence::R
 end
+
 
 
 function CalibrationProblem(
@@ -36,6 +40,8 @@ function CalibrationProblem(
     observations;
     start_year::Integer,
     end_year::Integer,
+    treatment_deaths=nothing,
+    recurrence=nothing,
     age_breaks,
     observation_model=NB2Observation(
         truncated(Normal(0, 0.3), 0, Inf)
@@ -103,6 +109,8 @@ function CalibrationProblem(
         prior,
         Int(start_year),
         Int(end_year),
+        treatment_deaths,
+        recurrence,
     )
 end
 
@@ -156,12 +164,25 @@ function predict(
             "ODE simulation failed: $(sol.retcode)"
         ))
 
+
+    years = [obs.year for obs in problem.observations]
+
+    if !isnothing(problem.recurrence)
+        append!(
+            years,
+            [r.year for r in problem.recurrence.rows],
+        )
+    end
+
+    sort!(unique!(years))
+
     return model_outputs(
         problem.model,
         sol;
-        years=[obs.year for obs in problem.observations],
+        years=years,
         age_breaks=problem.age_breaks,
     )
+
 end
 
 
@@ -276,7 +297,25 @@ function calibration_loglikelihood(
         offset += n
     end
 
-    return ll
+
+    # Conditional treatment-death likelihood.
+    ll_deaths = treatment_death_loglikelihood(
+        problem.treatment_deaths,
+        theta,
+    )
+
+    isfinite(ll_deaths) || return -Inf
+
+    # Conditional recurrent-notification likelihood.
+    ll_recurrence = recurrence_loglikelihood(
+        problem.recurrence,
+        out,
+    )
+
+    isfinite(ll_recurrence) || return -Inf
+
+    return ll + ll_deaths + ll_recurrence
+
 end
 
 

@@ -5,6 +5,7 @@ using DifferentialEquations
 
 include("data/contacts.jl")
 include("data/notifications.jl")
+include("data/surveillance.jl")
 
 include("models/abstract.jl")
 
@@ -35,6 +36,8 @@ include("simulation/ensemble.jl")
 include("outputs/summary.jl")
 
 include("inference/likelihoods.jl")
+include("inference/treatment_deaths.jl")
+include("inference/recurrence.jl")
 include("inference/calibration.jl")
 include("inference/optimisation.jl")
 include("inference/profiles.jl")
@@ -97,5 +100,17 @@ export AbstractCalibrationFit, MLEFit, fit_mle
 export profile_likelihood, profile_likelihoods
 export compare_calibrations, likelihood_ratio
 export plot_profile_likelihood
+export load_annual_counts,
+    load_site_notifications,
+    load_treatment_outcomes,
+    load_historical_notification_types,
+    load_kiribati_surveillance
+export combine_notification_observations
+export TreatmentDeathObservation,
+    treatment_death_probability,
+    treatment_death_loglikelihood,
+    treatment_death_fit_rows
+export RecurrentTBObservation,
+    recurrence_loglikelihood
 
 end

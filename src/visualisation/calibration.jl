@@ -17,31 +17,58 @@ function plot_calibration_national(
     return fig
 end
 
-"""Age-group notification fit, respecting 2024's combined childhood observation."""
+
+"""Age-group notification fit, including combined age groups."""
 function plot_calibration_by_age(
     fit::AbstractCalibrationFit;
     diagnostics=calibration_diagnostics(fit),
 )
-    # One panel per observed label, including any aggregate such as 0-14.
-    labels = unique([r.age_group for r in diagnostics.age])
-    fig = Figure(size=(1100, 350*cld(length(labels), 3)))
+    labels = unique([
+        r.age_group for r in diagnostics.age
+                        if r.age_group != "all"
+    ])
+
+    fig = Figure(size=(1100, 350 * cld(length(labels), 3)))
+
     for (k, label) in enumerate(labels)
-        ax = Axis(fig[cld(k, 3), mod1(k, 3)], title=label,
-            xlabel="Year", ylabel="Notifications")
-        group = [r for r in diagnostics.age if r.age_group==label]
-        sort!(group, by=r -> r.year)
-        lines!(ax, [r.year for r in group], [r.expected for r in group],
-            color=:steelblue, linewidth=2)
-        scatter!(ax, [r.year for r in group], [r.observed for r in group], color=:black)
-        all_years = [
-            obs.year for obs in fit.problem.observations
+        # Select and sort observations for this age group.
+        group = [
+            r for r in diagnostics.age
+                  if r.age_group == label
         ]
+        sort!(group, by=r -> r.year)
+
+        group_years = [r.year for r in group]
+
+        ax = Axis(
+            fig[cld(k, 3), mod1(k, 3)],
+            title=label,
+            xlabel="Year",
+            ylabel="Notifications",
+        )
+
+        lines!(
+            ax,
+            group_years,
+            [r.expected for r in group],
+            color=:steelblue,
+            linewidth=2,
+        )
+
+        scatter!(
+            ax,
+            group_years,
+            [r.observed for r in group],
+            color=:black,
+        )
 
         xlims!(
             ax,
-            minimum(all_years) - 0.5,
-            maximum(all_years) + 0.5,
+            minimum(group_years) - 0.5,
+            maximum(group_years) + 0.5,
         )
     end
+
     return fig
 end
+

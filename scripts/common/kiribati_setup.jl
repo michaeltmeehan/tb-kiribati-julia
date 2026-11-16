@@ -26,6 +26,8 @@ function setup_dodd_analysis(;
     end_year::Int=2025,
     output_years=2013:2024,
     nages::Int=96,
+    use_historical_notifications::Bool=false,
+    national_start_year::Int=1980,
 )
     # --------------------------------------------------------
     # 1. Paths
@@ -98,7 +100,7 @@ function setup_dodd_analysis(;
     )
 
     # --------------------------------------------------------
-    # 4. Load notification data
+    # 4. Load surveillance data
     # --------------------------------------------------------
 
     notifications = CSV.read(
@@ -106,11 +108,26 @@ function setup_dodd_analysis(;
         DataFrame,
     )
 
-    observations = load_notification_observations(
-        notification_file;
+    surveillance = load_kiribati_surveillance(
+        data_dir;
         age_labels=age_labels,
-        years=years,
+        age_years=years,
     )
+
+    age_observations = surveillance.age_notifications
+
+    observations = if use_historical_notifications
+        combine_notification_observations(
+            age_observations,
+            surveillance.national_notifications;
+            n_age_groups=length(age_labels),
+            start_year=start_year,
+            end_year=end_year,
+            national_start_year=national_start_year,
+        )
+    else
+        age_observations
+    end
 
     # --------------------------------------------------------
     # 5. Construct model and demography
@@ -133,6 +150,9 @@ function setup_dodd_analysis(;
         demographic_data=demographic_data,
         contact=contact,
         notifications=notifications,
+        surveillance=surveillance,
+        age_observations=age_observations,
+        calibration_years=[obs.year for obs in observations],
         observations=observations,
         age_breaks=age_breaks,
         age_labels=age_labels,

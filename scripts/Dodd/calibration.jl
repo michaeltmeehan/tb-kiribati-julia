@@ -19,7 +19,13 @@ include(joinpath(
 # Shared Kiribati setup
 # ------------------------------------------------------------
 
-setup = setup_dodd_analysis()
+setup = setup_dodd_analysis(
+    start_year=1970,
+    end_year=2026,
+    output_years=2013:2025,
+    use_historical_notifications=true,
+    national_start_year=1980,
+)
 
 # ------------------------------------------------------------
 # Observation-model priors
@@ -47,6 +53,10 @@ problem = CalibrationProblem(
     setup.observations;
     start_year=setup.start_year,
     end_year=setup.end_year,
+    treatment_deaths=TreatmentDeathObservation(
+        setup.surveillance.treatment_outcomes;
+        include_2024=false,
+    ),
     age_breaks=setup.age_breaks,
     observation_model=AnnualRandomEffectNB2Observation(
         sigma_prior,
@@ -63,7 +73,7 @@ fit = fit_map(
     problem;
     rng=MersenneTwister(42),
     nstarts=3,
-    iterations=3000,
+    iterations=10_000,
 )
 
 # ------------------------------------------------------------
