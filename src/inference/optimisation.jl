@@ -181,13 +181,32 @@ function _fit_calibration(
         ]
     end
 
+
     function objective(z)
+        # Reject nonfinite transformed parameters.
+        all(isfinite, z) || return 1e100
+
         theta = unpack(z)
 
-        value = if method == :map
-            calibration_logposterior(problem, theta)
-        else
-            calibration_loglikelihood(problem, theta)
+        # Reject nonfinite natural parameters.
+        all(isfinite, Base.values(theta)) || return 1e100
+
+        value = try
+            if method == :map
+                calibration_logposterior(problem, theta)
+            else
+                calibration_loglikelihood(problem, theta)
+            end
+        catch err
+            # An unsuccessful simulation is an invalid
+            # parameter combination, not a fatal error.
+            if err isa ErrorException &&
+                startswith(err.msg, "ODE simulation failed:")
+                return 1e100
+            end
+
+            # Unexpected errors should still be reported.
+            rethrow()
         end
 
         return isfinite(value) ? -value : 1e100

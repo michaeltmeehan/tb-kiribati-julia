@@ -166,3 +166,115 @@ println("sigma_obs: ", fit.parameters.sigma_obs)
 println("tau_year: ", fit.parameters.tau_year)
 
 println("Results: ", output_dir)
+
+
+
+# ------------------------------------------------------------
+# Maximum likelihood calibration
+# ------------------------------------------------------------
+
+println("\nRunning maximum likelihood calibration...")
+
+treatment_cfr_mle = 304 / 4928
+duration_mle = 3.
+
+mle = fit_mle(
+    problem;
+    fixed=(treatment_cfr=treatment_cfr_mle, duration=duration_mle),
+    initial=fit.parameters,  # Start from the MAP estimate
+    rng=MersenneTwister(43),
+    nstarts=1,
+    iterations=3_000,
+)
+
+println("\nMLE converged: ", mle.converged)
+println("MAP log likelihood: ", fit.log_likelihood)
+println("MLE log likelihood: ", mle.log_likelihood)
+println(
+    "Improvement: ",
+    mle.log_likelihood - fit.log_likelihood,
+)
+
+if mle.log_likelihood < fit.log_likelihood - 1e-6
+    @warn "MLE is worse than MAP: further optimization is needed."
+end
+
+
+# ------------------------------------------------------------
+# MLE diagnostics and reporting
+# ------------------------------------------------------------
+
+mle_diagnostics = calibration_diagnostics(mle)
+
+mle_fig_national = plot_calibration_national(
+    mle;
+    diagnostics=mle_diagnostics,
+)
+
+mle_fig_age = plot_calibration_by_age(
+    mle;
+    diagnostics=mle_diagnostics,
+)
+
+mle_dir = save_calibration(
+    mle,
+    joinpath(setup.output_dir, "calibration_mle");
+    diagnostics=mle_diagnostics,
+    figures=(
+        national=mle_fig_national,
+        age=mle_fig_age,
+    ),
+)
+
+
+# ------------------------------------------------------------
+# Compare MAP and MLE parameter estimates
+# ------------------------------------------------------------
+
+parameter_names = collect(keys(fit.parameters))
+
+parameter_comparison = DataFrame(
+    parameter=String.(parameter_names),
+    map=[
+        Float64(getproperty(fit.parameters, name))
+        for name in parameter_names
+    ],
+    mle=[
+        Float64(getproperty(mle.parameters, name))
+        for name in parameter_names
+    ],
+)
+
+parameter_comparison.difference =
+    parameter_comparison.mle .- parameter_comparison.map
+
+println("\nMAP versus MLE:")
+show(
+    stdout,
+    MIME"text/plain"(),
+    parameter_comparison;
+    allrows=true,
+)
+println()
+
+CSV.write(
+    joinpath(mle_dir, "map_vs_mle.csv"),
+    parameter_comparison,
+)
+
+
+# ------------------------------------------------------------
+# Quadrature convergence at the MLE
+# ------------------------------------------------------------
+
+mle_quadrature = quadrature_convergence(
+    mle;
+    orders=(30, 50, 70, 100),
+)
+
+CSV.write(
+    joinpath(mle_dir, "quadrature_convergence.csv"),
+    DataFrame(mle_quadrature),
+)
+
+println("\nMLE results saved to: ", mle_dir)
