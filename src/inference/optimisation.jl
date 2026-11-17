@@ -197,15 +197,36 @@ function _fit_calibration(
             else
                 calibration_loglikelihood(problem, theta)
             end
+
         catch err
-            # An unsuccessful simulation is an invalid
-            # parameter combination, not a fatal error.
+            # An unsuccessful simulation is an invalid trial point.
             if err isa ErrorException &&
                 startswith(err.msg, "ODE simulation failed:")
                 return 1e100
             end
 
-            # Unexpected errors should still be reported.
+            # Floating-point saturation of the detection-logit
+            # transformation can produce K = 0 or K = 1.
+            if err isa ArgumentError &&
+                occursin(
+                "K must lie in (0, 1)",
+                sprint(showerror, err),
+            )
+                return 1e100
+            end
+
+            # The Dodd initialization heuristic is only valid
+            # when all initial epidemiological states are
+            # nonnegative.
+            if err isa ArgumentError &&
+                occursin(
+                "Initialisation produces a negative latent population",
+                sprint(showerror, err),
+            )
+                return 1e100
+            end
+
+            # Do not silently suppress unrelated programming errors.
             rethrow()
         end
 

@@ -16,11 +16,18 @@ include("demography/projected.jl")
 
 include("simulation/context.jl")
 
-include("models/dodd/model.jl")
-include("models/dodd/parameters.jl")
-include("models/dodd/dynamics.jl")
-include("models/dodd/initial_conditions.jl")
-include("models/dodd/priors.jl")
+include("models/Dodd/model.jl")
+include("models/Dodd/parameters.jl")
+include("models/Dodd/dynamics.jl")
+include("models/Dodd/initial_conditions.jl")
+include("models/Dodd/priors.jl")
+
+# Extended Dodd model
+include("models/DoddExtended/model.jl")
+include("models/DoddExtended/presentation.jl")
+include("models/DoddExtended/parameters.jl")
+include("models/DoddExtended/dynamics.jl")
+include("models/DoddExtended/initial_conditions.jl")
 
 include("simulation/simulate.jl")
 include("simulation/equilibrium.jl")
@@ -28,7 +35,9 @@ include("simulation/equilibrium.jl")
 include("outputs/counters.jl")
 include("outputs/aggregation.jl")
 
-include("models/dodd/outputs.jl")
+include("models/DoddExtended/outputs.jl")
+
+include("models/Dodd/outputs.jl")
 
 include("inference/sampling.jl")
 
@@ -112,5 +121,8 @@ export TreatmentDeathObservation,
     treatment_death_fit_rows
 export RecurrentTBObservation,
     recurrence_loglikelihood
+export DoddExtendedTBModel, DoddExtendedTBParameters
+export extended_presentation, load_kiribati_presentation
+export extended_fixed_parameters, extend_initial_state
 
 end
