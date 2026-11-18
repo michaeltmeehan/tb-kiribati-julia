@@ -1,0 +1,10 @@
+year,cohort_type,age_group,sex,coh,succ,fail,died,lost,neval
+2018,newrel,0-14,a,43,41,,,,
+2019,newrel,0-14,a,75,71,,,,
+2020,newrel,0-14,a,75,72,,,,
+2021,newrel,0-14,a,46,43,,,,
+2022,newrel,0-14,a,55,51,,,,
+2023,newrel,0-14,a,150,145,,,,
+2024,newrel,0-14,a,193,185,3,2,3,0
+2024,newrel,a,f,272,254,3,11,3,1
+2024,newrel,a,m,325,286,1,12,23,3

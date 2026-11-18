@@ -1,0 +1,1974 @@
+country,iso2,iso3,iso_numeric,g_whoregion,year,cohort_type,age_group,sex,succ,fail,died,lost,neval,coh
+Afghanistan,AF,AFG,4,EMR,2018,newrel,0-14,a,10027,,,,,10461
+Albania,AL,ALB,8,EUR,2010,newrel,0-14,a,17,0,0,0,1,18
+Albania,AL,ALB,8,EUR,2011,newrel,0-14,a,7,0,0,0,0,7
+Albania,AL,ALB,8,EUR,2012,newrel,0-14,a,3,0,0,0,0,3
+Albania,AL,ALB,8,EUR,2013,newrel,0-14,a,18,0,0,1,0,19
+Albania,AL,ALB,8,EUR,2014,newrel,0-14,a,20,0,0,0,1,21
+Albania,AL,ALB,8,EUR,2015,newrel,0-14,a,10,0,0,0,1,11
+Albania,AL,ALB,8,EUR,2016,newrel,0-14,a,11,0,0,1,1,13
+Albania,AL,ALB,8,EUR,2017,newrel,0-14,a,14,0,0,0,0,14
+Albania,AL,ALB,8,EUR,2018,newrel,0-14,a,4,0,0,0,0,4
+Albania,AL,ALB,8,EUR,2019,newrel,0-14,a,11,0,0,0,0,11
+Albania,AL,ALB,8,EUR,2020,newrel,0-14,a,3,0,0,0,0,3
+Albania,AL,ALB,8,EUR,2021,newrel,0-14,a,8,0,0,0,0,8
+Albania,AL,ALB,8,EUR,2022,newrel,0-14,a,6,0,0,0,0,6
+Albania,AL,ALB,8,EUR,2023,newrel,0-14,a,8,0,0,0,0,8
+Albania,AL,ALB,8,EUR,2024,newrel,0-14,a,10,0,0,0,1,11
+Albania,AL,ALB,8,EUR,2024,newrel,a,m,134,0,7,10,6,157
+Albania,AL,ALB,8,EUR,2024,newrel,a,f,66,0,1,7,1,75
+American Samoa,AS,ASM,16,WPR,2018,newrel,0-14,a,0,,,,,0
+American Samoa,AS,ASM,16,WPR,2019,newrel,0-14,a,0,,,,,0
+Andorra,AD,AND,20,EUR,2010,newrel,0-14,a,0,0,0,0,0,0
+Andorra,AD,AND,20,EUR,2011,newrel,0-14,a,0,0,0,0,0,0
+Andorra,AD,AND,20,EUR,2012,newrel,0-14,a,0,0,0,0,0,0
+Andorra,AD,AND,20,EUR,2013,newrel,0-14,a,,,,,,0
+Andorra,AD,AND,20,EUR,2014,newrel,0-14,a,0,0,0,0,0,0
+Andorra,AD,AND,20,EUR,2015,newrel,0-14,a,0,0,0,0,0,0
+Andorra,AD,AND,20,EUR,2016,newrel,0-14,a,0,0,0,0,0,0
+Andorra,AD,AND,20,EUR,2017,newrel,0-14,a,0,0,0,0,0,0
+Andorra,AD,AND,20,EUR,2018,newrel,0-14,a,,,,,,0
+Andorra,AD,AND,20,EUR,2019,newrel,0-14,a,,,,,,0
+Andorra,AD,AND,20,EUR,2020,newrel,0-14,a,,,,,,0
+Andorra,AD,AND,20,EUR,2022,newrel,0-14,a,,,,,,0
+Antigua and Barbuda,AG,ATG,28,AMR,2018,newrel,0-14,a,1,0,0,0,0,1
+Antigua and Barbuda,AG,ATG,28,AMR,2019,newrel,0-14,a,0,0,0,0,0,0
+Antigua and Barbuda,AG,ATG,28,AMR,2020,newrel,0-14,a,0,0,0,0,0,0
+Antigua and Barbuda,AG,ATG,28,AMR,2021,newrel,0-14,a,0,0,0,0,0,0
+Antigua and Barbuda,AG,ATG,28,AMR,2022,newrel,0-14,a,0,0,0,0,0,0
+Antigua and Barbuda,AG,ATG,28,AMR,2023,newrel,0-14,a,0,0,0,0,0,0
+Antigua and Barbuda,AG,ATG,28,AMR,2024,newrel,0-14,a,0,,,,,0
+Argentina,AR,ARG,32,AMR,2013,newrel,0-14,a,406,1,11,61,409,888
+Argentina,AR,ARG,32,AMR,2014,newrel,0-14,a,482,0,6,60,312,860
+Argentina,AR,ARG,32,AMR,2015,newrel,0-14,a,482,0,10,81,410,983
+Argentina,AR,ARG,32,AMR,2016,newrel,0-14,a,477,1,8,68,178,732
+Argentina,AR,ARG,32,AMR,2017,newrel,0-14,a,575,0,15,89,231,910
+Argentina,AR,ARG,32,AMR,2018,newrel,0-14,a,575,4,9,60,304,952
+Argentina,AR,ARG,32,AMR,2019,newrel,0-14,a,362,2,5,46,300,715
+Argentina,AR,ARG,32,AMR,2020,newrel,0-14,a,425,0,11,53,240,729
+Argentina,AR,ARG,32,AMR,2021,newrel,0-14,a,456,0,9,55,274,794
+Argentina,AR,ARG,32,AMR,2022,newrel,0-14,a,640,0,12,69,258,979
+Argentina,AR,ARG,32,AMR,2023,newrel,0-14,a,693,0,15,83,343,1134
+Armenia,AM,ARM,51,EUR,2010,newrel,0-14,a,56,2,0,1,1,60
+Armenia,AM,ARM,51,EUR,2011,newrel,0-14,a,46,2,0,2,1,51
+Armenia,AM,ARM,51,EUR,2012,newrel,0-14,a,31,0,0,5,0,36
+Armenia,AM,ARM,51,EUR,2013,newrel,0-14,a,30,0,0,7,0,37
+Armenia,AM,ARM,51,EUR,2014,newrel,0-14,a,26,0,1,4,2,33
+Armenia,AM,ARM,51,EUR,2015,newrel,0-14,a,19,0,0,4,0,23
+Armenia,AM,ARM,51,EUR,2016,newrel,0-14,a,18,0,0,1,0,19
+Armenia,AM,ARM,51,EUR,2017,newrel,0-14,a,12,1,0,6,0,19
+Armenia,AM,ARM,51,EUR,2018,newrel,0-14,a,32,2,0,3,0,37
+Armenia,AM,ARM,51,EUR,2019,newrel,0-14,a,26,0,0,3,0,29
+Armenia,AM,ARM,51,EUR,2020,newrel,0-14,a,20,0,1,0,0,21
+Armenia,AM,ARM,51,EUR,2021,newrel,0-14,a,18,0,0,0,0,18
+Armenia,AM,ARM,51,EUR,2022,newrel,0-14,a,15,0,0,1,1,17
+Armenia,AM,ARM,51,EUR,2023,newrel,0-14,a,27,0,0,0,0,27
+Armenia,AM,ARM,51,EUR,2024,newrel,0-14,a,20,0,0,0,0,20
+Armenia,AM,ARM,51,EUR,2024,newrel,a,m,228,9,14,24,1,276
+Armenia,AM,ARM,51,EUR,2024,newrel,a,f,78,1,4,1,4,88
+Aruba,AW,ABW,533,AMR,2018,newrel,0-14,a,0,0,0,0,0,0
+Australia,AU,AUS,36,WPR,2019,newrel,0-14,a,30,,,,,38
+Australia,AU,AUS,36,WPR,2020,newrel,0-14,a,29,,,,,31
+Australia,AU,AUS,36,WPR,2021,newrel,0-14,a,29,,,,,30
+Australia,AU,AUS,36,WPR,2022,newrel,0-14,a,25,,,,,29
+Australia,AU,AUS,36,WPR,2023,newrel,0-14,a,40,,,,,43
+Australia,AU,AUS,36,WPR,2024,newrel,0-14,a,15,0,0,0,1,16
+Australia,AU,AUS,36,WPR,2024,newrel,a,m,484,2,35,13,87,621
+Australia,AU,AUS,36,WPR,2024,newrel,a,f,423,1,12,9,51,496
+Austria,AT,AUT,40,EUR,2010,newrel,0-14,a,8,0,1,0,5,14
+Austria,AT,AUT,40,EUR,2011,newrel,0-14,a,10,0,0,1,0,11
+Austria,AT,AUT,40,EUR,2012,newrel,0-14,a,22,0,0,0,4,26
+Austria,AT,AUT,40,EUR,2013,newrel,0-14,a,21,0,0,2,0,23
+Austria,AT,AUT,40,EUR,2014,newrel,0-14,a,12,0,0,0,2,14
+Austria,AT,AUT,40,EUR,2015,newrel,0-14,a,14,0,1,0,4,19
+Austria,AT,AUT,40,EUR,2016,newrel,0-14,a,26,0,0,0,3,29
+Austria,AT,AUT,40,EUR,2017,newrel,0-14,a,18,0,0,0,3,21
+Austria,AT,AUT,40,EUR,2018,newrel,0-14,a,20,0,0,0,4,24
+Austria,AT,AUT,40,EUR,2019,newrel,0-14,a,19,0,0,0,3,22
+Austria,AT,AUT,40,EUR,2020,newrel,0-14,a,10,0,1,0,1,12
+Austria,AT,AUT,40,EUR,2021,newrel,0-14,a,9,0,0,1,3,13
+Austria,AT,AUT,40,EUR,2022,newrel,0-14,a,12,0,0,0,0,12
+Austria,AT,AUT,40,EUR,2023,newrel,0-14,a,9,0,0,3,0,12
+Austria,AT,AUT,40,EUR,2024,newrel,0-14,a,2,0,0,1,5,8
+Austria,AT,AUT,40,EUR,2024,newrel,a,m,41,,17,10,152,220
+Austria,AT,AUT,40,EUR,2024,newrel,a,f,24,,10,4,57,95
+Azerbaijan,AZ,AZE,31,EUR,2022,newrel,0-14,a,75,12,0,10,13,110
+Azerbaijan,AZ,AZE,31,EUR,2022,newrel,a,m,2169,151,135,155,14,2624
+Azerbaijan,AZ,AZE,31,EUR,2022,newrel,a,f,788,62,25,86,21,982
+Azerbaijan,AZ,AZE,31,EUR,2023,newrel,0-14,a,113,12,,5,9,139
+Azerbaijan,AZ,AZE,31,EUR,2023,newrel,a,m,1372,49,106,89,9,1625
+Azerbaijan,AZ,AZE,31,EUR,2023,newrel,a,f,1036,122,28,56,10,1252
+Azerbaijan,AZ,AZE,31,EUR,2024,newrel,0-14,a,122,9,2,15,5,153
+Azerbaijan,AZ,AZE,31,EUR,2024,newrel,a,m,2076,152,108,177,2,2515
+Azerbaijan,AZ,AZE,31,EUR,2024,newrel,a,f,751,52,29,63,10,905
+Bahamas,BS,BHS,44,AMR,2018,newrel,0-14,a,5,0,0,0,0,5
+Bahamas,BS,BHS,44,AMR,2019,newrel,0-14,a,6,0,0,0,0,6
+Bahamas,BS,BHS,44,AMR,2020,newrel,0-14,a,,,,,,0
+Bahamas,BS,BHS,44,AMR,2021,newrel,0-14,a,2,0,0,0,0,2
+Bahamas,BS,BHS,44,AMR,2022,newrel,0-14,a,3,0,0,0,0,3
+Bahamas,BS,BHS,44,AMR,2023,newrel,0-14,a,2,0,0,0,0,2
+Bahamas,BS,BHS,44,AMR,2024,newrel,0-14,a,4,0,0,1,0,5
+Bahamas,BS,BHS,44,AMR,2024,newrel,a,m,29,0,2,8,1,40
+Bahamas,BS,BHS,44,AMR,2024,newrel,a,f,19,0,1,2,0,22
+Bahrain,BH,BHR,48,EMR,2018,newrel,0-14,a,0,,,,,0
+Bahrain,BH,BHR,48,EMR,2019,newrel,0-14,a,2,,,,,3
+Bahrain,BH,BHR,48,EMR,2020,newrel,0-14,a,0,,,,,0
+Bahrain,BH,BHR,48,EMR,2021,newrel,0-14,a,1,,,,,1
+Bahrain,BH,BHR,48,EMR,2023,newrel,0-14,a,5,,,,,5
+Bahrain,BH,BHR,48,EMR,2024,newrel,0-14,a,1,0,0,0,0,1
+Bahrain,BH,BHR,48,EMR,2024,newrel,a,m,85,0,5,7,0,97
+Bahrain,BH,BHR,48,EMR,2024,newrel,a,f,49,0,0,0,0,49
+Bangladesh,BD,BGD,50,SEA,2018,newrel,0-14,a,10947,,,,,11299
+Bangladesh,BD,BGD,50,SEA,2019,newrel,0-14,a,11882,,,,,12307
+Bangladesh,BD,BGD,50,SEA,2019,newrel,a,m,153620,646,6159,1062,2183,163670
+Bangladesh,BD,BGD,50,SEA,2019,newrel,a,f,120832,259,2272,691,2139,126193
+Bangladesh,BD,BGD,50,SEA,2020,newrel,0-14,a,9129,,,,,9363
+Bangladesh,BD,BGD,50,SEA,2020,newrel,a,m,119529,464,4703,495,1293,126484
+Bangladesh,BD,BGD,50,SEA,2020,newrel,a,f,98585,229,1779,343,1359,102295
+Bangladesh,BD,BGD,50,SEA,2021,newrel,0-14,a,10121,,,,,10427
+Bangladesh,BD,BGD,50,SEA,2021,newrel,a,m,160197,482,4307,480,1356,166822
+Bangladesh,BD,BGD,50,SEA,2021,newrel,a,f,136290,202,1555,339,1652,140038
+Bangladesh,BD,BGD,50,SEA,2022,newrel,0-14,a,10294,,,,,10701
+Bangladesh,BD,BGD,50,SEA,2022,newrel,a,m,138655,551,4980,719,2094,146999
+Bangladesh,BD,BGD,50,SEA,2022,newrel,a,f,110660,231,1810,478,1866,115045
+Bangladesh,BD,BGD,50,SEA,2023,newrel,0-14,a,11538,,,,,11906
+Bangladesh,BD,BGD,50,SEA,2023,newrel,a,m,162656,485,5515,916,2030,171602
+Bangladesh,BD,BGD,50,SEA,2023,newrel,a,f,125061,195,2048,661,1689,129654
+Bangladesh,BD,BGD,50,SEA,2024,newrel,0-14,a,16024,16,144,126,287,16597
+Bangladesh,BD,BGD,50,SEA,2024,newrel,a,m,167747,483,6988,1465,2167,178850
+Bangladesh,BD,BGD,50,SEA,2024,newrel,a,f,127883,204,2545,951,1936,133519
+Barbados,BB,BRB,52,AMR,2018,newrel,0-14,a,0,0,0,0,0,0
+Barbados,BB,BRB,52,AMR,2019,newrel,0-14,a,0,0,0,0,0,0
+Barbados,BB,BRB,52,AMR,2024,newrel,0-14,a,0,0,0,0,0,0
+Barbados,BB,BRB,52,AMR,2024,newrel,a,m,0,0,0,0,0,0
+Barbados,BB,BRB,52,AMR,2024,newrel,a,f,0,0,0,0,0,0
+Belarus,BY,BLR,112,EUR,2010,newrel,0-14,a,20,3,0,0,2,25
+Belarus,BY,BLR,112,EUR,2011,newrel,0-14,a,12,4,0,0,1,17
+Belarus,BY,BLR,112,EUR,2012,newrel,0-14,a,13,1,0,0,1,15
+Belarus,BY,BLR,112,EUR,2013,newrel,0-14,a,11,0,0,0,0,11
+Belarus,BY,BLR,112,EUR,2014,newrel,0-14,a,17,0,0,0,0,17
+Belarus,BY,BLR,112,EUR,2015,newrel,0-14,a,7,0,0,0,0,7
+Belarus,BY,BLR,112,EUR,2016,newrel,0-14,a,8,0,0,0,3,11
+Belarus,BY,BLR,112,EUR,2017,newrel,0-14,a,11,0,0,0,0,11
+Belarus,BY,BLR,112,EUR,2018,newrel,0-14,a,10,0,0,0,2,12
+Belarus,BY,BLR,112,EUR,2019,newrel,0-14,a,8,0,0,0,0,8
+Belarus,BY,BLR,112,EUR,2020,newrel,0-14,a,3,0,0,0,0,3
+Belarus,BY,BLR,112,EUR,2020,newrel,a,m,511,6,53,17,6,593
+Belarus,BY,BLR,112,EUR,2020,newrel,a,f,199,4,31,6,0,240
+Belarus,BY,BLR,112,EUR,2021,newrel,0-14,a,5,0,0,0,0,5
+Belarus,BY,BLR,112,EUR,2021,newrel,a,m,551,15,65,30,0,661
+Belarus,BY,BLR,112,EUR,2021,newrel,a,f,208,4,16,14,0,242
+Belarus,BY,BLR,112,EUR,2022,newrel,0-14,a,4,0,0,0,0,4
+Belarus,BY,BLR,112,EUR,2022,newrel,a,m,649,16,51,16,2,734
+Belarus,BY,BLR,112,EUR,2022,newrel,a,f,220,5,31,5,4,265
+Belarus,BY,BLR,112,EUR,2023,newrel,0-14,a,10,0,0,0,0,10
+Belarus,BY,BLR,112,EUR,2023,newrel,a,m,606,5,47,20,0,678
+Belarus,BY,BLR,112,EUR,2023,newrel,a,f,220,3,29,1,0,253
+Belarus,BY,BLR,112,EUR,2024,newrel,0-14,a,3,0,0,0,0,3
+Belarus,BY,BLR,112,EUR,2024,newrel,a,m,518,5,59,20,7,609
+Belarus,BY,BLR,112,EUR,2024,newrel,a,f,164,4,25,7,1,201
+Belgium,BE,BEL,56,EUR,2010,newrel,0-14,a,35,0,0,3,0,38
+Belgium,BE,BEL,56,EUR,2011,newrel,0-14,a,30,0,1,1,4,36
+Belgium,BE,BEL,56,EUR,2012,newrel,0-14,a,54,0,1,0,7,62
+Belgium,BE,BEL,56,EUR,2013,newrel,0-14,a,53,0,0,2,1,56
+Belgium,BE,BEL,56,EUR,2014,newrel,0-14,a,56,0,0,0,3,59
+Belgium,BE,BEL,56,EUR,2015,newrel,0-14,a,67,0,1,0,1,69
+Belgium,BE,BEL,56,EUR,2016,newrel,0-14,a,55,0,0,1,1,57
+Belgium,BE,BEL,56,EUR,2017,newrel,0-14,a,59,0,0,4,4,67
+Belgium,BE,BEL,56,EUR,2018,newrel,0-14,a,54,0,0,5,1,60
+Belgium,BE,BEL,56,EUR,2019,newrel,0-14,a,45,0,0,1,2,48
+Belgium,BE,BEL,56,EUR,2020,newrel,0-14,a,39,0,0,0,9,48
+Belgium,BE,BEL,56,EUR,2021,newrel,0-14,a,34,0,0,2,4,40
+Belgium,BE,BEL,56,EUR,2023,newrel,0-14,a,26,0,0,1,9,36
+Belgium,BE,BEL,56,EUR,2024,newrel,0-14,a,29,0,0,0,4,33
+Belgium,BE,BEL,56,EUR,2024,newrel,a,m,339,0,21,41,74,475
+Belgium,BE,BEL,56,EUR,2024,newrel,a,f,157,0,4,4,27,192
+Belize,BZ,BLZ,84,AMR,2013,newrel,0-14,a,2,0,0,1,1,4
+Belize,BZ,BLZ,84,AMR,2014,newrel,0-14,a,3,0,0,1,1,5
+Belize,BZ,BLZ,84,AMR,2015,newrel,0-14,a,3,,1,,0,4
+Belize,BZ,BLZ,84,AMR,2016,newrel,0-14,a,1,0,1,0,1,3
+Belize,BZ,BLZ,84,AMR,2017,newrel,0-14,a,1,0,0,0,0,1
+Belize,BZ,BLZ,84,AMR,2018,newrel,0-14,a,0,0,0,0,0,0
+Belize,BZ,BLZ,84,AMR,2019,newrel,0-14,a,0,0,0,0,0,0
+Belize,BZ,BLZ,84,AMR,2020,newrel,0-14,a,1,0,0,1,0,2
+Belize,BZ,BLZ,84,AMR,2021,newrel,0-14,a,2,0,0,0,0,2
+Belize,BZ,BLZ,84,AMR,2022,newrel,0-14,a,0,0,0,0,1,1
+Belize,BZ,BLZ,84,AMR,2023,newrel,0-14,a,0,0,0,1,0,1
+Belize,BZ,BLZ,84,AMR,2024,newrel,0-14,a,0,0,0,0,0,0
+Belize,BZ,BLZ,84,AMR,2024,newrel,a,m,30,0,10,8,6,54
+Belize,BZ,BLZ,84,AMR,2024,newrel,a,f,13,1,3,1,1,19
+Benin,BJ,BEN,204,AFR,2018,newrel,0-14,a,173,,,,,202
+Benin,BJ,BEN,204,AFR,2019,newrel,0-14,a,212,,,,,232
+Benin,BJ,BEN,204,AFR,2020,newrel,0-14,a,195,,,,,215
+Benin,BJ,BEN,204,AFR,2021,newrel,0-14,a,120,,,,,134
+Benin,BJ,BEN,204,AFR,2022,newrel,0-14,a,157,,,,,174
+Benin,BJ,BEN,204,AFR,2023,newrel,0-14,a,164,,,,,175
+Benin,BJ,BEN,204,AFR,2024,newrel,0-14,a,145,9,0,0,0,154
+Benin,BJ,BEN,204,AFR,2024,newrel,a,m,2309,45,110,96,25,2585
+Benin,BJ,BEN,204,AFR,2024,newrel,a,f,1243,25,59,52,14,1393
+Bermuda,BM,BMU,60,AMR,2018,newrel,0-14,a,0,0,0,0,0,0
+Bermuda,BM,BMU,60,AMR,2019,newrel,0-14,a,0,0,0,0,0,0
+Bermuda,BM,BMU,60,AMR,2020,newrel,0-14,a,0,0,0,0,0,0
+Bermuda,BM,BMU,60,AMR,2021,newrel,0-14,a,0,0,0,0,0,0
+Bermuda,BM,BMU,60,AMR,2022,newrel,0-14,a,0,0,0,0,0,0
+Bhutan,BT,BTN,64,SEA,2018,newrel,0-14,a,26,,,,,26
+Bhutan,BT,BTN,64,SEA,2019,newrel,0-14,a,27,,,,,27
+Bhutan,BT,BTN,64,SEA,2020,newrel,0-14,a,26,,,,,31
+Bhutan,BT,BTN,64,SEA,2021,newrel,0-14,a,16,,,,,16
+Bhutan,BT,BTN,64,SEA,2022,newrel,0-14,a,30,,,,,32
+Bhutan,BT,BTN,64,SEA,2023,newrel,0-14,a,20,,,,,20
+Bosnia and Herzegovina,BA,BIH,70,EUR,2010,newrel,0-14,a,0,0,0,0,0,0
+Bosnia and Herzegovina,BA,BIH,70,EUR,2011,newrel,0-14,a,14,0,1,1,1,17
+Bosnia and Herzegovina,BA,BIH,70,EUR,2012,newrel,0-14,a,13,1,0,0,0,14
+Bosnia and Herzegovina,BA,BIH,70,EUR,2013,newrel,0-14,a,9,2,0,0,4,15
+Bosnia and Herzegovina,BA,BIH,70,EUR,2014,newrel,0-14,a,11,3,,,1,15
+Bosnia and Herzegovina,BA,BIH,70,EUR,2015,newrel,0-14,a,12,0,0,0,2,14
+Bosnia and Herzegovina,BA,BIH,70,EUR,2016,newrel,0-14,a,8,0,1,0,1,10
+Bosnia and Herzegovina,BA,BIH,70,EUR,2017,newrel,0-14,a,5,2,0,1,3,11
+Bosnia and Herzegovina,BA,BIH,70,EUR,2018,newrel,0-14,a,1,,,,,5
+Bosnia and Herzegovina,BA,BIH,70,EUR,2019,newrel,0-14,a,0,0,0,0,3,3
+Bosnia and Herzegovina,BA,BIH,70,EUR,2020,newrel,0-14,a,,,,,,1
+Bosnia and Herzegovina,BA,BIH,70,EUR,2021,newrel,0-14,a,,,,,,1
+Bosnia and Herzegovina,BA,BIH,70,EUR,2022,newrel,0-14,a,0,0,0,0,0,0
+Botswana,BW,BWA,72,AFR,2018,newrel,0-14,a,257,,,,,312
+Botswana,BW,BWA,72,AFR,2019,newrel,0-14,a,206,,,,,572
+Botswana,BW,BWA,72,AFR,2020,newrel,0-14,a,212,,,,,251
+Botswana,BW,BWA,72,AFR,2020,newrel,a,m,1286,11,135,26,193,1651
+Botswana,BW,BWA,72,AFR,2020,newrel,a,f,984,3,79,9,203,1278
+Botswana,BW,BWA,72,AFR,2021,newrel,0-14,a,133,,,,,158
+Botswana,BW,BWA,72,AFR,2021,newrel,a,m,1310,10,162,19,235,1736
+Botswana,BW,BWA,72,AFR,2021,newrel,a,f,831,10,67,7,149,1064
+Botswana,BW,BWA,72,AFR,2022,newrel,0-14,a,147,,,,,198
+Botswana,BW,BWA,72,AFR,2022,newrel,a,m,1484,13,128,18,339,1982
+Botswana,BW,BWA,72,AFR,2022,newrel,a,f,925,6,75,10,189,1205
+Botswana,BW,BWA,72,AFR,2023,newrel,0-14,a,215,,,,,243
+Botswana,BW,BWA,72,AFR,2023,newrel,a,m,1628,13,158,77,87,1963
+Botswana,BW,BWA,72,AFR,2023,newrel,a,f,1096,13,79,41,49,1278
+Botswana,BW,BWA,72,AFR,2024,newrel,0-14,a,149,0,11,3,0,163
+Botswana,BW,BWA,72,AFR,2024,newrel,a,m,1449,18,142,37,0,1646
+Botswana,BW,BWA,72,AFR,2024,newrel,a,f,879,4,55,9,0,947
+Brazil,BR,BRA,76,AMR,2013,newrel,0-14,a,2089,0,104,153,295,2641
+Brazil,BR,BRA,76,AMR,2014,newrel,0-14,a,1719,0,92,131,291,2233
+Brazil,BR,BRA,76,AMR,2015,newrel,0-14,a,1647,1,61,125,275,2109
+Brazil,BR,BRA,76,AMR,2016,newrel,0-14,a,1750,2,68,132,264,2216
+Brazil,BR,BRA,76,AMR,2017,newrel,0-14,a,1746,1,63,134,337,2281
+Brazil,BR,BRA,76,AMR,2018,newrel,0-14,a,1928,0,80,174,328,2510
+Brazil,BR,BRA,76,AMR,2019,newrel,0-14,a,1964,0,75,209,411,2659
+Brazil,BR,BRA,76,AMR,2019,newrel,a,m,38926,46,4593,7656,6944,58165
+Brazil,BR,BRA,76,AMR,2019,newrel,a,f,18724,19,1753,2376,2768,25640
+Brazil,BR,BRA,76,AMR,2020,newrel,0-14,a,1357,0,72,155,319,1903
+Brazil,BR,BRA,76,AMR,2020,newrel,a,m,32847,35,4487,7140,6247,50756
+Brazil,BR,BRA,76,AMR,2020,newrel,a,f,15701,11,1650,2138,2569,22069
+Brazil,BR,BRA,76,AMR,2021,newrel,0-14,a,1500,1,69,213,411,2194
+Brazil,BR,BRA,76,AMR,2021,newrel,a,m,33889,38,5248,7878,7198,54251
+Brazil,BR,BRA,76,AMR,2021,newrel,a,f,16550,17,1807,2537,2861,23772
+Brazil,BR,BRA,76,AMR,2022,newrel,0-14,a,1997,1,88,231,391,2708
+Brazil,BR,BRA,76,AMR,2022,newrel,a,m,38523,40,5457,9288,7317,60625
+Brazil,BR,BRA,76,AMR,2022,newrel,a,f,18722,17,2087,2853,2949,26628
+Brazil,BR,BRA,76,AMR,2023,newrel,0-14,a,2134,0,109,284,461,2988
+Brazil,BR,BRA,76,AMR,2023,newrel,a,m,40007,42,5667,9802,7811,63329
+Brazil,BR,BRA,76,AMR,2023,newrel,a,f,18938,15,2090,3071,3094,27208
+Brazil,BR,BRA,76,AMR,2024,newrel,0-14,a,2216,6,89,331,456,3098
+Brazil,BR,BRA,76,AMR,2024,newrel,a,m,43792,91,6264,15860,9246,75253
+Brazil,BR,BRA,76,AMR,2024,newrel,a,f,20455,38,2314,5128,3748,31683
+British Virgin Islands,VG,VGB,92,AMR,2022,newrel,0-14,a,0,0,0,0,0,0
+Brunei Darussalam,BN,BRN,96,WPR,2018,newrel,0-14,a,5,,,,,5
+Brunei Darussalam,BN,BRN,96,WPR,2019,newrel,0-14,a,6,,,,,6
+Brunei Darussalam,BN,BRN,96,WPR,2020,newrel,0-14,a,1,,,,,1
+Bulgaria,BG,BGR,100,EUR,2010,newrel,0-14,a,9,0,0,1,1,11
+Bulgaria,BG,BGR,100,EUR,2011,newrel,0-14,a,12,0,0,0,1,13
+Bulgaria,BG,BGR,100,EUR,2012,newrel,0-14,a,178,0,0,0,0,178
+Bulgaria,BG,BGR,100,EUR,2013,newrel,0-14,a,139,0,1,6,0,146
+Bulgaria,BG,BGR,100,EUR,2014,newrel,0-14,a,139,0,0,6,0,145
+Bulgaria,BG,BGR,100,EUR,2015,newrel,0-14,a,112,0,1,5,0,118
+Bulgaria,BG,BGR,100,EUR,2016,newrel,0-14,a,117,0,0,7,0,124
+Bulgaria,BG,BGR,100,EUR,2017,newrel,0-14,a,101,0,0,4,0,105
+Bulgaria,BG,BGR,100,EUR,2018,newrel,0-14,a,66,0,0,1,0,67
+Bulgaria,BG,BGR,100,EUR,2019,newrel,0-14,a,47,0,1,3,3,54
+Bulgaria,BG,BGR,100,EUR,2021,newrel,0-14,a,13,0,0,4,1,18
+Bulgaria,BG,BGR,100,EUR,2023,newrel,0-14,a,17,0,1,1,1,20
+Bulgaria,BG,BGR,100,EUR,2024,newrel,0-14,a,19,0,0,10,2,31
+Bulgaria,BG,BGR,100,EUR,2024,newrel,a,m,441,8,66,51,18,584
+Bulgaria,BG,BGR,100,EUR,2024,newrel,a,f,252,3,23,34,8,320
+Burkina Faso,BF,BFA,854,AFR,2023,newrel,0-14,a,290,,,,,299
+Burundi,BI,BDI,108,AFR,2018,newrel,0-14,a,375,,,,,387
+Burundi,BI,BDI,108,AFR,2019,newrel,0-14,a,310,,,,,324
+Burundi,BI,BDI,108,AFR,2020,newrel,0-14,a,277,,,,,289
+Burundi,BI,BDI,108,AFR,2021,newrel,0-14,a,280,,,,,290
+Burundi,BI,BDI,108,AFR,2022,newrel,0-14,a,280,,,,,349
+Burundi,BI,BDI,108,AFR,2023,newrel,0-14,a,330,,,,,343
+Burundi,BI,BDI,108,AFR,2024,newrel,0-14,a,266,0,30,5,4,305
+Burundi,BI,BDI,108,AFR,2024,newrel,a,m,5126,12,158,195,110,5601
+Burundi,BI,BDI,108,AFR,2024,newrel,a,f,2167,8,82,48,179,2484
+Cabo Verde,CV,CPV,132,AFR,2018,newrel,0-14,a,4,,,,,4
+Cabo Verde,CV,CPV,132,AFR,2019,newrel,0-14,a,4,,,,,4
+Cabo Verde,CV,CPV,132,AFR,2020,newrel,0-14,a,6,,,,,6
+Cabo Verde,CV,CPV,132,AFR,2021,newrel,0-14,a,2,,,,,2
+Cabo Verde,CV,CPV,132,AFR,2022,newrel,0-14,a,6,,,,,6
+Cabo Verde,CV,CPV,132,AFR,2023,newrel,0-14,a,4,,,,,7
+Cambodia,KH,KHM,116,WPR,2022,newrel,0-14,a,8018,,,,,8044
+Cambodia,KH,KHM,116,WPR,2023,newrel,0-14,a,7116,,,,,7160
+Cambodia,KH,KHM,116,WPR,2024,newrel,0-14,a,5489,1,6,34,6,5536
+Cambodia,KH,KHM,116,WPR,2024,newrel,a,m,18263,14,476,370,132,19255
+Cambodia,KH,KHM,116,WPR,2024,newrel,a,f,13743,10,230,304,90,14377
+Cameroon,CM,CMR,120,AFR,2019,newrel,0-14,a,1100,,,,,1271
+Cameroon,CM,CMR,120,AFR,2020,newrel,0-14,a,1087,,,,,1222
+Cameroon,CM,CMR,120,AFR,2020,newrel,a,m,11705,91,878,741,316,13731
+Cameroon,CM,CMR,120,AFR,2020,newrel,a,f,7194,27,563,383,202,8369
+Cameroon,CM,CMR,120,AFR,2021,newrel,0-14,a,1196,,,,,1380
+Cameroon,CM,CMR,120,AFR,2021,newrel,a,m,12536,94,766,690,222,14308
+Cameroon,CM,CMR,120,AFR,2021,newrel,a,f,7149,36,449,289,178,8101
+Cameroon,CM,CMR,120,AFR,2022,newrel,0-14,a,1286,,,,,1363
+Cameroon,CM,CMR,120,AFR,2022,newrel,a,m,13992,89,843,749,206,15879
+Cameroon,CM,CMR,120,AFR,2022,newrel,a,f,7932,41,446,311,113,8843
+Cameroon,CM,CMR,120,AFR,2023,newrel,0-14,a,1193,,,,,1279
+Cameroon,CM,CMR,120,AFR,2023,newrel,a,m,14089,80,786,687,203,15845
+Cameroon,CM,CMR,120,AFR,2023,newrel,a,f,7859,35,440,331,117,8782
+Cameroon,CM,CMR,120,AFR,2024,newrel,0-14,a,1682,1,70,79,20,1852
+Cameroon,CM,CMR,120,AFR,2024,newrel,a,m,15359,80,775,908,172,17294
+Cameroon,CM,CMR,120,AFR,2024,newrel,a,f,8393,27,311,391,111,9233
+Canada,CA,CAN,124,AMR,2018,newrel,0-14,a,88,0,1,0,9,98
+Canada,CA,CAN,124,AMR,2019,newrel,0-14,a,100,0,1,1,12,114
+Canada,CA,CAN,124,AMR,2022,newrel,0-14,a,104,0,0,0,25,129
+Canada,CA,CAN,124,AMR,2023,newrel,0-14,a,114,0,4,1,20,139
+Cayman Islands,KY,CYM,136,AMR,2019,newrel,0-14,a,0,0,0,0,0,0
+Cayman Islands,KY,CYM,136,AMR,2021,newrel,0-14,a,0,0,0,0,0,0
+Cayman Islands,KY,CYM,136,AMR,2022,newrel,0-14,a,0,0,0,0,0,0
+Central African Republic,CF,CAF,140,AFR,2019,newrel,0-14,a,924,,,,,1150
+Central African Republic,CF,CAF,140,AFR,2019,newrel,a,m,5249,43,458,897,0,6647
+Central African Republic,CF,CAF,140,AFR,2019,newrel,a,f,3416,10,98,192,384,4100
+Central African Republic,CF,CAF,140,AFR,2020,newrel,0-14,a,1141,,,,,1629
+Central African Republic,CF,CAF,140,AFR,2021,newrel,0-14,a,1248,,,,,1689
+Central African Republic,CF,CAF,140,AFR,2022,newrel,0-14,a,1575,,,,,1693
+Central African Republic,CF,CAF,140,AFR,2023,newrel,0-14,a,1683,,,,,1987
+Central African Republic,CF,CAF,140,AFR,2024,newrel,0-14,a,1508,0,0,0,176,1684
+Chad,TD,TCD,148,AFR,2018,newrel,0-14,a,722,,,,,950
+Chad,TD,TCD,148,AFR,2019,newrel,0-14,a,1007,,,,,1043
+Chad,TD,TCD,148,AFR,2020,newrel,0-14,a,777,,,,,927
+Chad,TD,TCD,148,AFR,2021,newrel,0-14,a,742,,,,,898
+Chad,TD,TCD,148,AFR,2022,newrel,0-14,a,848,,,,,1065
+Chad,TD,TCD,148,AFR,2023,newrel,0-14,a,818,,,,,965
+Chile,CL,CHL,152,AMR,2013,newrel,0-14,a,,,,,,59
+Chile,CL,CHL,152,AMR,2014,newrel,0-14,a,40,0,1,0,16,57
+Chile,CL,CHL,152,AMR,2015,newrel,0-14,a,52,1,1,0,0,54
+Chile,CL,CHL,152,AMR,2016,newrel,0-14,a,45,0,0,0,0,45
+Chile,CL,CHL,152,AMR,2017,newrel,0-14,a,40,0,0,0,0,40
+Chile,CL,CHL,152,AMR,2018,newrel,0-14,a,70,0,0,0,6,76
+Chile,CL,CHL,152,AMR,2019,newrel,0-14,a,42,0,1,7,4,54
+Chile,CL,CHL,152,AMR,2020,newrel,0-14,a,53,0,1,2,5,61
+Chile,CL,CHL,152,AMR,2021,newrel,0-14,a,77,0,1,5,4,87
+Chile,CL,CHL,152,AMR,2022,newrel,0-14,a,77,0,0,1,5,83
+Chile,CL,CHL,152,AMR,2023,newrel,0-14,a,97,0,1,4,2,104
+Chile,CL,CHL,152,AMR,2024,newrel,0-14,a,110,0,1,1,6,118
+Chile,CL,CHL,152,AMR,2024,newrel,a,m,1366,2,253,391,67,2079
+Chile,CL,CHL,152,AMR,2024,newrel,a,f,813,2,85,120,35,1055
+China,CN,CHN,156,WPR,2018,newrel,0-14,a,6001,,,,,6421
+China,CN,CHN,156,WPR,2019,newrel,0-14,a,6221,,,,,6665
+China,CN,CHN,156,WPR,2019,newrel,a,m,461230,3159,12195,10290,3621,490495
+China,CN,CHN,156,WPR,2019,newrel,a,f,211543,838,3234,3441,2414,221470
+China,CN,CHN,156,WPR,2020,newrel,0-14,a,6583,,,,,6827
+China,CN,CHN,156,WPR,2020,newrel,a,m,391053,2401,11126,7699,3158,415437
+China,CN,CHN,156,WPR,2020,newrel,a,f,185233,608,2844,2710,1905,193300
+China,CN,CHN,156,WPR,2021,newrel,0-14,a,6545,,,,,6810
+China,CN,CHN,156,WPR,2021,newrel,a,m,364207,1845,10826,6824,5152,388854
+China,CN,CHN,156,WPR,2021,newrel,a,f,173380,410,2701,2490,3075,182056
+China,CN,CHN,156,WPR,2022,newrel,0-14,a,5710,,,,,6293
+China,CN,CHN,156,WPR,2022,newrel,a,m,315029,1313,11131,5316,2333,335122
+China,CN,CHN,156,WPR,2022,newrel,a,f,151814,305,2764,1859,1533,158275
+China,CN,CHN,156,WPR,2023,newrel,0-14,a,6230,,,,,6495
+China,CN,CHN,156,WPR,2023,newrel,a,m,344555,1472,12525,6651,2173,367376
+China,CN,CHN,156,WPR,2023,newrel,a,f,174098,339,3139,2131,1756,181463
+China,CN,CHN,156,WPR,2024,newrel,0-14,a,5847,16,16,28,0,5907
+China,CN,CHN,156,WPR,2024,newrel,a,m,267075,4656,12035,4122,3902,291790
+China,CN,CHN,156,WPR,2024,newrel,a,f,229763,929,4354,1372,12,236430
+"China, Hong Kong SAR",HK,HKG,344,WPR,2018,newrel,0-14,a,11,,,,,20
+"China, Hong Kong SAR",HK,HKG,344,WPR,2019,newrel,0-14,a,15,,,,,18
+"China, Hong Kong SAR",HK,HKG,344,WPR,2020,newrel,0-14,a,12,,,,,12
+"China, Hong Kong SAR",HK,HKG,344,WPR,2021,newrel,0-14,a,20,,,,,20
+"China, Hong Kong SAR",HK,HKG,344,WPR,2022,newrel,0-14,a,11,,,,,11
+"China, Hong Kong SAR",HK,HKG,344,WPR,2023,newrel,0-14,a,14,,,,,14
+"China, Hong Kong SAR",HK,HKG,344,WPR,2024,newrel,0-14,a,11,0,0,0,0,11
+"China, Hong Kong SAR",HK,HKG,344,WPR,2024,newrel,a,m,1520,0,343,34,28,1925
+"China, Hong Kong SAR",HK,HKG,344,WPR,2024,newrel,a,f,869,0,102,17,58,1046
+"China, Macao SAR",MO,MAC,446,WPR,2018,newrel,0-14,a,2,,,,,2
+"China, Macao SAR",MO,MAC,446,WPR,2019,newrel,0-14,a,2,,,,,2
+"China, Macao SAR",MO,MAC,446,WPR,2020,newrel,0-14,a,3,,,,,3
+"China, Macao SAR",MO,MAC,446,WPR,2021,newrel,0-14,a,2,,,,,4
+"China, Macao SAR",MO,MAC,446,WPR,2022,newrel,0-14,a,1,,,,,1
+"China, Macao SAR",MO,MAC,446,WPR,2023,newrel,0-14,a,3,,,,,3
+"China, Macao SAR",MO,MAC,446,WPR,2024,newrel,0-14,a,1,0,0,0,0,1
+"China, Macao SAR",MO,MAC,446,WPR,2024,newrel,a,m,160,2,20,0,10,192
+"China, Macao SAR",MO,MAC,446,WPR,2024,newrel,a,f,79,0,0,1,6,86
+Colombia,CO,COL,170,AMR,2013,newrel,0-14,a,334,14,19,17,187,571
+Colombia,CO,COL,170,AMR,2014,newrel,0-14,a,445,1,23,42,18,529
+Colombia,CO,COL,170,AMR,2015,newrel,0-14,a,384,1,23,28,18,454
+Colombia,CO,COL,170,AMR,2016,newrel,0-14,a,508,14,53,99,152,826
+Colombia,CO,COL,170,AMR,2017,newrel,0-14,a,340,0,18,23,112,493
+Colombia,CO,COL,170,AMR,2018,newrel,0-14,a,343,4,27,34,17,425
+Colombia,CO,COL,170,AMR,2019,newrel,0-14,a,303,2,36,31,15,387
+Colombia,CO,COL,170,AMR,2020,newrel,0-14,a,237,2,28,18,12,297
+Colombia,CO,COL,170,AMR,2021,newrel,0-14,a,251,1,19,21,24,316
+Colombia,CO,COL,170,AMR,2022,newrel,0-14,a,451,4,37,48,24,564
+Colombia,CO,COL,170,AMR,2023,newrel,0-14,a,442,3,39,60,31,575
+Colombia,CO,COL,170,AMR,2024,newrel,0-14,a,536,2,29,72,9,648
+Colombia,CO,COL,170,AMR,2024,newrel,a,m,10006,111,2147,2529,49,14842
+Colombia,CO,COL,170,AMR,2024,newrel,a,f,5262,59,757,823,80,6981
+Comoros,KM,COM,174,AFR,2022,newrel,0-14,a,12,,,,,12
+Comoros,KM,COM,174,AFR,2023,newrel,0-14,a,10,,,,,10
+Comoros,KM,COM,174,AFR,2024,newrel,0-14,a,16,0,0,0,0,16
+Comoros,KM,COM,174,AFR,2024,newrel,a,m,67,0,2,4,3,76
+Comoros,KM,COM,174,AFR,2024,newrel,a,f,51,0,1,3,0,55
+Congo,CG,COG,178,AFR,2018,newrel,0-14,a,0,,,,,0
+Cook Islands,CK,COK,184,WPR,2019,newrel,0-14,a,0,,,,,0
+Cook Islands,CK,COK,184,WPR,2022,newrel,0-14,a,,,,,,0
+Costa Rica,CR,CRI,188,AMR,2013,newrel,0-14,a,28,0,1,0,1,30
+Costa Rica,CR,CRI,188,AMR,2018,newrel,0-14,a,13,0,0,0,0,13
+Costa Rica,CR,CRI,188,AMR,2020,newrel,0-14,a,7,0,0,0,1,8
+Costa Rica,CR,CRI,188,AMR,2021,newrel,0-14,a,8,0,0,0,0,8
+Costa Rica,CR,CRI,188,AMR,2023,newrel,0-14,a,20,0,0,0,0,20
+Costa Rica,CR,CRI,188,AMR,2024,newrel,0-14,a,20,0,0,1,0,21
+Costa Rica,CR,CRI,188,AMR,2024,newrel,a,m,243,3,34,20,0,300
+Costa Rica,CR,CRI,188,AMR,2024,newrel,a,f,154,0,4,6,0,164
+Croatia,HR,HRV,191,EUR,2012,newrel,0-14,a,1,0,0,0,11,12
+Croatia,HR,HRV,191,EUR,2013,newrel,0-14,a,1,0,0,1,2,4
+Croatia,HR,HRV,191,EUR,2014,newrel,0-14,a,1,0,0,0,1,2
+Croatia,HR,HRV,191,EUR,2015,newrel,0-14,a,0,0,0,0,0,0
+Croatia,HR,HRV,191,EUR,2016,newrel,0-14,a,3,0,0,0,2,5
+Croatia,HR,HRV,191,EUR,2017,newrel,0-14,a,2,0,0,0,1,3
+Croatia,HR,HRV,191,EUR,2018,newrel,0-14,a,2,0,0,0,6,8
+Croatia,HR,HRV,191,EUR,2019,newrel,0-14,a,1,0,0,0,0,1
+Croatia,HR,HRV,191,EUR,2020,newrel,0-14,a,0,0,0,0,2,2
+Croatia,HR,HRV,191,EUR,2021,newrel,0-14,a,2,0,0,0,0,2
+Croatia,HR,HRV,191,EUR,2022,newrel,0-14,a,1,0,0,0,0,1
+Croatia,HR,HRV,191,EUR,2023,newrel,0-14,a,2,0,0,0,1,3
+Cuba,CU,CUB,192,AMR,2018,newrel,0-14,a,10,0,0,0,0,10
+Cuba,CU,CUB,192,AMR,2019,newrel,0-14,a,5,0,1,0,0,6
+Cuba,CU,CUB,192,AMR,2020,newrel,0-14,a,9,0,0,0,0,9
+Cuba,CU,CUB,192,AMR,2021,newrel,0-14,a,8,0,0,0,0,8
+Cuba,CU,CUB,192,AMR,2022,newrel,0-14,a,13,0,0,0,0,13
+Cuba,CU,CUB,192,AMR,2023,newrel,0-14,a,13,0,0,0,1,14
+Cuba,CU,CUB,192,AMR,2024,newrel,0-14,a,16,0,2,0,0,18
+Cuba,CU,CUB,192,AMR,2024,newrel,a,m,710,25,86,34,4,859
+Cuba,CU,CUB,192,AMR,2024,newrel,a,f,193,5,19,4,2,223
+Cyprus,CY,CYP,196,EUR,2010,newrel,0-14,a,0,0,0,0,0,0
+Cyprus,CY,CYP,196,EUR,2011,newrel,0-14,a,0,0,0,0,0,0
+Cyprus,CY,CYP,196,EUR,2012,newrel,0-14,a,0,0,1,0,2,3
+Cyprus,CY,CYP,196,EUR,2013,newrel,0-14,a,0,0,0,0,0,0
+Cyprus,CY,CYP,196,EUR,2014,newrel,0-14,a,0,0,0,0,0,0
+Cyprus,CY,CYP,196,EUR,2015,newrel,0-14,a,0,0,0,0,0,0
+Cyprus,CY,CYP,196,EUR,2016,newrel,0-14,a,0,0,0,0,0,0
+Cyprus,CY,CYP,196,EUR,2017,newrel,0-14,a,1,0,1,0,1,3
+Cyprus,CY,CYP,196,EUR,2018,newrel,0-14,a,1,0,0,0,0,1
+Cyprus,CY,CYP,196,EUR,2019,newrel,0-14,a,0,0,0,0,2,2
+Cyprus,CY,CYP,196,EUR,2020,newrel,0-14,a,0,0,0,0,0,0
+Cyprus,CY,CYP,196,EUR,2021,newrel,0-14,a,0,0,0,0,0,0
+Cyprus,CY,CYP,196,EUR,2022,newrel,0-14,a,0,0,0,0,2,2
+Cyprus,CY,CYP,196,EUR,2023,newrel,0-14,a,0,0,0,0,3,3
+Czechia,CZ,CZE,203,EUR,2010,newrel,0-14,a,2,0,0,0,0,2
+Czechia,CZ,CZE,203,EUR,2011,newrel,0-14,a,4,0,0,0,0,4
+Czechia,CZ,CZE,203,EUR,2012,newrel,0-14,a,5,0,0,0,0,5
+Czechia,CZ,CZE,203,EUR,2013,newrel,0-14,a,2,0,0,1,2,5
+Czechia,CZ,CZE,203,EUR,2014,newrel,0-14,a,4,0,0,0,1,5
+Czechia,CZ,CZE,203,EUR,2015,newrel,0-14,a,5,0,0,0,0,5
+Czechia,CZ,CZE,203,EUR,2016,newrel,0-14,a,8,0,0,2,0,10
+Czechia,CZ,CZE,203,EUR,2017,newrel,0-14,a,5,0,0,1,0,6
+Czechia,CZ,CZE,203,EUR,2018,newrel,0-14,a,4,0,0,0,1,5
+Czechia,CZ,CZE,203,EUR,2019,newrel,0-14,a,4,0,0,0,0,4
+Czechia,CZ,CZE,203,EUR,2020,newrel,0-14,a,2,0,0,0,0,2
+Czechia,CZ,CZE,203,EUR,2021,newrel,0-14,a,11,0,0,1,0,12
+Czechia,CZ,CZE,203,EUR,2022,newrel,0-14,a,5,0,0,6,0,11
+Czechia,CZ,CZE,203,EUR,2023,newrel,0-14,a,27,0,0,0,0,27
+Czechia,CZ,CZE,203,EUR,2024,newrel,0-14,a,14,0,0,3,0,17
+Czechia,CZ,CZE,203,EUR,2024,newrel,a,m,218,0,24,59,8,309
+Czechia,CZ,CZE,203,EUR,2024,newrel,a,f,91,0,6,9,1,107
+Democratic People's Republic of Korea,KP,PRK,408,SEA,2022,newrel,0-14,a,,,,,,4084
+Democratic People's Republic of Korea,KP,PRK,408,SEA,2024,newrel,0-14,a,3052,135,34,102,68,3391
+Democratic People's Republic of Korea,KP,PRK,408,SEA,2024,newrel,a,m,38334,2672,1543,1456,260,44265
+Democratic People's Republic of Korea,KP,PRK,408,SEA,2024,newrel,a,f,23771,1351,540,810,540,27012
+Democratic Republic of the Congo,CD,COD,180,AFR,2018,newrel,0-14,a,15237,,,,,18453
+Democratic Republic of the Congo,CD,COD,180,AFR,2019,newrel,0-14,a,17613,,,,,19677
+Democratic Republic of the Congo,CD,COD,180,AFR,2020,newrel,0-14,a,20276,,,,,22342
+Democratic Republic of the Congo,CD,COD,180,AFR,2021,newrel,0-14,a,26011,,,,,26773
+Democratic Republic of the Congo,CD,COD,180,AFR,2022,newrel,0-14,a,31982,,,,,32745
+Democratic Republic of the Congo,CD,COD,180,AFR,2023,newrel,0-14,a,33812,,,,,34614
+Democratic Republic of the Congo,CD,COD,180,AFR,2024,newrel,0-14,a,37370,20,355,278,267,38290
+Denmark,DK,DNK,208,EUR,2010,newrel,0-14,a,7,0,0,0,1,8
+Denmark,DK,DNK,208,EUR,2011,newrel,0-14,a,7,0,0,0,3,10
+Denmark,DK,DNK,208,EUR,2012,newrel,0-14,a,8,0,0,0,9,17
+Denmark,DK,DNK,208,EUR,2013,newrel,0-14,a,11,0,0,0,11,22
+Denmark,DK,DNK,208,EUR,2014,newrel,0-14,a,4,0,0,0,5,9
+Denmark,DK,DNK,208,EUR,2015,newrel,0-14,a,2,0,0,0,12,14
+Denmark,DK,DNK,208,EUR,2016,newrel,0-14,a,3,0,0,0,15,18
+Denmark,DK,DNK,208,EUR,2017,newrel,0-14,a,0,0,0,0,0,0
+Denmark,DK,DNK,208,EUR,2018,newrel,0-14,a,0,0,0,0,10,10
+Denmark,DK,DNK,208,EUR,2019,newrel,0-14,a,0,0,0,0,16,16
+Denmark,DK,DNK,208,EUR,2020,newrel,0-14,a,3,0,0,0,7,10
+Denmark,DK,DNK,208,EUR,2021,newrel,0-14,a,0,0,0,0,6,6
+Denmark,DK,DNK,208,EUR,2022,newrel,0-14,a,1,0,0,0,3,4
+Denmark,DK,DNK,208,EUR,2023,newrel,0-14,a,1,0,0,0,8,9
+Djibouti,DJ,DJI,262,EMR,2018,newrel,0-14,a,189,,,,,236
+Djibouti,DJ,DJI,262,EMR,2019,newrel,0-14,a,164,,,,,168
+Djibouti,DJ,DJI,262,EMR,2021,newrel,0-14,a,49,,,,,49
+Dominica,DM,DMA,212,AMR,2018,newrel,0-14,a,0,0,0,0,0,0
+Dominica,DM,DMA,212,AMR,2020,newrel,0-14,a,0,0,0,0,0,0
+Dominica,DM,DMA,212,AMR,2021,newrel,0-14,a,0,0,0,0,0,0
+Dominica,DM,DMA,212,AMR,2022,newrel,0-14,a,0,0,0,0,0,0
+Dominica,DM,DMA,212,AMR,2023,newrel,0-14,a,0,0,0,0,0,0
+Dominican Republic,DO,DOM,214,AMR,2013,newrel,0-14,a,0,0,0,0,0,0
+Dominican Republic,DO,DOM,214,AMR,2014,newrel,0-14,a,0,0,0,0,0,0
+Dominican Republic,DO,DOM,214,AMR,2015,newrel,0-14,a,112,2,5,16,1,136
+Dominican Republic,DO,DOM,214,AMR,2016,newrel,0-14,a,104,1,3,14,9,131
+Dominican Republic,DO,DOM,214,AMR,2017,newrel,0-14,a,81,0,4,12,9,106
+Dominican Republic,DO,DOM,214,AMR,2018,newrel,0-14,a,87,0,1,11,4,103
+Dominican Republic,DO,DOM,214,AMR,2019,newrel,0-14,a,64,0,4,2,1,71
+Dominican Republic,DO,DOM,214,AMR,2020,newrel,0-14,a,33,0,0,1,0,34
+Dominican Republic,DO,DOM,214,AMR,2021,newrel,0-14,a,40,0,2,2,0,44
+Dominican Republic,DO,DOM,214,AMR,2022,newrel,0-14,a,64,0,2,7,0,73
+Dominican Republic,DO,DOM,214,AMR,2023,newrel,0-14,a,112,0,2,11,0,125
+Dominican Republic,DO,DOM,214,AMR,2024,newrel,0-14,a,111,0,0,10,0,121
+Dominican Republic,DO,DOM,214,AMR,2024,newrel,a,m,2523,7,180,455,3,3168
+Dominican Republic,DO,DOM,214,AMR,2024,newrel,a,f,1258,3,87,193,2,1543
+Ecuador,EC,ECU,218,AMR,2024,newrel,0-14,a,42,1,3,11,2,59
+Ecuador,EC,ECU,218,AMR,2024,newrel,a,m,3993,61,420,1320,124,5918
+Ecuador,EC,ECU,218,AMR,2024,newrel,a,f,1879,28,198,621,58,2784
+Egypt,EG,EGY,818,EMR,2019,newrel,0-14,a,488,,,,,488
+Egypt,EG,EGY,818,EMR,2020,newrel,0-14,a,471,,,,,471
+Egypt,EG,EGY,818,EMR,2021,newrel,0-14,a,474,,,,,474
+Egypt,EG,EGY,818,EMR,2022,newrel,0-14,a,413,,,,,469
+Egypt,EG,EGY,818,EMR,2023,newrel,0-14,a,534,,,,,560
+Egypt,EG,EGY,818,EMR,2024,newrel,0-14,a,589,1,6,13,0,609
+El Salvador,SV,SLV,222,AMR,2015,newrel,0-14,a,8,0,0,0,0,8
+El Salvador,SV,SLV,222,AMR,2016,newrel,0-14,a,8,0,0,0,0,8
+El Salvador,SV,SLV,222,AMR,2017,newrel,0-14,a,7,0,0,0,0,7
+El Salvador,SV,SLV,222,AMR,2018,newrel,0-14,a,128,0,2,5,0,135
+El Salvador,SV,SLV,222,AMR,2019,newrel,0-14,a,128,0,0,7,0,135
+Equatorial Guinea,GQ,GNQ,226,AFR,2018,newrel,0-14,a,67,,,,,90
+Equatorial Guinea,GQ,GNQ,226,AFR,2019,newrel,0-14,a,15,,,,,21
+Equatorial Guinea,GQ,GNQ,226,AFR,2020,newrel,0-14,a,70,,,,,98
+Equatorial Guinea,GQ,GNQ,226,AFR,2021,newrel,0-14,a,65,,,,,108
+Equatorial Guinea,GQ,GNQ,226,AFR,2022,newrel,0-14,a,151,,,,,185
+Equatorial Guinea,GQ,GNQ,226,AFR,2023,newrel,0-14,a,105,,,,,143
+Equatorial Guinea,GQ,GNQ,226,AFR,2024,newrel,0-14,a,104,0,5,26,2,137
+Equatorial Guinea,GQ,GNQ,226,AFR,2024,newrel,a,m,1000,5,114,330,76,1525
+Equatorial Guinea,GQ,GNQ,226,AFR,2024,newrel,a,f,796,5,102,243,52,1198
+Estonia,EE,EST,233,EUR,2010,newrel,0-14,a,3,0,0,0,0,3
+Estonia,EE,EST,233,EUR,2011,newrel,0-14,a,0,0,0,0,0,0
+Estonia,EE,EST,233,EUR,2012,newrel,0-14,a,1,1,0,0,0,2
+Estonia,EE,EST,233,EUR,2013,newrel,0-14,a,1,0,0,0,0,1
+Estonia,EE,EST,233,EUR,2014,newrel,0-14,a,1,0,0,0,0,1
+Estonia,EE,EST,233,EUR,2015,newrel,0-14,a,2,0,0,0,0,2
+Estonia,EE,EST,233,EUR,2016,newrel,0-14,a,4,0,0,0,0,4
+Estonia,EE,EST,233,EUR,2017,newrel,0-14,a,0,0,0,0,0,0
+Estonia,EE,EST,233,EUR,2018,newrel,0-14,a,2,0,0,0,0,2
+Estonia,EE,EST,233,EUR,2019,newrel,0-14,a,1,0,0,0,0,1
+Estonia,EE,EST,233,EUR,2020,newrel,0-14,a,1,0,0,0,0,1
+Estonia,EE,EST,233,EUR,2021,newrel,0-14,a,0,0,0,0,0,0
+Estonia,EE,EST,233,EUR,2022,newrel,0-14,a,0,0,0,0,0,0
+Estonia,EE,EST,233,EUR,2023,newrel,0-14,a,2,0,0,0,0,2
+Estonia,EE,EST,233,EUR,2024,newrel,0-14,a,0,0,0,0,0,0
+Estonia,EE,EST,233,EUR,2024,newrel,a,m,44,0,4,2,0,50
+Estonia,EE,EST,233,EUR,2024,newrel,a,f,16,0,0,2,0,18
+Eswatini,SZ,SWZ,748,AFR,2018,newrel,0-14,a,152,,,,,161
+Eswatini,SZ,SWZ,748,AFR,2019,newrel,0-14,a,158,,,,,176
+Eswatini,SZ,SWZ,748,AFR,2020,newrel,0-14,a,90,,,,,99
+Eswatini,SZ,SWZ,748,AFR,2020,newrel,a,m,908,57,76,36,42,1119
+Eswatini,SZ,SWZ,748,AFR,2020,newrel,a,f,663,5,119,21,22,830
+Eswatini,SZ,SWZ,748,AFR,2021,newrel,0-14,a,74,,,,,82
+Eswatini,SZ,SWZ,748,AFR,2021,newrel,a,m,851,10,141,50,33,1085
+Eswatini,SZ,SWZ,748,AFR,2021,newrel,a,f,587,7,96,30,17,737
+Eswatini,SZ,SWZ,748,AFR,2022,newrel,0-14,a,115,,,,,129
+Eswatini,SZ,SWZ,748,AFR,2022,newrel,a,m,1108,20,134,58,41,1361
+Eswatini,SZ,SWZ,748,AFR,2022,newrel,a,f,784,9,86,24,25,928
+Eswatini,SZ,SWZ,748,AFR,2023,newrel,0-14,a,153,,,,,185
+Eswatini,SZ,SWZ,748,AFR,2023,newrel,a,m,1037,10,110,54,53,1264
+Eswatini,SZ,SWZ,748,AFR,2023,newrel,a,f,757,12,72,44,23,908
+Eswatini,SZ,SWZ,748,AFR,2024,newrel,0-14,a,144,1,2,2,6,155
+Eswatini,SZ,SWZ,748,AFR,2024,newrel,a,m,1040,16,98,63,56,1273
+Eswatini,SZ,SWZ,748,AFR,2024,newrel,a,f,699,9,68,49,35,860
+Fiji,FJ,FJI,242,WPR,2018,newrel,0-14,a,48,,,,,76
+Fiji,FJ,FJI,242,WPR,2020,newrel,0-14,a,46,,,,,128
+Fiji,FJ,FJI,242,WPR,2021,newrel,0-14,a,18,,,,,48
+Fiji,FJ,FJI,242,WPR,2022,newrel,0-14,a,36,,,,,94
+Fiji,FJ,FJI,242,WPR,2023,newrel,0-14,a,16,,,,,25
+Fiji,FJ,FJI,242,WPR,2024,newrel,0-14,a,41,0,6,15,4,66
+Fiji,FJ,FJI,242,WPR,2024,newrel,a,m,223,0,61,57,42,383
+Fiji,FJ,FJI,242,WPR,2024,newrel,a,f,141,3,36,25,25,230
+Finland,FI,FIN,246,EUR,2010,newrel,0-14,a,2,0,1,0,2,5
+Finland,FI,FIN,246,EUR,2011,newrel,0-14,a,3,0,0,0,2,5
+Finland,FI,FIN,246,EUR,2012,newrel,0-14,a,1,0,0,0,3,4
+Finland,FI,FIN,246,EUR,2013,newrel,0-14,a,0,0,0,0,0,0
+Finland,FI,FIN,246,EUR,2014,newrel,0-14,a,1,0,0,0,8,9
+Finland,FI,FIN,246,EUR,2015,newrel,0-14,a,3,0,0,0,8,11
+Finland,FI,FIN,246,EUR,2016,newrel,0-14,a,1,0,0,0,5,6
+Finland,FI,FIN,246,EUR,2017,newrel,0-14,a,5,0,0,0,1,6
+Finland,FI,FIN,246,EUR,2018,newrel,0-14,a,2,0,0,0,0,2
+Finland,FI,FIN,246,EUR,2019,newrel,0-14,a,0,0,0,0,9,9
+Finland,FI,FIN,246,EUR,2020,newrel,0-14,a,2,0,0,0,3,5
+Finland,FI,FIN,246,EUR,2021,newrel,0-14,a,1,0,0,0,3,4
+Finland,FI,FIN,246,EUR,2022,newrel,0-14,a,0,0,0,0,7,7
+Finland,FI,FIN,246,EUR,2023,newrel,0-14,a,2,0,0,0,0,2
+France,FR,FRA,250,EUR,2016,newrel,0-14,a,122,0,1,10,120,253
+France,FR,FRA,250,EUR,2017,newrel,0-14,a,91,0,3,4,220,318
+France,FR,FRA,250,EUR,2018,newrel,0-14,a,26,0,0,1,203,230
+France,FR,FRA,250,EUR,2019,newrel,0-14,a,22,0,1,0,194,217
+France,FR,FRA,250,EUR,2020,newrel,0-14,a,81,0,1,1,104,187
+France,FR,FRA,250,EUR,2021,newrel,0-14,a,59,0,1,5,105,170
+France,FR,FRA,250,EUR,2022,newrel,0-14,a,66,0,1,5,111,183
+France,FR,FRA,250,EUR,2023,newrel,0-14,a,43,0,0,1,204,248
+French Polynesia,PF,PYF,258,WPR,2020,newrel,0-14,a,6,,,,,6
+French Polynesia,PF,PYF,258,WPR,2022,newrel,0-14,a,3,,,,,3
+French Polynesia,PF,PYF,258,WPR,2024,newrel,0-14,a,0,0,0,0,0,0
+French Polynesia,PF,PYF,258,WPR,2024,newrel,a,m,14,0,1,1,0,16
+French Polynesia,PF,PYF,258,WPR,2024,newrel,a,f,9,1,0,1,0,11
+Gabon,GA,GAB,266,AFR,2019,newrel,0-14,a,378,,,,,378
+Gambia,GM,GMB,270,AFR,2024,newrel,0-14,a,132,0,6,2,,140
+Gambia,GM,GMB,270,AFR,2024,newrel,a,m,1681,38,95,120,0,1934
+Gambia,GM,GMB,270,AFR,2024,newrel,a,f,809,15,43,27,0,894
+Georgia,GE,GEO,268,EUR,2010,newrel,0-14,a,213,9,1,13,18,254
+Georgia,GE,GEO,268,EUR,2011,newrel,0-14,a,191,3,0,8,4,206
+Georgia,GE,GEO,268,EUR,2012,newrel,0-14,a,199,0,0,5,2,206
+Georgia,GE,GEO,268,EUR,2013,newrel,0-14,a,161,0,2,9,7,179
+Georgia,GE,GEO,268,EUR,2014,newrel,0-14,a,117,1,0,5,2,125
+Georgia,GE,GEO,268,EUR,2015,newrel,0-14,a,127,0,1,6,3,137
+Georgia,GE,GEO,268,EUR,2016,newrel,0-14,a,106,1,0,5,3,115
+Georgia,GE,GEO,268,EUR,2017,newrel,0-14,a,84,0,0,2,7,93
+Georgia,GE,GEO,268,EUR,2018,newrel,0-14,a,60,0,0,1,0,61
+Georgia,GE,GEO,268,EUR,2019,newrel,0-14,a,62,1,0,2,0,65
+Georgia,GE,GEO,268,EUR,2020,newrel,0-14,a,45,0,1,0,1,47
+Georgia,GE,GEO,268,EUR,2021,newrel,0-14,a,35,0,0,6,0,41
+Georgia,GE,GEO,268,EUR,2022,newrel,0-14,a,42,1,0,2,0,45
+Georgia,GE,GEO,268,EUR,2023,newrel,0-14,a,51,0,0,0,0,51
+Georgia,GE,GEO,268,EUR,2024,newrel,0-14,a,30,0,0,0,2,32
+Georgia,GE,GEO,268,EUR,2024,newrel,a,m,683,31,43,79,15,851
+Georgia,GE,GEO,268,EUR,2024,newrel,a,f,278,6,16,15,4,319
+Germany,DE,DEU,276,EUR,2010,newrel,0-14,a,55,0,1,0,8,64
+Germany,DE,DEU,276,EUR,2011,newrel,0-14,a,51,0,0,0,16,67
+Germany,DE,DEU,276,EUR,2012,newrel,0-14,a,146,0,3,3,21,173
+Germany,DE,DEU,276,EUR,2013,newrel,0-14,a,136,0,4,3,29,172
+Germany,DE,DEU,276,EUR,2014,newrel,0-14,a,109,0,0,1,28,138
+Germany,DE,DEU,276,EUR,2015,newrel,0-14,a,128,0,2,5,57,192
+Germany,DE,DEU,276,EUR,2016,newrel,0-14,a,168,0,1,2,52,223
+Germany,DE,DEU,276,EUR,2017,newrel,0-14,a,191,1,1,3,39,235
+Germany,DE,DEU,276,EUR,2018,newrel,0-14,a,158,0,1,4,44,207
+Germany,DE,DEU,276,EUR,2019,newrel,0-14,a,152,0,1,3,36,192
+Germany,DE,DEU,276,EUR,2020,newrel,0-14,a,142,0,0,1,25,168
+Germany,DE,DEU,276,EUR,2021,newrel,0-14,a,124,0,0,5,26,155
+Germany,DE,DEU,276,EUR,2022,newrel,0-14,a,131,0,1,4,48,184
+Germany,DE,DEU,276,EUR,2023,newrel,0-14,a,173,0,3,6,46,228
+Germany,DE,DEU,276,EUR,2024,newrel,0-14,a,190,0,0,8,22,220
+Germany,DE,DEU,276,EUR,2024,newrel,a,m,1864,3,152,255,400,2674
+Germany,DE,DEU,276,EUR,2024,newrel,a,f,979,1,72,78,191,1321
+Ghana,GH,GHA,288,AFR,2018,newrel,0-14,a,604,,,,,747
+Ghana,GH,GHA,288,AFR,2019,newrel,0-14,a,654,,,,,822
+Ghana,GH,GHA,288,AFR,2020,newrel,0-14,a,506,,,,,615
+Ghana,GH,GHA,288,AFR,2022,newrel,0-14,a,692,,,,,823
+Ghana,GH,GHA,288,AFR,2023,newrel,0-14,a,712,,,,,823
+Ghana,GH,GHA,288,AFR,2024,newrel,0-14,a,755,0,64,74,11,904
+Ghana,GH,GHA,288,AFR,2024,newrel,a,m,12623,54,820,595,93,14185
+Ghana,GH,GHA,288,AFR,2024,newrel,a,f,5408,12,277,148,43,5888
+Greece,GR,GRC,300,EUR,2018,newrel,0-14,a,0,0,0,0,5,5
+Greenland,GL,GRL,304,EUR,2014,newrel,0-14,a,2,0,0,0,0,2
+Greenland,GL,GRL,304,EUR,2015,newrel,0-14,a,5,0,0,0,0,5
+Greenland,GL,GRL,304,EUR,2016,newrel,0-14,a,2,0,0,0,0,2
+Grenada,GD,GRD,308,AMR,2018,newrel,0-14,a,0,0,0,0,0,0
+Grenada,GD,GRD,308,AMR,2019,newrel,0-14,a,0,0,0,0,0,0
+Grenada,GD,GRD,308,AMR,2020,newrel,0-14,a,0,0,0,0,0,0
+Grenada,GD,GRD,308,AMR,2021,newrel,0-14,a,0,0,0,0,0,0
+Grenada,GD,GRD,308,AMR,2022,newrel,0-14,a,0,0,0,0,0,0
+Grenada,GD,GRD,308,AMR,2023,newrel,0-14,a,0,0,0,0,0,0
+Grenada,GD,GRD,308,AMR,2024,newrel,0-14,a,0,0,0,0,0,0
+Grenada,GD,GRD,308,AMR,2024,newrel,a,m,1,0,1,3,0,5
+Grenada,GD,GRD,308,AMR,2024,newrel,a,f,0,0,0,0,0,0
+Guam,GU,GUM,316,WPR,2018,newrel,0-14,a,9,,,,,9
+Guam,GU,GUM,316,WPR,2019,newrel,0-14,a,9,,,,,10
+Guam,GU,GUM,316,WPR,2020,newrel,0-14,a,0,,,,,0
+Guam,GU,GUM,316,WPR,2021,newrel,0-14,a,5,,,,,5
+Guam,GU,GUM,316,WPR,2022,newrel,0-14,a,5,,,,,6
+Guam,GU,GUM,316,WPR,2023,newrel,0-14,a,5,,,,,5
+Guatemala,GT,GTM,320,AMR,2013,newrel,0-14,a,267,1,2,3,1,274
+Guatemala,GT,GTM,320,AMR,2014,newrel,0-14,a,252,1,8,3,0,264
+Guatemala,GT,GTM,320,AMR,2015,newrel,0-14,a,280,0,3,8,1,292
+Guatemala,GT,GTM,320,AMR,2016,newrel,0-14,a,204,0,6,4,0,214
+Guatemala,GT,GTM,320,AMR,2017,newrel,0-14,a,255,0,4,11,2,272
+Guatemala,GT,GTM,320,AMR,2018,newrel,0-14,a,210,0,3,0,0,213
+Guatemala,GT,GTM,320,AMR,2019,newrel,0-14,a,420,0,2,21,0,443
+Guatemala,GT,GTM,320,AMR,2020,newrel,0-14,a,358,0,8,2,0,368
+Guatemala,GT,GTM,320,AMR,2021,newrel,0-14,a,348,1,5,2,0,356
+Guatemala,GT,GTM,320,AMR,2022,newrel,0-14,a,428,2,7,13,0,450
+Guatemala,GT,GTM,320,AMR,2024,newrel,0-14,a,456,3,13,23,,495
+Guatemala,GT,GTM,320,AMR,2024,newrel,a,m,2399,30,222,215,,2866
+Guatemala,GT,GTM,320,AMR,2024,newrel,a,f,1539,16,118,123,,1796
+Guinea-Bissau,GW,GNB,624,AFR,2020,newrel,a,m,1161,15,152,192,54,1574
+Guinea-Bissau,GW,GNB,624,AFR,2020,newrel,a,f,747,7,90,97,27,968
+Guinea-Bissau,GW,GNB,624,AFR,2021,newrel,a,m,1136,32,96,235,67,1566
+Guinea-Bissau,GW,GNB,624,AFR,2021,newrel,a,f,722,9,63,104,26,924
+Guinea-Bissau,GW,GNB,624,AFR,2023,newrel,a,m,1332,11,124,294,22,1783
+Guinea-Bissau,GW,GNB,624,AFR,2023,newrel,a,f,663,1,73,113,19,869
+Guyana,GY,GUY,328,AMR,2013,newrel,0-14,a,13,0,2,4,1,20
+Guyana,GY,GUY,328,AMR,2014,newrel,0-14,a,8,0,0,3,0,11
+Guyana,GY,GUY,328,AMR,2015,newrel,0-14,a,14,0,0,2,2,18
+Guyana,GY,GUY,328,AMR,2016,newrel,0-14,a,14,0,1,0,2,17
+Guyana,GY,GUY,328,AMR,2017,newrel,0-14,a,8,0,0,0,2,10
+Guyana,GY,GUY,328,AMR,2018,newrel,0-14,a,8,0,0,3,0,11
+Guyana,GY,GUY,328,AMR,2019,newrel,0-14,a,13,0,1,1,0,15
+Guyana,GY,GUY,328,AMR,2020,newrel,0-14,a,4,0,0,1,0,5
+Guyana,GY,GUY,328,AMR,2021,newrel,0-14,a,7,,,1,0,8
+Guyana,GY,GUY,328,AMR,2022,newrel,0-14,a,7,0,0,1,0,8
+Guyana,GY,GUY,328,AMR,2023,newrel,0-14,a,6,0,0,0,0,6
+Guyana,GY,GUY,328,AMR,2024,newrel,0-14,a,8,,,1,1,10
+Haiti,HT,HTI,332,AMR,2013,newrel,0-14,a,1562,95,9,19,220,1905
+Haiti,HT,HTI,332,AMR,2014,newrel,0-14,a,1373,2,71,154,93,1693
+Haiti,HT,HTI,332,AMR,2015,newrel,0-14,a,1299,6,79,167,43,1594
+Haiti,HT,HTI,332,AMR,2016,newrel,0-14,a,1160,4,54,132,33,1383
+Haiti,HT,HTI,332,AMR,2017,newrel,0-14,a,1296,5,69,111,130,1611
+Haiti,HT,HTI,332,AMR,2019,newrel,0-14,a,984,3,47,119,48,1201
+Haiti,HT,HTI,332,AMR,2020,newrel,0-14,a,803,2,50,113,8,976
+Haiti,HT,HTI,332,AMR,2021,newrel,0-14,a,773,2,30,102,19,926
+Honduras,HN,HND,340,AMR,2015,newrel,0-14,a,106,0,5,0,8,119
+Honduras,HN,HND,340,AMR,2016,newrel,0-14,a,124,0,3,4,7,138
+Honduras,HN,HND,340,AMR,2017,newrel,0-14,a,93,0,6,3,0,102
+Honduras,HN,HND,340,AMR,2018,newrel,0-14,a,72,0,2,4,0,78
+Honduras,HN,HND,340,AMR,2019,newrel,0-14,a,47,0,1,1,0,49
+Honduras,HN,HND,340,AMR,2020,newrel,0-14,a,39,0,1,1,0,41
+Honduras,HN,HND,340,AMR,2021,newrel,0-14,a,46,0,1,1,3,51
+Honduras,HN,HND,340,AMR,2022,newrel,0-14,a,52,0,1,0,4,57
+Honduras,HN,HND,340,AMR,2023,newrel,0-14,a,59,0,2,2,1,64
+Honduras,HN,HND,340,AMR,2024,newrel,0-14,a,59,0,7,3,0,69
+Honduras,HN,HND,340,AMR,2024,newrel,a,m,1419,7,155,158,13,1752
+Honduras,HN,HND,340,AMR,2024,newrel,a,f,788,2,77,41,13,921
+Hungary,HU,HUN,348,EUR,2010,newrel,0-14,a,4,0,0,0,0,4
+Hungary,HU,HUN,348,EUR,2011,newrel,0-14,a,1,0,0,0,0,1
+Hungary,HU,HUN,348,EUR,2012,newrel,0-14,a,5,0,1,2,1,9
+Hungary,HU,HUN,348,EUR,2013,newrel,0-14,a,5,0,0,1,1,7
+Hungary,HU,HUN,348,EUR,2014,newrel,0-14,a,4,0,0,0,0,4
+Hungary,HU,HUN,348,EUR,2015,newrel,0-14,a,8,0,0,1,0,9
+Hungary,HU,HUN,348,EUR,2016,newrel,0-14,a,5,0,0,0,0,5
+Hungary,HU,HUN,348,EUR,2017,newrel,0-14,a,5,1,0,0,0,6
+Hungary,HU,HUN,348,EUR,2018,newrel,0-14,a,1,0,1,0,1,3
+Hungary,HU,HUN,348,EUR,2019,newrel,0-14,a,8,0,0,0,2,10
+Hungary,HU,HUN,348,EUR,2020,newrel,0-14,a,4,0,0,0,1,5
+Hungary,HU,HUN,348,EUR,2021,newrel,0-14,a,4,0,0,0,0,4
+Hungary,HU,HUN,348,EUR,2022,newrel,0-14,a,2,0,1,0,3,6
+Hungary,HU,HUN,348,EUR,2023,newrel,0-14,a,5,0,0,0,1,6
+Hungary,HU,HUN,348,EUR,2024,newrel,0-14,a,8,0,0,0,0,8
+Hungary,HU,HUN,348,EUR,2024,newrel,a,m,202,1,1,37,19,260
+Hungary,HU,HUN,348,EUR,2024,newrel,a,f,103,9,15,8,6,141
+Iceland,IS,ISL,352,EUR,2010,newrel,0-14,a,0,0,0,0,0,0
+Iceland,IS,ISL,352,EUR,2011,newrel,0-14,a,0,0,0,0,0,0
+Iceland,IS,ISL,352,EUR,2012,newrel,0-14,a,0,0,0,0,0,0
+Iceland,IS,ISL,352,EUR,2013,newrel,0-14,a,0,0,0,0,0,0
+Iceland,IS,ISL,352,EUR,2014,newrel,0-14,a,0,0,0,0,0,0
+Iceland,IS,ISL,352,EUR,2015,newrel,0-14,a,0,0,0,0,0,0
+Iceland,IS,ISL,352,EUR,2016,newrel,0-14,a,0,0,0,0,0,0
+Iceland,IS,ISL,352,EUR,2017,newrel,0-14,a,0,0,0,0,0,0
+Iceland,IS,ISL,352,EUR,2018,newrel,0-14,a,0,0,0,0,0,0
+Iceland,IS,ISL,352,EUR,2019,newrel,0-14,a,0,0,0,0,0,0
+Iceland,IS,ISL,352,EUR,2020,newrel,0-14,a,2,0,0,0,0,2
+Iceland,IS,ISL,352,EUR,2021,newrel,0-14,a,0,0,0,0,0,0
+Iceland,IS,ISL,352,EUR,2022,newrel,0-14,a,0,0,0,0,0,0
+Iceland,IS,ISL,352,EUR,2023,newrel,0-14,a,1,0,0,0,0,1
+India,IN,IND,356,SEA,2018,newrel,0-14,a,105890,,,,,124797
+India,IN,IND,356,SEA,2019,newrel,0-14,a,127503,,,,,144835
+India,IN,IND,356,SEA,2019,newrel,a,m,1109096,8690,59876,52645,111440,1341747
+India,IN,IND,356,SEA,2019,newrel,a,f,698203,3760,23080,24067,61706,810816
+India,IN,IND,356,SEA,2020,newrel,0-14,a,85025,,,,,96638
+India,IN,IND,356,SEA,2020,newrel,a,m,822665,5495,49607,32040,71205,981012
+India,IN,IND,356,SEA,2020,newrel,a,f,542209,2740,20668,16032,41297,622946
+India,IN,IND,356,SEA,2021,newrel,0-14,a,100162,,,,,110884
+India,IN,IND,356,SEA,2021,newrel,a,m,982624,6117,62038,31868,65269,1147916
+India,IN,IND,356,SEA,2021,newrel,a,f,671013,3216,25990,17099,40525,757843
+India,IN,IND,356,SEA,2022,newrel,0-14,a,109844,,,,,127979
+India,IN,IND,356,SEA,2022,newrel,a,m,1158061,6774,63940,29506,68591,1326872
+India,IN,IND,356,SEA,2022,newrel,a,f,785105,3606,25824,14989,38327,867851
+India,IN,IND,356,SEA,2023,newrel,0-14,a,119369,,,,,128946
+India,IN,IND,356,SEA,2023,newrel,a,m,1224356,7263,61636,23612,62548,1379415
+India,IN,IND,356,SEA,2023,newrel,a,f,827647,3928,24991,12192,37941,906699
+India,IN,IND,356,SEA,2024,newrel,0-14,a,124235,349,1462,1712,1356,129114
+India,IN,IND,356,SEA,2024,newrel,a,m,1397449,6467,54773,23925,15763,1498377
+India,IN,IND,356,SEA,2024,newrel,a,f,940567,2965,21707,11623,11295,988157
+Indonesia,ID,IDN,360,WPR,2018,newrel,0-14,a,56806,,,,,68529
+Indonesia,ID,IDN,360,WPR,2019,newrel,0-14,a,58002,,,,,70004
+Indonesia,ID,IDN,360,WPR,2019,newrel,a,m,264268,1301,8489,18511,27001,319570
+Indonesia,ID,IDN,360,WPR,2019,newrel,a,f,198140,788,4361,12056,20826,236171
+Indonesia,ID,IDN,360,WPR,2020,newrel,0-14,a,30865,,,,,34368
+Indonesia,ID,IDN,360,WPR,2020,newrel,a,m,177456,719,9134,15146,6288,208743
+Indonesia,ID,IDN,360,WPR,2020,newrel,a,f,134586,486,4551,9503,4654,153780
+Indonesia,ID,IDN,360,WPR,2021,newrel,0-14,a,34517,,,,,38349
+Indonesia,ID,IDN,360,WPR,2021,newrel,a,m,192143,733,10049,16810,4900,224635
+Indonesia,ID,IDN,360,WPR,2021,newrel,a,f,146595,508,5147,10708,3652,166610
+Indonesia,ID,IDN,360,WPR,2022,newrel,0-14,a,97738,,,,,106254
+Indonesia,ID,IDN,360,WPR,2022,newrel,a,m,308551,1122,14820,29281,6909,360683
+Indonesia,ID,IDN,360,WPR,2022,newrel,a,f,237491,681,7765,18598,5089,269624
+Indonesia,ID,IDN,360,WPR,2023,newrel,0-14,a,119667,,,,,130653
+Indonesia,ID,IDN,360,WPR,2023,newrel,a,m,348232,1328,17525,36494,8796,412375
+Indonesia,ID,IDN,360,WPR,2023,newrel,a,f,267083,747,9430,22825,6354,306439
+Indonesia,ID,IDN,360,WPR,2024,newrel,0-14,a,92613,17,723,5752,1299,100404
+Indonesia,ID,IDN,360,WPR,2024,newrel,a,m,382217,1488,21313,43745,7583,456346
+Indonesia,ID,IDN,360,WPR,2024,newrel,a,f,292321,788,11134,26568,5186,335997
+Iran (Islamic Republic of),IR,IRN,364,EMR,2018,newrel,0-14,a,280,,,,,314
+Iran (Islamic Republic of),IR,IRN,364,EMR,2019,newrel,0-14,a,279,,,,,320
+Iran (Islamic Republic of),IR,IRN,364,EMR,2020,newrel,0-14,a,158,,,,,177
+Iran (Islamic Republic of),IR,IRN,364,EMR,2021,newrel,0-14,a,170,,,,,202
+Iran (Islamic Republic of),IR,IRN,364,EMR,2022,newrel,0-14,a,220,,,,,252
+Iran (Islamic Republic of),IR,IRN,364,EMR,2023,newrel,0-14,a,162,,,,,189
+Iran (Islamic Republic of),IR,IRN,364,EMR,2024,newrel,0-14,a,190,0,16,3,14,223
+Iran (Islamic Republic of),IR,IRN,364,EMR,2024,newrel,a,m,3270,54,361,243,97,4025
+Iran (Islamic Republic of),IR,IRN,364,EMR,2024,newrel,a,f,2760,36,178,65,76,3115
+Ireland,IE,IRL,372,EUR,2010,newrel,0-14,a,3,0,0,0,0,3
+Ireland,IE,IRL,372,EUR,2011,newrel,0-14,a,1,0,0,0,2,3
+Ireland,IE,IRL,372,EUR,2012,newrel,0-14,a,8,0,0,0,2,10
+Ireland,IE,IRL,372,EUR,2013,newrel,0-14,a,6,0,0,0,3,9
+Ireland,IE,IRL,372,EUR,2014,newrel,0-14,a,4,0,0,1,2,7
+Ireland,IE,IRL,372,EUR,2015,newrel,0-14,a,11,0,0,0,3,14
+Ireland,IE,IRL,372,EUR,2016,newrel,0-14,a,4,0,0,0,12,16
+Ireland,IE,IRL,372,EUR,2017,newrel,0-14,a,1,0,1,0,5,7
+Ireland,IE,IRL,372,EUR,2018,newrel,0-14,a,3,0,0,0,4,7
+Ireland,IE,IRL,372,EUR,2019,newrel,0-14,a,1,0,0,0,9,10
+Ireland,IE,IRL,372,EUR,2020,newrel,0-14,a,0,0,0,0,6,6
+Ireland,IE,IRL,372,EUR,2021,newrel,0-14,a,0,0,0,0,1,1
+Ireland,IE,IRL,372,EUR,2022,newrel,0-14,a,2,0,0,0,3,5
+Ireland,IE,IRL,372,EUR,2023,newrel,0-14,a,0,0,0,0,8,8
+Ireland,IE,IRL,372,EUR,2024,newrel,0-14,a,2,0,0,0,3,5
+Israel,IL,ISR,376,EUR,2010,newrel,0-14,a,17,0,0,0,0,17
+Israel,IL,ISR,376,EUR,2011,newrel,0-14,a,18,0,0,0,2,20
+Israel,IL,ISR,376,EUR,2012,newrel,0-14,a,18,0,1,0,0,19
+Israel,IL,ISR,376,EUR,2013,newrel,0-14,a,13,0,0,0,1,14
+Israel,IL,ISR,376,EUR,2014,newrel,0-14,a,21,0,0,0,8,29
+Israel,IL,ISR,376,EUR,2015,newrel,0-14,a,7,0,0,1,1,9
+Israel,IL,ISR,376,EUR,2016,newrel,0-14,a,11,0,0,0,1,12
+Israel,IL,ISR,376,EUR,2017,newrel,0-14,a,14,0,1,0,1,16
+Israel,IL,ISR,376,EUR,2018,newrel,0-14,a,15,1,0,0,0,16
+Israel,IL,ISR,376,EUR,2019,newrel,0-14,a,7,0,0,0,0,7
+Israel,IL,ISR,376,EUR,2020,newrel,0-14,a,4,0,0,0,0,4
+Israel,IL,ISR,376,EUR,2021,newrel,0-14,a,10,0,0,0,0,10
+Israel,IL,ISR,376,EUR,2022,newrel,0-14,a,23,0,2,0,0,25
+Israel,IL,ISR,376,EUR,2023,newrel,0-14,a,12,0,0,0,1,13
+Jamaica,JM,JAM,388,AMR,2013,newrel,0-14,a,12,0,0,0,0,12
+Jamaica,JM,JAM,388,AMR,2015,newrel,0-14,a,1,0,1,0,11,13
+Jamaica,JM,JAM,388,AMR,2016,newrel,0-14,a,1,0,0,0,6,7
+Jamaica,JM,JAM,388,AMR,2017,newrel,0-14,a,2,0,0,0,18,20
+Jamaica,JM,JAM,388,AMR,2018,newrel,0-14,a,1,0,0,0,8,9
+Jamaica,JM,JAM,388,AMR,2020,newrel,0-14,a,,,,,,8
+Jamaica,JM,JAM,388,AMR,2023,newrel,0-14,a,2,,0,,4,6
+Jamaica,JM,JAM,388,AMR,2024,newrel,0-14,a,5,0,0,0,3,8
+Jamaica,JM,JAM,388,AMR,2024,newrel,a,m,,,3,,41,70
+Jamaica,JM,JAM,388,AMR,2024,newrel,a,f,,,1,,4,5
+Japan,JP,JPN,392,WPR,2018,newrel,0-14,a,45,,,,,52
+Japan,JP,JPN,392,WPR,2019,newrel,0-14,a,35,,,,,38
+Japan,JP,JPN,392,WPR,2020,newrel,0-14,a,44,,,,,50
+Japan,JP,JPN,392,WPR,2021,newrel,0-14,a,29,,,,,29
+Japan,JP,JPN,392,WPR,2022,newrel,0-14,a,29,,,,,33
+Japan,JP,JPN,392,WPR,2023,newrel,0-14,a,31,,,,,37
+Japan,JP,JPN,392,WPR,2024,newrel,0-14,a,28,0,0,0,2,30
+Japan,JP,JPN,392,WPR,2024,newrel,a,m,3758,2,1486,124,329,5699
+Japan,JP,JPN,392,WPR,2024,newrel,a,f,3004,3,932,91,227,4257
+Jordan,JO,JOR,400,EMR,2018,newrel,0-14,a,32,,,,,32
+Jordan,JO,JOR,400,EMR,2019,newrel,0-14,a,11,,,,,12
+Jordan,JO,JOR,400,EMR,2020,newrel,0-14,a,11,,,,,15
+Jordan,JO,JOR,400,EMR,2021,newrel,0-14,a,9,,,,,12
+Jordan,JO,JOR,400,EMR,2022,newrel,0-14,a,16,,,,,19
+Jordan,JO,JOR,400,EMR,2023,newrel,0-14,a,18,,,,,18
+Kazakhstan,KZ,KAZ,398,EUR,2010,newrel,0-14,a,650,14,9,0,87,760
+Kazakhstan,KZ,KAZ,398,EUR,2011,newrel,0-14,a,575,12,6,1,67,661
+Kazakhstan,KZ,KAZ,398,EUR,2012,newrel,0-14,a,544,7,4,0,64,619
+Kazakhstan,KZ,KAZ,398,EUR,2013,newrel,0-14,a,444,7,2,0,1,454
+Kazakhstan,KZ,KAZ,398,EUR,2014,newrel,0-14,a,390,0,4,3,4,401
+Kazakhstan,KZ,KAZ,398,EUR,2015,newrel,0-14,a,348,4,1,1,0,354
+Kazakhstan,KZ,KAZ,398,EUR,2016,newrel,0-14,a,557,1,0,1,1,560
+Kazakhstan,KZ,KAZ,398,EUR,2017,newrel,0-14,a,326,3,4,0,0,333
+Kazakhstan,KZ,KAZ,398,EUR,2018,newrel,0-14,a,267,6,0,1,0,274
+Kazakhstan,KZ,KAZ,398,EUR,2019,newrel,0-14,a,271,2,1,0,0,274
+Kazakhstan,KZ,KAZ,398,EUR,2020,newrel,0-14,a,224,3,0,0,0,227
+Kazakhstan,KZ,KAZ,398,EUR,2020,newrel,a,m,2894,116,299,40,10,3359
+Kazakhstan,KZ,KAZ,398,EUR,2020,newrel,a,f,2149,55,162,14,3,2383
+Kazakhstan,KZ,KAZ,398,EUR,2021,newrel,0-14,a,191,6,2,0,0,199
+Kazakhstan,KZ,KAZ,398,EUR,2021,newrel,a,m,2863,71,289,50,6,3279
+Kazakhstan,KZ,KAZ,398,EUR,2021,newrel,a,f,2124,48,146,23,1,2342
+Kazakhstan,KZ,KAZ,398,EUR,2022,newrel,0-14,a,188,0,1,0,1,190
+Kazakhstan,KZ,KAZ,398,EUR,2022,newrel,a,m,3065,58,290,36,12,3461
+Kazakhstan,KZ,KAZ,398,EUR,2022,newrel,a,f,2260,25,154,15,7,2461
+Kazakhstan,KZ,KAZ,398,EUR,2023,newrel,0-14,a,201,3,2,1,2,209
+Kazakhstan,KZ,KAZ,398,EUR,2023,newrel,a,m,3017,74,252,42,4,3389
+Kazakhstan,KZ,KAZ,398,EUR,2023,newrel,a,f,2223,31,135,13,4,2406
+Kazakhstan,KZ,KAZ,398,EUR,2024,newrel,0-14,a,197,4,0,4,0,205
+Kazakhstan,KZ,KAZ,398,EUR,2024,newrel,a,m,3065,75,244,49,9,3442
+Kazakhstan,KZ,KAZ,398,EUR,2024,newrel,a,f,2147,33,131,25,3,2339
+Kenya,KE,KEN,404,AFR,2018,newrel,0-14,a,8779,,,,,9818
+Kenya,KE,KEN,404,AFR,2019,newrel,0-14,a,7289,,,,,8223
+Kenya,KE,KEN,404,AFR,2019,newrel,a,m,46207,365,3264,3218,1245,54299
+Kenya,KE,KEN,404,AFR,2019,newrel,a,f,25707,108,1984,1302,649,29750
+Kenya,KE,KEN,404,AFR,2020,newrel,0-14,a,4928,,,,,5631
+Kenya,KE,KEN,404,AFR,2020,newrel,a,m,38442,316,3181,2607,999,45545
+Kenya,KE,KEN,404,AFR,2020,newrel,a,f,21292,87,1884,1035,539,24837
+Kenya,KE,KEN,404,AFR,2021,newrel,0-14,a,6704,,,,,7413
+Kenya,KE,KEN,404,AFR,2021,newrel,a,m,42691,357,3120,2671,484,49323
+Kenya,KE,KEN,404,AFR,2021,newrel,a,f,22843,78,1638,969,235,25763
+Kenya,KE,KEN,404,AFR,2022,newrel,0-14,a,9503,,,,,10240
+Kenya,KE,KEN,404,AFR,2022,newrel,a,m,49710,417,3284,2893,230,56534
+Kenya,KE,KEN,404,AFR,2022,newrel,a,f,28021,130,1833,1028,143,31155
+Kenya,KE,KEN,404,AFR,2023,newrel,0-14,a,11794,,,,,12589
+Kenya,KE,KEN,404,AFR,2023,newrel,a,m,53062,393,3125,2670,502,59752
+Kenya,KE,KEN,404,AFR,2023,newrel,a,f,31021,97,1821,1046,287,34272
+Kenya,KE,KEN,404,AFR,2024,newrel,0-14,a,9187,7,235,239,50,9718
+Kenya,KE,KEN,404,AFR,2024,newrel,a,m,53198,418,3040,3073,275,60004
+Kenya,KE,KEN,404,AFR,2024,newrel,a,f,32123,125,1862,1117,157,35384
+Kiribati,KI,KIR,296,WPR,2018,newrel,0-14,a,41,,,,,43
+Kiribati,KI,KIR,296,WPR,2019,newrel,0-14,a,71,,,,,75
+Kiribati,KI,KIR,296,WPR,2020,newrel,0-14,a,72,,,,,75
+Kiribati,KI,KIR,296,WPR,2021,newrel,0-14,a,43,,,,,46
+Kiribati,KI,KIR,296,WPR,2022,newrel,0-14,a,51,,,,,55
+Kiribati,KI,KIR,296,WPR,2023,newrel,0-14,a,145,,,,,150
+Kiribati,KI,KIR,296,WPR,2024,newrel,0-14,a,185,3,2,3,0,193
+Kiribati,KI,KIR,296,WPR,2024,newrel,a,m,286,1,12,23,3,325
+Kiribati,KI,KIR,296,WPR,2024,newrel,a,f,254,3,11,3,1,272
+Kuwait,KW,KWT,414,EMR,2018,newrel,0-14,a,12,,,,,12
+Kuwait,KW,KWT,414,EMR,2019,newrel,0-14,a,13,,,,,13
+Kuwait,KW,KWT,414,EMR,2020,newrel,0-14,a,12,,,,,13
+Kuwait,KW,KWT,414,EMR,2021,newrel,0-14,a,10,,,,,10
+Kuwait,KW,KWT,414,EMR,2022,newrel,0-14,a,9,,,,,9
+Kuwait,KW,KWT,414,EMR,2023,newrel,0-14,a,8,,,,,8
+Kyrgyzstan,KG,KGZ,417,EUR,2012,newrel,0-14,a,617,18,5,0,0,640
+Kyrgyzstan,KG,KGZ,417,EUR,2013,newrel,0-14,a,553,1,5,4,7,570
+Kyrgyzstan,KG,KGZ,417,EUR,2014,newrel,0-14,a,399,0,2,10,2,413
+Kyrgyzstan,KG,KGZ,417,EUR,2015,newrel,0-14,a,488,4,4,20,0,516
+Kyrgyzstan,KG,KGZ,417,EUR,2016,newrel,0-14,a,359,4,7,13,0,383
+Kyrgyzstan,KG,KGZ,417,EUR,2018,newrel,0-14,a,239,3,5,12,1,260
+Kyrgyzstan,KG,KGZ,417,EUR,2020,newrel,0-14,a,130,2,5,4,41,182
+Kyrgyzstan,KG,KGZ,417,EUR,2021,newrel,0-14,a,173,2,0,4,1,180
+Kyrgyzstan,KG,KGZ,417,EUR,2022,newrel,0-14,a,254,1,5,2,3,265
+Kyrgyzstan,KG,KGZ,417,EUR,2023,newrel,0-14,a,210,3,2,2,0,217
+Kyrgyzstan,KG,KGZ,417,EUR,2024,newrel,0-14,a,245,,1,6,,252
+Lao People's Democratic Republic,LA,LAO,418,WPR,2021,newrel,0-14,a,55,,,,,73
+Lao People's Democratic Republic,LA,LAO,418,WPR,2022,newrel,0-14,a,78,,,,,99
+Lao People's Democratic Republic,LA,LAO,418,WPR,2023,newrel,0-14,a,90,,,,,104
+Lao People's Democratic Republic,LA,LAO,418,WPR,2024,newrel,0-14,a,54,0,3,8,0,65
+Lao People's Democratic Republic,LA,LAO,418,WPR,2024,newrel,a,m,5471,7,295,325,20,6118
+Lao People's Democratic Republic,LA,LAO,418,WPR,2024,newrel,a,f,2641,4,128,164,12,2949
+Latvia,LV,LVA,428,EUR,2010,newrel,0-14,a,6,0,2,0,0,8
+Latvia,LV,LVA,428,EUR,2011,newrel,0-14,a,6,0,0,0,1,7
+Latvia,LV,LVA,428,EUR,2012,newrel,0-14,a,53,0,0,3,0,56
+Latvia,LV,LVA,428,EUR,2013,newrel,0-14,a,45,0,0,0,0,45
+Latvia,LV,LVA,428,EUR,2014,newrel,0-14,a,41,0,0,0,0,41
+Latvia,LV,LVA,428,EUR,2015,newrel,0-14,a,25,0,0,0,0,25
+Latvia,LV,LVA,428,EUR,2016,newrel,0-14,a,23,0,0,0,0,23
+Latvia,LV,LVA,428,EUR,2023,newrel,0-14,a,0,0,0,0,9,9
+Latvia,LV,LVA,428,EUR,2024,newrel,0-14,a,1,,,,,1
+Latvia,LV,LVA,428,EUR,2024,newrel,a,m,121,0,28,4,43,196
+Latvia,LV,LVA,428,EUR,2024,newrel,a,f,42,0,3,1,19,65
+Lebanon,LB,LBN,422,EMR,2018,newrel,0-14,a,42,,,,,44
+Lebanon,LB,LBN,422,EMR,2019,newrel,0-14,a,50,,,,,54
+Lebanon,LB,LBN,422,EMR,2020,newrel,0-14,a,42,,,,,43
+Lebanon,LB,LBN,422,EMR,2021,newrel,0-14,a,37,,,,,41
+Lebanon,LB,LBN,422,EMR,2022,newrel,0-14,a,50,,,,,53
+Lebanon,LB,LBN,422,EMR,2023,newrel,0-14,a,45,,,,,48
+Lebanon,LB,LBN,422,EMR,2024,newrel,0-14,a,47,0,0,4,0,51
+Lebanon,LB,LBN,422,EMR,2024,newrel,a,m,196,0,13,13,1,223
+Lebanon,LB,LBN,422,EMR,2024,newrel,a,f,275,6,5,25,6,317
+Lesotho,LS,LSO,426,AFR,2018,newrel,0-14,a,192,,,,,232
+Lesotho,LS,LSO,426,AFR,2019,newrel,0-14,a,223,,,,,263
+Lesotho,LS,LSO,426,AFR,2019,newrel,a,m,3428,26,637,172,138,4401
+Lesotho,LS,LSO,426,AFR,2019,newrel,a,f,1945,13,359,86,112,2515
+Lesotho,LS,LSO,426,AFR,2020,newrel,0-14,a,134,,,,,171
+Lesotho,LS,LSO,426,AFR,2020,newrel,a,m,2200,21,464,154,99,2938
+Lesotho,LS,LSO,426,AFR,2020,newrel,a,f,1190,7,219,62,62,1540
+Lesotho,LS,LSO,426,AFR,2021,newrel,0-14,a,163,,,,,208
+Lesotho,LS,LSO,426,AFR,2021,newrel,a,m,2281,22,474,128,67,2972
+Lesotho,LS,LSO,426,AFR,2021,newrel,a,f,1189,14,236,59,38,1536
+Lesotho,LS,LSO,426,AFR,2022,newrel,0-14,a,276,,,,,322
+Lesotho,LS,LSO,426,AFR,2022,newrel,a,m,2896,32,489,168,32,3617
+Lesotho,LS,LSO,426,AFR,2022,newrel,a,f,1539,16,255,69,27,1906
+Lesotho,LS,LSO,426,AFR,2023,newrel,0-14,a,313,,,,,363
+Lesotho,LS,LSO,426,AFR,2023,newrel,a,m,3651,19,548,177,42,4437
+Lesotho,LS,LSO,426,AFR,2023,newrel,a,f,1633,11,251,97,29,2021
+Lesotho,LS,LSO,426,AFR,2024,newrel,0-14,a,307,0,11,19,6,343
+Lesotho,LS,LSO,426,AFR,2024,newrel,a,m,3654,24,617,208,48,4551
+Lesotho,LS,LSO,426,AFR,2024,newrel,a,f,1694,14,263,101,37,2109
+Liberia,LR,LBR,430,AFR,2020,newrel,a,m,3036,11,193,843,105,4188
+Liberia,LR,LBR,430,AFR,2020,newrel,a,f,2254,5,112,364,67,2802
+Liberia,LR,LBR,430,AFR,2024,newrel,a,m,4024,24,170,814,142,5174
+Liberia,LR,LBR,430,AFR,2024,newrel,a,f,2328,8,92,362,78,2868
+Libya,LY,LBY,434,EMR,2019,newrel,0-14,a,76,,,,,100
+Libya,LY,LBY,434,EMR,2020,newrel,0-14,a,85,,,,,100
+Libya,LY,LBY,434,EMR,2021,newrel,0-14,a,88,,,,,109
+Libya,LY,LBY,434,EMR,2022,newrel,0-14,a,88,,,,,109
+Libya,LY,LBY,434,EMR,2023,newrel,0-14,a,81,,,,,112
+Libya,LY,LBY,434,EMR,2024,newrel,0-14,a,96,0,1,25,1,123
+Libya,LY,LBY,434,EMR,2024,newrel,a,m,821,0,50,494,115,1480
+Libya,LY,LBY,434,EMR,2024,newrel,a,f,429,0,24,97,10,560
+Lithuania,LT,LTU,440,EUR,2010,newrel,0-14,a,1,0,0,0,2,3
+Lithuania,LT,LTU,440,EUR,2011,newrel,0-14,a,4,0,0,0,3,7
+Lithuania,LT,LTU,440,EUR,2012,newrel,0-14,a,51,0,0,4,1,56
+Lithuania,LT,LTU,440,EUR,2013,newrel,0-14,a,33,0,0,3,0,36
+Lithuania,LT,LTU,440,EUR,2014,newrel,0-14,a,19,0,0,2,0,21
+Lithuania,LT,LTU,440,EUR,2015,newrel,0-14,a,31,0,1,1,1,34
+Lithuania,LT,LTU,440,EUR,2016,newrel,0-14,a,47,0,0,0,0,47
+Lithuania,LT,LTU,440,EUR,2017,newrel,0-14,a,42,0,0,1,1,44
+Lithuania,LT,LTU,440,EUR,2018,newrel,0-14,a,19,0,0,0,0,19
+Lithuania,LT,LTU,440,EUR,2019,newrel,0-14,a,26,0,0,0,0,26
+Lithuania,LT,LTU,440,EUR,2020,newrel,0-14,a,13,0,0,0,0,13
+Lithuania,LT,LTU,440,EUR,2021,newrel,0-14,a,13,0,0,0,0,13
+Lithuania,LT,LTU,440,EUR,2022,newrel,0-14,a,14,0,0,0,0,14
+Lithuania,LT,LTU,440,EUR,2023,newrel,0-14,a,34,0,0,0,0,34
+Lithuania,LT,LTU,440,EUR,2024,newrel,0-14,a,2,0,0,0,0,2
+Lithuania,LT,LTU,440,EUR,2024,newrel,a,m,316,3,44,3,3,369
+Lithuania,LT,LTU,440,EUR,2024,newrel,a,f,116,0,14,3,1,134
+Luxembourg,LU,LUX,442,EUR,2010,newrel,0-14,a,0,0,0,0,0,0
+Luxembourg,LU,LUX,442,EUR,2011,newrel,0-14,a,0,0,0,0,0,0
+Luxembourg,LU,LUX,442,EUR,2012,newrel,0-14,a,,,,3,0,3
+Luxembourg,LU,LUX,442,EUR,2013,newrel,0-14,a,0,0,0,0,0,0
+Luxembourg,LU,LUX,442,EUR,2017,newrel,0-14,a,0,0,0,0,0,0
+Luxembourg,LU,LUX,442,EUR,2019,newrel,0-14,a,0,0,0,0,0,0
+Luxembourg,LU,LUX,442,EUR,2020,newrel,0-14,a,0,0,0,0,0,0
+Madagascar,MG,MDG,450,AFR,2020,newrel,0-14,a,3703,,,,,3817
+Madagascar,MG,MDG,450,AFR,2021,newrel,0-14,a,3578,,,,,4074
+Madagascar,MG,MDG,450,AFR,2022,newrel,0-14,a,4059,,,,,4727
+Madagascar,MG,MDG,450,AFR,2023,newrel,0-14,a,3605,,,,,4154
+Madagascar,MG,MDG,450,AFR,2024,newrel,0-14,a,4170,30,240,292,159,4891
+Madagascar,MG,MDG,450,AFR,2024,newrel,a,m,24705,278,1261,2681,1362,30287
+Madagascar,MG,MDG,450,AFR,2024,newrel,a,f,16627,139,765,1492,875,19898
+Malawi,MW,MWI,454,AFR,2018,newrel,0-14,a,1096,,,,,1183
+Malawi,MW,MWI,454,AFR,2019,newrel,0-14,a,1378,,,,,1519
+Malawi,MW,MWI,454,AFR,2020,newrel,0-14,a,1275,,,,,1373
+Malawi,MW,MWI,454,AFR,2021,newrel,0-14,a,1173,,,,,1263
+Malawi,MW,MWI,454,AFR,2022,newrel,0-14,a,1281,,,,,1369
+Malawi,MW,MWI,454,AFR,2023,newrel,0-14,a,1116,,,,,1197
+Malawi,MW,MWI,454,AFR,2024,newrel,0-14,a,1029,3,35,14,11,1092
+Malawi,MW,MWI,454,AFR,2024,newrel,a,m,10074,113,717,228,153,11285
+Malawi,MW,MWI,454,AFR,2024,newrel,a,f,5995,17,310,94,111,6527
+Malaysia,MY,MYS,458,WPR,2018,newrel,0-14,a,632,,,,,705
+Malaysia,MY,MYS,458,WPR,2019,newrel,0-14,a,756,,,,,840
+Malaysia,MY,MYS,458,WPR,2020,newrel,0-14,a,687,,,,,751
+Malaysia,MY,MYS,458,WPR,2021,newrel,0-14,a,671,,,,,723
+Malaysia,MY,MYS,458,WPR,2022,newrel,0-14,a,1052,,,,,1127
+Malaysia,MY,MYS,458,WPR,2023,newrel,0-14,a,483,,,,,1681
+Malaysia,MY,MYS,458,WPR,2024,newrel,0-14,a,1411,1,33,13,33,1491
+Malaysia,MY,MYS,458,WPR,2024,newrel,a,m,13289,26,2294,529,738,16876
+Malaysia,MY,MYS,458,WPR,2024,newrel,a,f,7741,21,842,128,349,9081
+Maldives,MV,MDV,462,SEA,2018,newrel,0-14,a,6,,,,,6
+Maldives,MV,MDV,462,SEA,2019,newrel,0-14,a,3,,,,,3
+Maldives,MV,MDV,462,SEA,2020,newrel,0-14,a,3,,,,,3
+Maldives,MV,MDV,462,SEA,2021,newrel,0-14,a,3,,,,,3
+Maldives,MV,MDV,462,SEA,2022,newrel,0-14,a,5,,,,,6
+Maldives,MV,MDV,462,SEA,2023,newrel,0-14,a,2,,,,,2
+Maldives,MV,MDV,462,SEA,2024,newrel,0-14,a,0,0,0,0,0,0
+Malta,MT,MLT,470,EUR,2010,newrel,0-14,a,0,0,0,0,0,0
+Malta,MT,MLT,470,EUR,2011,newrel,0-14,a,0,0,0,0,0,0
+Malta,MT,MLT,470,EUR,2012,newrel,0-14,a,1,0,0,0,1,2
+Malta,MT,MLT,470,EUR,2013,newrel,0-14,a,0,0,0,0,0,0
+Malta,MT,MLT,470,EUR,2020,newrel,0-14,a,7,0,0,0,0,7
+Malta,MT,MLT,470,EUR,2021,newrel,0-14,a,1,0,0,0,0,1
+Malta,MT,MLT,470,EUR,2024,newrel,0-14,a,0,0,0,0,0,0
+Marshall Islands,MH,MHL,584,WPR,2018,newrel,0-14,a,126,,,,,130
+Marshall Islands,MH,MHL,584,WPR,2019,newrel,0-14,a,99,,,,,102
+Marshall Islands,MH,MHL,584,WPR,2020,newrel,0-14,a,31,,,,,32
+Marshall Islands,MH,MHL,584,WPR,2021,newrel,0-14,a,30,,,,,31
+Marshall Islands,MH,MHL,584,WPR,2022,newrel,0-14,a,22,,,,,23
+Marshall Islands,MH,MHL,584,WPR,2023,newrel,0-14,a,91,,,,,92
+Marshall Islands,MH,MHL,584,WPR,2024,newrel,0-14,a,16,0,1,0,0,17
+Marshall Islands,MH,MHL,584,WPR,2024,newrel,a,m,40,0,7,2,0,49
+Marshall Islands,MH,MHL,584,WPR,2024,newrel,a,f,33,0,4,5,0,42
+Mauritania,MR,MRT,478,AFR,2018,newrel,0-14,a,95,,,,,126
+Mauritania,MR,MRT,478,AFR,2019,newrel,0-14,a,140,,,,,158
+Mauritania,MR,MRT,478,AFR,2020,newrel,0-14,a,72,,,,,100
+Mauritania,MR,MRT,478,AFR,2021,newrel,0-14,a,98,,,,,125
+Mauritania,MR,MRT,478,AFR,2022,newrel,0-14,a,79,,,,,107
+Mauritania,MR,MRT,478,AFR,2024,newrel,0-14,a,111,0,11,3,9,134
+Mauritania,MR,MRT,478,AFR,2024,newrel,a,m,1371,11,92,52,71,1597
+Mauritania,MR,MRT,478,AFR,2024,newrel,a,f,832,3,55,12,29,931
+Mauritius,MU,MUS,480,AFR,2018,newrel,0-14,a,2,,,,,2
+Mauritius,MU,MUS,480,AFR,2019,newrel,0-14,a,1,,,,,3
+Mauritius,MU,MUS,480,AFR,2020,newrel,0-14,a,3,,,,,3
+Mauritius,MU,MUS,480,AFR,2021,newrel,0-14,a,3,,,,,3
+Mauritius,MU,MUS,480,AFR,2022,newrel,0-14,a,1,,,,,1
+Mauritius,MU,MUS,480,AFR,2023,newrel,0-14,a,1,,,,,1
+Mexico,MX,MEX,484,AMR,2013,newrel,0-14,a,651,2,30,53,69,805
+Mexico,MX,MEX,484,AMR,2014,newrel,0-14,a,620,4,32,34,93,783
+Mexico,MX,MEX,484,AMR,2015,newrel,0-14,a,646,3,38,33,66,786
+Mexico,MX,MEX,484,AMR,2016,newrel,0-14,a,629,2,33,26,96,786
+Mexico,MX,MEX,484,AMR,2017,newrel,0-14,a,334,2,37,23,303,699
+Mexico,MX,MEX,484,AMR,2018,newrel,0-14,a,584,4,41,34,82,745
+Mexico,MX,MEX,484,AMR,2019,newrel,0-14,a,467,1,28,32,133,661
+Mexico,MX,MEX,484,AMR,2020,newrel,0-14,a,351,1,42,32,103,529
+Mexico,MX,MEX,484,AMR,2021,newrel,0-14,a,490,0,52,41,111,694
+Mexico,MX,MEX,484,AMR,2022,newrel,0-14,a,504,4,55,52,109,724
+Mexico,MX,MEX,484,AMR,2023,newrel,0-14,a,506,2,61,56,124,749
+Mexico,MX,MEX,484,AMR,2024,newrel,0-14,a,592,1,41,65,99,798
+Mexico,MX,MEX,484,AMR,2024,newrel,a,m,11716,166,2228,1908,1025,17043
+Mexico,MX,MEX,484,AMR,2024,newrel,a,f,7283,56,829,705,629,9502
+Micronesia (Federated States of),FM,FSM,583,WPR,2018,newrel,0-14,a,27,,,,,27
+Micronesia (Federated States of),FM,FSM,583,WPR,2019,newrel,0-14,a,21,,,,,21
+Micronesia (Federated States of),FM,FSM,583,WPR,2020,newrel,0-14,a,6,,,,,8
+Micronesia (Federated States of),FM,FSM,583,WPR,2021,newrel,0-14,a,6,,,,,8
+Micronesia (Federated States of),FM,FSM,583,WPR,2023,newrel,0-14,a,64,,,,,70
+Monaco,MC,MCO,492,EUR,2013,newrel,0-14,a,,,,,,0
+Monaco,MC,MCO,492,EUR,2014,newrel,0-14,a,,,,,,0
+Monaco,MC,MCO,492,EUR,2020,newrel,0-14,a,,,,,,0
+Mongolia,MN,MNG,496,WPR,2019,newrel,0-14,a,381,,,,,395
+Mongolia,MN,MNG,496,WPR,2020,newrel,0-14,a,426,,,,,441
+Mongolia,MN,MNG,496,WPR,2022,newrel,0-14,a,163,,,,,178
+Mongolia,MN,MNG,496,WPR,2023,newrel,0-14,a,151,,,,,156
+Mongolia,MN,MNG,496,WPR,2023,newrel,a,m,1404,57,100,135,37,1733
+Mongolia,MN,MNG,496,WPR,2023,newrel,a,f,935,43,40,57,28,1103
+Mongolia,MN,MNG,496,WPR,2024,newrel,0-14,a,140,5,1,4,10,160
+Mongolia,MN,MNG,496,WPR,2024,newrel,a,m,1256,106,76,134,35,1607
+Mongolia,MN,MNG,496,WPR,2024,newrel,a,f,886,69,42,42,32,1071
+Montenegro,ME,MNE,499,EUR,2010,newrel,0-14,a,3,0,0,0,0,3
+Montenegro,ME,MNE,499,EUR,2011,newrel,0-14,a,3,0,0,0,0,3
+Montenegro,ME,MNE,499,EUR,2012,newrel,0-14,a,0,0,0,0,0,0
+Montenegro,ME,MNE,499,EUR,2013,newrel,0-14,a,1,0,0,0,0,1
+Montenegro,ME,MNE,499,EUR,2014,newrel,0-14,a,0,0,0,0,0,0
+Montenegro,ME,MNE,499,EUR,2015,newrel,0-14,a,1,0,0,0,0,1
+Montenegro,ME,MNE,499,EUR,2016,newrel,0-14,a,0,0,0,0,0,0
+Montenegro,ME,MNE,499,EUR,2017,newrel,0-14,a,0,0,0,0,0,0
+Montenegro,ME,MNE,499,EUR,2018,newrel,0-14,a,2,0,0,0,0,2
+Montenegro,ME,MNE,499,EUR,2019,newrel,0-14,a,1,0,0,0,0,1
+Montenegro,ME,MNE,499,EUR,2020,newrel,0-14,a,0,0,0,0,0,0
+Montenegro,ME,MNE,499,EUR,2022,newrel,0-14,a,0,0,0,0,0,0
+Montenegro,ME,MNE,499,EUR,2023,newrel,0-14,a,0,0,0,0,0,0
+Montenegro,ME,MNE,499,EUR,2024,newrel,0-14,a,,0,0,0,0,0
+Montenegro,ME,MNE,499,EUR,2024,newrel,a,m,30,0,4,3,0,37
+Montenegro,ME,MNE,499,EUR,2024,newrel,a,f,18,0,2,1,0,21
+Montserrat,MS,MSR,500,AMR,2018,newrel,0-14,a,0,0,0,0,0,0
+Morocco,MA,MAR,504,EMR,2018,newrel,0-14,a,1835,,,,,2097
+Morocco,MA,MAR,504,EMR,2019,newrel,0-14,a,1925,,,,,2089
+Morocco,MA,MAR,504,EMR,2020,newrel,0-14,a,1941,,,,,2079
+Morocco,MA,MAR,504,EMR,2021,newrel,0-14,a,1728,,,,,2193
+Morocco,MA,MAR,504,EMR,2022,newrel,0-14,a,1494,,,,,2323
+Morocco,MA,MAR,504,EMR,2023,newrel,0-14,a,2190,,,,,2357
+Mozambique,MZ,MOZ,508,AFR,2020,newrel,0-14,a,10347,,,,,11766
+Mozambique,MZ,MOZ,508,AFR,2021,newrel,0-14,a,10953,,,,,11198
+Mozambique,MZ,MOZ,508,AFR,2022,newrel,0-14,a,13220,,,,,13541
+Mozambique,MZ,MOZ,508,AFR,2023,newrel,0-14,a,9712,,,,,10556
+Mozambique,MZ,MOZ,508,AFR,2024,newrel,0-14,a,10440,12,93,148,309,11002
+Myanmar,MM,MMR,104,SEA,2018,newrel,0-14,a,25181,,,,,26118
+Myanmar,MM,MMR,104,SEA,2019,newrel,0-14,a,22210,,,,,23072
+Myanmar,MM,MMR,104,SEA,2020,newrel,0-14,a,8228,,,,,8573
+Myanmar,MM,MMR,104,SEA,2021,newrel,0-14,a,5932,,,,,6260
+Myanmar,MM,MMR,104,SEA,2022,newrel,0-14,a,20534,,,,,21281
+Myanmar,MM,MMR,104,SEA,2023,newrel,0-14,a,20643,,,,,22815
+Myanmar,MM,MMR,104,SEA,2023,newrel,a,m,64744,811,3563,4120,4627,77865
+Myanmar,MM,MMR,104,SEA,2023,newrel,a,f,41059,313,1575,2111,2671,47729
+Myanmar,MM,MMR,104,SEA,2024,newrel,0-14,a,16502,61,79,414,230,17286
+Myanmar,MM,MMR,104,SEA,2024,newrel,a,m,59582,772,3508,3967,1396,69225
+Myanmar,MM,MMR,104,SEA,2024,newrel,a,f,38768,289,1486,1992,795,43330
+Namibia,NA,NAM,516,AFR,2018,newrel,0-14,a,649,,,,,713
+Namibia,NA,NAM,516,AFR,2019,newrel,0-14,a,655,,,,,711
+Namibia,NA,NAM,516,AFR,2019,newrel,a,m,3941,111,335,199,6,4592
+Namibia,NA,NAM,516,AFR,2019,newrel,a,f,2542,37,217,97,9,2902
+Namibia,NA,NAM,516,AFR,2020,newrel,0-14,a,590,,,,,631
+Namibia,NA,NAM,516,AFR,2020,newrel,a,m,3420,56,295,124,12,3907
+Namibia,NA,NAM,516,AFR,2020,newrel,a,f,2147,29,169,56,4,2405
+Namibia,NA,NAM,516,AFR,2021,newrel,0-14,a,589,,,,,638
+Namibia,NA,NAM,516,AFR,2021,newrel,a,m,3470,69,313,165,14,4031
+Namibia,NA,NAM,516,AFR,2021,newrel,a,f,2141,25,185,72,10,2433
+Namibia,NA,NAM,516,AFR,2022,newrel,0-14,a,931,,,,,1026
+Namibia,NA,NAM,516,AFR,2022,newrel,a,m,4411,78,334,234,7,5064
+Namibia,NA,NAM,516,AFR,2022,newrel,a,f,2923,35,218,126,8,3310
+Namibia,NA,NAM,516,AFR,2023,newrel,0-14,a,845,,,,,946
+Namibia,NA,NAM,516,AFR,2023,newrel,a,m,4791,71,329,246,25,5462
+Namibia,NA,NAM,516,AFR,2023,newrel,a,f,3117,26,226,145,18,3532
+Namibia,NA,NAM,516,AFR,2024,newrel,0-14,a,789,1,18,40,3,851
+Namibia,NA,NAM,516,AFR,2024,newrel,a,m,4544,49,322,306,12,5233
+Namibia,NA,NAM,516,AFR,2024,newrel,a,f,2742,19,159,153,12,3085
+Naoero,NR,NRU,520,WPR,2018,newrel,0-14,a,0,,,,,0
+Naoero,NR,NRU,520,WPR,2020,newrel,0-14,a,0,,,,,0
+Nepal,NP,NPL,524,SEA,2020,newrel,a,m,15250,130,593,416,427,16816
+Nepal,NP,NPL,524,SEA,2020,newrel,a,f,9321,54,289,189,240,10093
+Nepal,NP,NPL,524,SEA,2022,newrel,a,m,20839,170,765,634,303,22711
+Nepal,NP,NPL,524,SEA,2022,newrel,a,f,13392,94,343,291,172,14292
+Nepal,NP,NPL,524,SEA,2023,newrel,a,m,20767,191,802,571,343,22674
+Nepal,NP,NPL,524,SEA,2023,newrel,a,f,12836,111,404,250,121,13722
+Nepal,NP,NPL,524,SEA,2024,newrel,a,m,22423,219,889,525,205,24261
+Nepal,NP,NPL,524,SEA,2024,newrel,a,f,14267,85,417,235,96,15100
+Netherlands (Kingdom of the),NL,NLD,528,EUR,2010,newrel,0-14,a,12,0,0,0,1,13
+Netherlands (Kingdom of the),NL,NLD,528,EUR,2011,newrel,0-14,a,18,0,1,0,5,24
+Netherlands (Kingdom of the),NL,NLD,528,EUR,2012,newrel,0-14,a,46,0,0,2,2,50
+Netherlands (Kingdom of the),NL,NLD,528,EUR,2013,newrel,0-14,a,31,0,0,0,1,32
+Netherlands (Kingdom of the),NL,NLD,528,EUR,2014,newrel,0-14,a,46,0,0,0,1,47
+Netherlands (Kingdom of the),NL,NLD,528,EUR,2015,newrel,0-14,a,39,0,0,0,3,42
+Netherlands (Kingdom of the),NL,NLD,528,EUR,2016,newrel,0-14,a,47,0,0,0,1,48
+Netherlands (Kingdom of the),NL,NLD,528,EUR,2017,newrel,0-14,a,30,0,0,1,2,33
+Netherlands (Kingdom of the),NL,NLD,528,EUR,2018,newrel,0-14,a,19,0,0,1,0,20
+Netherlands (Kingdom of the),NL,NLD,528,EUR,2019,newrel,0-14,a,43,0,0,2,2,47
+Netherlands (Kingdom of the),NL,NLD,528,EUR,2020,newrel,0-14,a,17,0,2,0,0,19
+Netherlands (Kingdom of the),NL,NLD,528,EUR,2021,newrel,0-14,a,25,0,0,1,0,26
+Netherlands (Kingdom of the),NL,NLD,528,EUR,2023,newrel,0-14,a,16,0,0,0,3,19
+New Caledonia,NC,NCL,540,WPR,2020,newrel,0-14,a,1,,,,,3
+New Caledonia,NC,NCL,540,WPR,2022,newrel,0-14,a,2,,,,,3
+New Caledonia,NC,NCL,540,WPR,2023,newrel,0-14,a,1,,,,,1
+New Zealand,NZ,NZL,554,WPR,2018,newrel,0-14,a,8,,,,,9
+New Zealand,NZ,NZL,554,WPR,2019,newrel,0-14,a,2,,,,,2
+New Zealand,NZ,NZL,554,WPR,2020,newrel,0-14,a,6,,,,,6
+New Zealand,NZ,NZL,554,WPR,2021,newrel,0-14,a,6,,,,,7
+New Zealand,NZ,NZL,554,WPR,2022,newrel,0-14,a,11,,,,,12
+New Zealand,NZ,NZL,554,WPR,2023,newrel,0-14,a,13,,,,,14
+New Zealand,NZ,NZL,554,WPR,2024,newrel,0-14,a,10,0,0,0,0,10
+New Zealand,NZ,NZL,554,WPR,2024,newrel,a,m,135,0,8,4,29,176
+New Zealand,NZ,NZL,554,WPR,2024,newrel,a,f,150,0,6,1,27,184
+Nicaragua,NI,NIC,558,AMR,2014,newrel,0-14,a,29,0,0,0,0,29
+Nicaragua,NI,NIC,558,AMR,2015,newrel,0-14,a,124,0,0,0,0,124
+Nicaragua,NI,NIC,558,AMR,2016,newrel,0-14,a,242,1,1,4,1,249
+Nicaragua,NI,NIC,558,AMR,2017,newrel,0-14,a,160,0,2,9,0,171
+Nicaragua,NI,NIC,558,AMR,2018,newrel,0-14,a,144,0,1,3,0,148
+Nicaragua,NI,NIC,558,AMR,2019,newrel,0-14,a,158,0,4,7,4,173
+Nicaragua,NI,NIC,558,AMR,2020,newrel,0-14,a,98,0,0,5,0,103
+Nicaragua,NI,NIC,558,AMR,2021,newrel,0-14,a,78,0,0,5,0,83
+Nicaragua,NI,NIC,558,AMR,2022,newrel,0-14,a,95,0,0,8,1,104
+Nigeria,NG,NGA,566,AFR,2018,newrel,0-14,a,7402,,,,,8293
+Nigeria,NG,NGA,566,AFR,2019,newrel,0-14,a,8720,,,,,9540
+Nigeria,NG,NGA,566,AFR,2020,newrel,0-14,a,7674,,,,,8441
+Nigeria,NG,NGA,566,AFR,2020,newrel,a,m,72938,337,2986,3998,1211,81470
+Nigeria,NG,NGA,566,AFR,2020,newrel,a,f,48840,182,1737,2310,1245,54314
+Nigeria,NG,NGA,566,AFR,2021,newrel,0-14,a,11894,,,,,12977
+Nigeria,NG,NGA,566,AFR,2021,newrel,a,m,109682,3466,368,5207,2358,121081
+Nigeria,NG,NGA,566,AFR,2021,newrel,a,f,76340,2180,195,3129,1800,83644
+Nigeria,NG,NGA,566,AFR,2022,newrel,0-14,a,19274,,,,,20411
+Nigeria,NG,NGA,566,AFR,2023,newrel,0-14,a,34865,,,,,36197
+Niue,NU,NIU,570,WPR,2022,newrel,0-14,a,1,,,,,1
+North Macedonia,MK,MKD,807,EUR,2010,newrel,0-14,a,31,0,0,2,0,33
+North Macedonia,MK,MKD,807,EUR,2011,newrel,0-14,a,28,0,1,3,0,32
+North Macedonia,MK,MKD,807,EUR,2012,newrel,0-14,a,27,0,0,2,0,29
+North Macedonia,MK,MKD,807,EUR,2013,newrel,0-14,a,23,0,0,0,0,23
+North Macedonia,MK,MKD,807,EUR,2014,newrel,0-14,a,19,0,0,0,0,19
+North Macedonia,MK,MKD,807,EUR,2015,newrel,0-14,a,14,0,0,0,0,14
+North Macedonia,MK,MKD,807,EUR,2016,newrel,0-14,a,25,0,0,0,0,25
+North Macedonia,MK,MKD,807,EUR,2017,newrel,0-14,a,10,0,0,0,0,10
+North Macedonia,MK,MKD,807,EUR,2018,newrel,0-14,a,10,0,0,2,0,12
+North Macedonia,MK,MKD,807,EUR,2019,newrel,0-14,a,12,0,0,0,0,12
+North Macedonia,MK,MKD,807,EUR,2020,newrel,0-14,a,8,,,2,0,10
+North Macedonia,MK,MKD,807,EUR,2021,newrel,0-14,a,3,0,0,0,0,3
+North Macedonia,MK,MKD,807,EUR,2022,newrel,0-14,a,5,0,0,0,2,7
+Northern Mariana Islands,MP,MNP,580,WPR,2018,newrel,0-14,a,6,,,,,6
+Northern Mariana Islands,MP,MNP,580,WPR,2019,newrel,0-14,a,1,,,,,1
+Northern Mariana Islands,MP,MNP,580,WPR,2020,newrel,0-14,a,1,,,,,1
+Northern Mariana Islands,MP,MNP,580,WPR,2021,newrel,0-14,a,0,,,,,1
+Northern Mariana Islands,MP,MNP,580,WPR,2022,newrel,0-14,a,0,,,,,0
+Northern Mariana Islands,MP,MNP,580,WPR,2023,newrel,0-14,a,0,,,,,0
+Norway,NO,NOR,578,EUR,2010,newrel,0-14,a,4,0,0,0,2,6
+Norway,NO,NOR,578,EUR,2011,newrel,0-14,a,9,0,0,0,0,9
+Norway,NO,NOR,578,EUR,2012,newrel,0-14,a,17,0,0,0,2,19
+Norway,NO,NOR,578,EUR,2013,newrel,0-14,a,16,0,0,0,0,16
+Norway,NO,NOR,578,EUR,2014,newrel,0-14,a,11,0,0,0,1,12
+Norway,NO,NOR,578,EUR,2015,newrel,0-14,a,18,0,0,0,0,18
+Norway,NO,NOR,578,EUR,2016,newrel,0-14,a,14,0,0,0,0,14
+Norway,NO,NOR,578,EUR,2017,newrel,0-14,a,17,0,0,0,0,17
+Norway,NO,NOR,578,EUR,2018,newrel,0-14,a,5,0,0,0,2,7
+Norway,NO,NOR,578,EUR,2019,newrel,0-14,a,4,0,0,0,0,4
+Norway,NO,NOR,578,EUR,2020,newrel,0-14,a,10,0,0,0,0,10
+Norway,NO,NOR,578,EUR,2021,newrel,0-14,a,3,0,0,0,1,4
+Norway,NO,NOR,578,EUR,2022,newrel,0-14,a,5,0,1,0,0,6
+Norway,NO,NOR,578,EUR,2023,newrel,0-14,a,7,0,0,0,0,7
+Norway,NO,NOR,578,EUR,2024,newrel,a,m,69,1,2,7,6,85
+Norway,NO,NOR,578,EUR,2024,newrel,a,f,69,0,3,3,0,75
+Oman,OM,OMN,512,EMR,2018,newrel,0-14,a,6,,,,,6
+Oman,OM,OMN,512,EMR,2019,newrel,0-14,a,4,,,,,5
+Oman,OM,OMN,512,EMR,2020,newrel,0-14,a,4,,,,,5
+Oman,OM,OMN,512,EMR,2021,newrel,0-14,a,4,,,,,4
+Oman,OM,OMN,512,EMR,2022,newrel,0-14,a,3,,,,,4
+Oman,OM,OMN,512,EMR,2023,newrel,0-14,a,3,,,,,3
+Oman,OM,OMN,512,EMR,2024,newrel,0-14,a,2,0,0,0,0,2
+Oman,OM,OMN,512,EMR,2024,newrel,a,m,162,0,15,6,107,290
+Oman,OM,OMN,512,EMR,2024,newrel,a,f,39,0,5,1,81,126
+Pakistan,PK,PAK,586,EMR,2022,newrel,0-14,a,57472,,,,,58858
+Palau,PW,PLW,585,WPR,2018,newrel,0-14,a,1,,,,,1
+Palau,PW,PLW,585,WPR,2019,newrel,0-14,a,0,,,,,0
+Palau,PW,PLW,585,WPR,2020,newrel,0-14,a,0,,,,,0
+Palau,PW,PLW,585,WPR,2021,newrel,0-14,a,0,,,,,0
+Palau,PW,PLW,585,WPR,2022,newrel,0-14,a,0,,,,,0
+Palau,PW,PLW,585,WPR,2023,newrel,0-14,a,1,,,,,1
+Palau,PW,PLW,585,WPR,2024,newrel,0-14,a,0,0,0,0,0,0
+Palau,PW,PLW,585,WPR,2024,newrel,a,m,3,0,0,0,0,3
+Palau,PW,PLW,585,WPR,2024,newrel,a,f,2,0,0,0,0,2
+Panama,PA,PAN,591,AMR,2014,newrel,0-14,a,103,,2,10,0,115
+Panama,PA,PAN,591,AMR,2015,newrel,0-14,a,126,3,3,12,2,146
+Panama,PA,PAN,591,AMR,2016,newrel,0-14,a,146,,4,15,4,169
+Panama,PA,PAN,591,AMR,2017,newrel,0-14,a,121,,3,10,0,134
+Panama,PA,PAN,591,AMR,2018,newrel,0-14,a,64,0,2,5,0,71
+Panama,PA,PAN,591,AMR,2019,newrel,0-14,a,101,0,1,8,0,110
+Panama,PA,PAN,591,AMR,2020,newrel,0-14,a,58,0,5,6,0,69
+Panama,PA,PAN,591,AMR,2021,newrel,0-14,a,82,0,5,11,0,98
+Panama,PA,PAN,591,AMR,2022,newrel,0-14,a,98,3,12,18,0,131
+Panama,PA,PAN,591,AMR,2023,newrel,0-14,a,168,1,18,28,0,215
+Panama,PA,PAN,591,AMR,2024,newrel,0-14,a,139,0,25,21,0,185
+Panama,PA,PAN,591,AMR,2024,newrel,a,m,1103,5,181,183,1,1473
+Panama,PA,PAN,591,AMR,2024,newrel,a,f,540,3,85,74,0,702
+Papua New Guinea,PG,PNG,598,WPR,2018,newrel,0-14,a,4870,,,,,6705
+Papua New Guinea,PG,PNG,598,WPR,2019,newrel,0-14,a,5027,,,,,7337
+Papua New Guinea,PG,PNG,598,WPR,2019,newrel,a,m,10748,113,488,2037,1569,14955
+Papua New Guinea,PG,PNG,598,WPR,2019,newrel,a,f,10093,120,455,1856,1714,14238
+Papua New Guinea,PG,PNG,598,WPR,2020,newrel,0-14,a,4527,,,,,6212
+Papua New Guinea,PG,PNG,598,WPR,2020,newrel,a,m,10292,109,439,1761,1202,13803
+Papua New Guinea,PG,PNG,598,WPR,2020,newrel,a,f,9670,88,463,1842,1275,13338
+Papua New Guinea,PG,PNG,598,WPR,2021,newrel,0-14,a,4853,,,,,6802
+Papua New Guinea,PG,PNG,598,WPR,2021,newrel,a,m,10642,134,471,745,2345,14337
+Papua New Guinea,PG,PNG,598,WPR,2021,newrel,a,f,10063,113,447,1961,1323,13907
+Papua New Guinea,PG,PNG,598,WPR,2022,newrel,0-14,a,6400,,,,,8685
+Papua New Guinea,PG,PNG,598,WPR,2022,newrel,a,m,12869,167,488,1037,3185,17746
+Papua New Guinea,PG,PNG,598,WPR,2022,newrel,a,f,12625,118,501,2785,1285,17314
+Papua New Guinea,PG,PNG,598,WPR,2023,newrel,0-14,a,7520,,,,,9424
+Papua New Guinea,PG,PNG,598,WPR,2023,newrel,a,m,15730,270,587,3518,1255,21360
+Papua New Guinea,PG,PNG,598,WPR,2023,newrel,a,f,15071,203,565,3556,1085,20480
+Papua New Guinea,PG,PNG,598,WPR,2024,newrel,0-14,a,7981,185,182,2043,305,10696
+Papua New Guinea,PG,PNG,598,WPR,2024,newrel,a,m,17430,234,697,3735,1185,23281
+Papua New Guinea,PG,PNG,598,WPR,2024,newrel,a,f,16039,173,631,3324,1190,21357
+Paraguay,PY,PRY,600,AMR,2013,newrel,0-14,a,116,0,2,3,62,183
+Paraguay,PY,PRY,600,AMR,2014,newrel,0-14,a,139,0,6,13,29,187
+Paraguay,PY,PRY,600,AMR,2015,newrel,0-14,a,109,0,12,11,17,149
+Paraguay,PY,PRY,600,AMR,2016,newrel,0-14,a,138,1,8,20,21,188
+Paraguay,PY,PRY,600,AMR,2017,newrel,0-14,a,150,0,2,23,0,175
+Paraguay,PY,PRY,600,AMR,2018,newrel,0-14,a,116,0,6,28,9,159
+Paraguay,PY,PRY,600,AMR,2019,newrel,0-14,a,135,0,10,28,19,192
+Paraguay,PY,PRY,600,AMR,2020,newrel,0-14,a,103,0,3,11,2,119
+Paraguay,PY,PRY,600,AMR,2021,newrel,0-14,a,61,0,5,24,5,95
+Paraguay,PY,PRY,600,AMR,2022,newrel,0-14,a,84,0,9,24,8,125
+Paraguay,PY,PRY,600,AMR,2023,newrel,0-14,a,89,0,6,16,13,124
+Paraguay,PY,PRY,600,AMR,2024,newrel,0-14,a,117,3,7,22,15,164
+Paraguay,PY,PRY,600,AMR,2024,newrel,a,m,2039,40,274,621,221,3195
+Paraguay,PY,PRY,600,AMR,2024,newrel,a,f,747,12,75,136,64,1034
+Peru,PE,PER,604,AMR,2015,newrel,0-14,a,152,0,5,13,51,221
+Peru,PE,PER,604,AMR,2016,newrel,0-14,a,664,0,13,29,116,822
+Peru,PE,PER,604,AMR,2017,newrel,0-14,a,1007,0,15,43,101,1166
+Peru,PE,PER,604,AMR,2018,newrel,0-14,a,1141,2,13,42,65,1263
+Peru,PE,PER,604,AMR,2019,newrel,0-14,a,1170,2,22,47,90,1331
+Peru,PE,PER,604,AMR,2020,newrel,0-14,a,752,2,16,41,26,837
+Peru,PE,PER,604,AMR,2020,newrel,a,m,11258,87,926,651,572,13494
+Peru,PE,PER,604,AMR,2020,newrel,a,f,6527,39,426,220,232,7444
+Peru,PE,PER,604,AMR,2021,newrel,0-14,a,759,1,17,35,27,839
+Peru,PE,PER,604,AMR,2021,newrel,a,m,11814,67,1016,833,320,14050
+Peru,PE,PER,604,AMR,2021,newrel,a,f,7629,42,440,318,204,8633
+Peru,PE,PER,604,AMR,2022,newrel,0-14,a,899,7,17,42,19,984
+Peru,PE,PER,604,AMR,2022,newrel,a,m,13094,236,1109,1141,277,15857
+Peru,PE,PER,604,AMR,2022,newrel,a,f,8134,120,499,396,169,9318
+Peru,PE,PER,604,AMR,2023,newrel,0-14,a,1125,1,20,37,16,1199
+Peru,PE,PER,604,AMR,2023,newrel,a,m,14834,56,1417,1422,200,17929
+Peru,PE,PER,604,AMR,2023,newrel,a,f,8888,27,617,495,112,10139
+Peru,PE,PER,604,AMR,2024,newrel,0-14,a,1011,3,34,38,18,1104
+Peru,PE,PER,604,AMR,2024,newrel,a,m,15249,43,1419,1646,606,18963
+Peru,PE,PER,604,AMR,2024,newrel,a,f,8691,21,564,545,109,9930
+Philippines,PH,PHL,608,WPR,2018,newrel,0-14,a,35519,,,,,45380
+Philippines,PH,PHL,608,WPR,2019,newrel,0-14,a,28814,,,,,32163
+Philippines,PH,PHL,608,WPR,2019,newrel,a,m,193306,730,5122,8292,16393,223843
+Philippines,PH,PHL,608,WPR,2019,newrel,a,f,103163,277,1857,4171,9466,118934
+Philippines,PH,PHL,608,WPR,2020,newrel,0-14,a,14625,,,,,19768
+Philippines,PH,PHL,608,WPR,2020,newrel,a,m,139400,433,4338,5068,31704,180943
+Philippines,PH,PHL,608,WPR,2020,newrel,a,f,67235,179,1517,2254,18859,90044
+Philippines,PH,PHL,608,WPR,2021,newrel,0-14,a,21563,,,,,26442
+Philippines,PH,PHL,608,WPR,2021,newrel,a,m,201315,580,5750,12398,29654,249697
+Philippines,PH,PHL,608,WPR,2021,newrel,a,f,98474,251,2100,6399,19093,126317
+Philippines,PH,PHL,608,WPR,2022,newrel,0-14,a,33030,,,,,40327
+Philippines,PH,PHL,608,WPR,2022,newrel,a,m,256953,769,6825,35556,25669,325772
+Philippines,PH,PHL,608,WPR,2022,newrel,a,f,138240,344,2528,21673,17325,180110
+Philippines,PH,PHL,608,WPR,2023,newrel,0-14,a,43295,,,,,48877
+Philippines,PH,PHL,608,WPR,2023,newrel,a,m,304682,827,7378,36361,12537,361785
+Philippines,PH,PHL,608,WPR,2023,newrel,a,f,173712,368,2695,23354,8578,208707
+Philippines,PH,PHL,608,WPR,2024,newrel,0-14,a,43430,34,187,2120,1003,46774
+Philippines,PH,PHL,608,WPR,2024,newrel,a,m,308004,682,6861,24848,10215,350610
+Philippines,PH,PHL,608,WPR,2024,newrel,a,f,176306,356,2629,14846,5999,200136
+Poland,PL,POL,616,EUR,2010,newrel,0-14,a,10,0,0,2,8,20
+Poland,PL,POL,616,EUR,2011,newrel,0-14,a,20,0,0,0,7,27
+Poland,PL,POL,616,EUR,2012,newrel,0-14,a,68,0,0,3,23,94
+Poland,PL,POL,616,EUR,2013,newrel,0-14,a,74,0,0,3,39,116
+Poland,PL,POL,616,EUR,2014,newrel,0-14,a,37,0,0,3,30,70
+Poland,PL,POL,616,EUR,2015,newrel,0-14,a,44,0,0,0,37,81
+Poland,PL,POL,616,EUR,2016,newrel,0-14,a,53,0,3,5,41,102
+Portugal,PT,PRT,620,EUR,2010,newrel,0-14,a,13,0,0,1,5,19
+Portugal,PT,PRT,620,EUR,2011,newrel,0-14,a,15,0,1,0,1,17
+Portugal,PT,PRT,620,EUR,2012,newrel,0-14,a,65,0,0,1,9,75
+Portugal,PT,PRT,620,EUR,2013,newrel,0-14,a,41,0,0,1,6,48
+Portugal,PT,PRT,620,EUR,2014,newrel,0-14,a,37,0,0,0,4,41
+Portugal,PT,PRT,620,EUR,2015,newrel,0-14,a,29,0,0,0,4,33
+Portugal,PT,PRT,620,EUR,2016,newrel,0-14,a,27,0,0,0,9,36
+Portugal,PT,PRT,620,EUR,2017,newrel,0-14,a,26,0,0,3,15,44
+Portugal,PT,PRT,620,EUR,2018,newrel,0-14,a,41,0,1,0,7,49
+Portugal,PT,PRT,620,EUR,2019,newrel,0-14,a,44,0,1,0,26,71
+Portugal,PT,PRT,620,EUR,2020,newrel,0-14,a,37,0,0,1,4,42
+Portugal,PT,PRT,620,EUR,2021,newrel,0-14,a,30,0,0,0,14,44
+Portugal,PT,PRT,620,EUR,2022,newrel,0-14,a,40,0,0,2,10,52
+Portugal,PT,PRT,620,EUR,2023,newrel,0-14,a,32,0,0,1,11,44
+Portugal,PT,PRT,620,EUR,2024,newrel,0-14,a,43,1,0,0,6,50
+Portugal,PT,PRT,620,EUR,2024,newrel,a,m,714,64,45,49,101,973
+Portugal,PT,PRT,620,EUR,2024,newrel,a,f,394,34,14,23,69,534
+Puerto Rico,PR,PRI,630,AMR,2018,newrel,0-14,a,0,0,1,0,0,1
+Puerto Rico,PR,PRI,630,AMR,2019,newrel,0-14,a,0,0,0,0,0,0
+Puerto Rico,PR,PRI,630,AMR,2020,newrel,0-14,a,1,0,0,0,0,1
+Puerto Rico,PR,PRI,630,AMR,2021,newrel,0-14,a,0,0,0,0,0,0
+Puerto Rico,PR,PRI,630,AMR,2022,newrel,0-14,a,0,0,0,0,0,0
+Qatar,QA,QAT,634,EMR,2018,newrel,0-14,a,1,,,,,3
+Qatar,QA,QAT,634,EMR,2019,newrel,0-14,a,3,,,,,3
+Qatar,QA,QAT,634,EMR,2020,newrel,0-14,a,4,,,,,7
+Qatar,QA,QAT,634,EMR,2021,newrel,0-14,a,12,,,,,15
+Qatar,QA,QAT,634,EMR,2022,newrel,0-14,a,2,,,,,3
+Qatar,QA,QAT,634,EMR,2023,newrel,0-14,a,6,,,,,8
+Qatar,QA,QAT,634,EMR,2024,newrel,0-14,a,3,0,0,2,0,5
+Qatar,QA,QAT,634,EMR,2024,newrel,a,m,446,6,9,63,74,598
+Qatar,QA,QAT,634,EMR,2024,newrel,a,f,180,2,4,22,29,237
+Republic of Korea,KR,KOR,410,WPR,2018,newrel,0-14,a,70,,,,,73
+Republic of Korea,KR,KOR,410,WPR,2019,newrel,0-14,a,72,,,,,76
+Republic of Korea,KR,KOR,410,WPR,2020,newrel,0-14,a,47,,,,,53
+Republic of Korea,KR,KOR,410,WPR,2021,newrel,0-14,a,33,,,,,35
+Republic of Korea,KR,KOR,410,WPR,2022,newrel,0-14,a,26,,,,,27
+Republic of Korea,KR,KOR,410,WPR,2023,newrel,0-14,a,19,,,,,19
+Republic of Korea,KR,KOR,410,WPR,2024,newrel,0-14,a,26,0,1,0,0,27
+Republic of Korea,KR,KOR,410,WPR,2024,newrel,a,m,8566,1,1736,244,156,10703
+Republic of Korea,KR,KOR,410,WPR,2024,newrel,a,f,5192,3,1080,150,100,6525
+Republic of Moldova,MD,MDA,498,EUR,2010,newrel,0-14,a,131,1,0,2,6,140
+Republic of Moldova,MD,MDA,498,EUR,2011,newrel,0-14,a,154,1,3,1,0,159
+Republic of Moldova,MD,MDA,498,EUR,2012,newrel,0-14,a,140,0,2,0,1,143
+Republic of Moldova,MD,MDA,498,EUR,2013,newrel,0-14,a,122,0,0,3,0,125
+Republic of Moldova,MD,MDA,498,EUR,2014,newrel,0-14,a,100,1,2,1,0,104
+Republic of Moldova,MD,MDA,498,EUR,2015,newrel,0-14,a,96,1,1,2,1,101
+Republic of Moldova,MD,MDA,498,EUR,2016,newrel,0-14,a,84,1,2,1,0,88
+Republic of Moldova,MD,MDA,498,EUR,2017,newrel,0-14,a,105,2,0,0,0,107
+Republic of Moldova,MD,MDA,498,EUR,2018,newrel,0-14,a,87,0,0,1,8,96
+Republic of Moldova,MD,MDA,498,EUR,2019,newrel,0-14,a,103,0,0,0,0,103
+Republic of Moldova,MD,MDA,498,EUR,2020,newrel,0-14,a,56,0,0,0,0,56
+Republic of Moldova,MD,MDA,498,EUR,2020,newrel,a,m,753,44,139,27,18,981
+Republic of Moldova,MD,MDA,498,EUR,2020,newrel,a,f,364,9,47,6,1,427
+Republic of Moldova,MD,MDA,498,EUR,2021,newrel,0-14,a,70,0,0,1,0,71
+Republic of Moldova,MD,MDA,498,EUR,2021,newrel,a,m,980,37,161,60,4,1242
+Republic of Moldova,MD,MDA,498,EUR,2021,newrel,a,f,338,8,43,7,0,396
+Republic of Moldova,MD,MDA,498,EUR,2022,newrel,0-14,a,71,0,0,0,0,71
+Republic of Moldova,MD,MDA,498,EUR,2022,newrel,a,m,1039,39,124,34,8,1244
+Republic of Moldova,MD,MDA,498,EUR,2022,newrel,a,f,377,14,31,5,2,429
+Republic of Moldova,MD,MDA,498,EUR,2023,newrel,0-14,a,133,0,0,0,0,133
+Republic of Moldova,MD,MDA,498,EUR,2023,newrel,a,m,1048,30,111,52,1,1242
+Republic of Moldova,MD,MDA,498,EUR,2023,newrel,a,f,382,13,35,4,0,434
+Republic of Moldova,MD,MDA,498,EUR,2024,newrel,0-14,a,99,0,0,2,0,101
+Republic of Moldova,MD,MDA,498,EUR,2024,newrel,a,m,999,66,91,48,0,1204
+Republic of Moldova,MD,MDA,498,EUR,2024,newrel,a,f,360,11,25,13,0,409
+Romania,RO,ROU,642,EUR,2010,newrel,0-14,a,86,1,1,3,5,96
+Romania,RO,ROU,642,EUR,2011,newrel,0-14,a,112,0,1,0,0,113
+Romania,RO,ROU,642,EUR,2012,newrel,0-14,a,674,2,7,27,6,716
+Romania,RO,ROU,642,EUR,2013,newrel,0-14,a,663,1,7,15,6,692
+Romania,RO,ROU,642,EUR,2014,newrel,0-14,a,613,0,4,13,4,634
+Romania,RO,ROU,642,EUR,2015,newrel,0-14,a,614,0,9,23,5,651
+Romania,RO,ROU,642,EUR,2016,newrel,0-14,a,578,2,5,9,1,595
+Romania,RO,ROU,642,EUR,2017,newrel,0-14,a,512,0,9,7,2,530
+Romania,RO,ROU,642,EUR,2018,newrel,0-14,a,516,0,8,9,7,540
+Romania,RO,ROU,642,EUR,2019,newrel,0-14,a,372,2,5,7,2,388
+Romania,RO,ROU,642,EUR,2020,newrel,0-14,a,245,0,6,6,1,258
+Romania,RO,ROU,642,EUR,2021,newrel,0-14,a,263,1,7,4,3,278
+Romania,RO,ROU,642,EUR,2022,newrel,0-14,a,309,1,4,4,6,324
+Romania,RO,ROU,642,EUR,2023,newrel,0-14,a,411,0,2,2,9,424
+Romania,RO,ROU,642,EUR,2024,newrel,0-14,a,325,0,3,7,2,337
+Romania,RO,ROU,642,EUR,2024,newrel,a,m,4944,163,650,224,97,6078
+Romania,RO,ROU,642,EUR,2024,newrel,a,f,2108,29,158,64,54,2413
+Russian Federation,RU,RUS,643,EUR,2011,newrel,0-14,a,576,13,3,7,30,629
+Russian Federation,RU,RUS,643,EUR,2012,newrel,0-14,a,717,11,7,4,15,754
+Russian Federation,RU,RUS,643,EUR,2013,newrel,0-14,a,708,3,6,1,15,733
+Russian Federation,RU,RUS,643,EUR,2014,newrel,0-14,a,2964,28,22,9,67,3090
+Russian Federation,RU,RUS,643,EUR,2015,newrel,0-14,a,2736,20,19,5,126,2906
+Russian Federation,RU,RUS,643,EUR,2016,newrel,0-14,a,2574,15,13,4,71,2677
+Russian Federation,RU,RUS,643,EUR,2017,newrel,0-14,a,2209,22,10,4,59,2304
+Russian Federation,RU,RUS,643,EUR,2018,newrel,0-14,a,1811,28,13,5,48,1905
+Russian Federation,RU,RUS,643,EUR,2019,newrel,0-14,a,1652,39,10,6,46,1753
+Russian Federation,RU,RUS,643,EUR,2020,newrel,0-14,a,1365,26,4,8,29,1432
+Russian Federation,RU,RUS,643,EUR,2021,newrel,0-14,a,1433,27,6,5,22,1493
+Russian Federation,RU,RUS,643,EUR,2022,newrel,0-14,a,1374,32,6,5,38,1455
+Russian Federation,RU,RUS,643,EUR,2023,newrel,0-14,a,1336,25,5,1,34,1401
+Russian Federation,RU,RUS,643,EUR,2024,newrel,0-14,a,1058,58,1,10,9,1136
+Russian Federation,RU,RUS,643,EUR,2024,newrel,a,m,18073,3753,2504,1336,574,26240
+Russian Federation,RU,RUS,643,EUR,2024,newrel,a,f,8442,1168,921,338,127,10996
+Rwanda,RW,RWA,646,AFR,2018,newrel,0-14,a,364,,,,,388
+Rwanda,RW,RWA,646,AFR,2019,newrel,0-14,a,412,,,,,437
+Rwanda,RW,RWA,646,AFR,2020,newrel,0-14,a,299,,,,,324
+Rwanda,RW,RWA,646,AFR,2021,newrel,0-14,a,288,,,,,310
+Rwanda,RW,RWA,646,AFR,2022,newrel,0-14,a,385,,,,,402
+Rwanda,RW,RWA,646,AFR,2023,newrel,0-14,a,594,,,,,639
+Rwanda,RW,RWA,646,AFR,2024,newrel,0-14,a,1183,0,23,6,2,1214
+Rwanda,RW,RWA,646,AFR,2024,newrel,a,m,5488,32,266,157,35,5978
+Rwanda,RW,RWA,646,AFR,2024,newrel,a,f,2251,5,139,46,22,2463
+Saint Kitts and Nevis,KN,KNA,659,AMR,2022,newrel,0-14,a,0,0,0,0,0,0
+Saint Lucia,LC,LCA,662,AMR,2018,newrel,0-14,a,0,0,0,0,0,0
+Saint Lucia,LC,LCA,662,AMR,2019,newrel,0-14,a,0,0,0,0,0,0
+Saint Lucia,LC,LCA,662,AMR,2020,newrel,0-14,a,0,0,0,0,0,0
+Saint Lucia,LC,LCA,662,AMR,2021,newrel,0-14,a,0,0,0,0,0,0
+Saint Lucia,LC,LCA,662,AMR,2022,newrel,0-14,a,0,0,0,0,0,0
+Saint Lucia,LC,LCA,662,AMR,2024,newrel,0-14,a,0,0,0,0,0,0
+Saint Lucia,LC,LCA,662,AMR,2024,newrel,a,m,1,0,0,0,0,1
+Saint Lucia,LC,LCA,662,AMR,2024,newrel,a,f,0,0,0,0,0,0
+Saint Vincent and the Grenadines,VC,VCT,670,AMR,2019,newrel,0-14,a,0,0,0,0,0,0
+Saint Vincent and the Grenadines,VC,VCT,670,AMR,2020,newrel,0-14,a,0,0,1,0,0,1
+Samoa,WS,WSM,882,WPR,2018,newrel,0-14,a,2,,,,,2
+Samoa,WS,WSM,882,WPR,2020,newrel,0-14,a,0,,,,,0
+Samoa,WS,WSM,882,WPR,2021,newrel,0-14,a,0,,,,,0
+Samoa,WS,WSM,882,WPR,2023,newrel,0-14,a,1,,,,,1
+Samoa,WS,WSM,882,WPR,2024,newrel,0-14,a,0,,,,,0
+San Marino,SM,SMR,674,EUR,2015,newrel,0-14,a,0,0,0,0,0,0
+San Marino,SM,SMR,674,EUR,2016,newrel,0-14,a,0,0,0,0,0,0
+San Marino,SM,SMR,674,EUR,2017,newrel,0-14,a,0,0,0,0,0,0
+San Marino,SM,SMR,674,EUR,2018,newrel,0-14,a,0,0,0,0,0,0
+Sao Tome and Principe,ST,STP,678,AFR,2018,newrel,0-14,a,5,,,,,5
+Sao Tome and Principe,ST,STP,678,AFR,2019,newrel,0-14,a,10,,,,,11
+Sao Tome and Principe,ST,STP,678,AFR,2020,newrel,0-14,a,2,,,,,3
+Sao Tome and Principe,ST,STP,678,AFR,2021,newrel,0-14,a,1,,,,,1
+Sao Tome and Principe,ST,STP,678,AFR,2022,newrel,0-14,a,6,,,,,8
+Sao Tome and Principe,ST,STP,678,AFR,2023,newrel,0-14,a,4,,,,,10
+Sao Tome and Principe,ST,STP,678,AFR,2024,newrel,0-14,a,5,0,1,0,0,6
+Sao Tome and Principe,ST,STP,678,AFR,2024,newrel,a,m,56,0,11,7,5,79
+Sao Tome and Principe,ST,STP,678,AFR,2024,newrel,a,f,38,1,4,4,0,47
+Saudi Arabia,SA,SAU,682,EMR,2018,newrel,0-14,a,75,,,,,88
+Saudi Arabia,SA,SAU,682,EMR,2019,newrel,0-14,a,90,,,,,106
+Saudi Arabia,SA,SAU,682,EMR,2020,newrel,0-14,a,70,,,,,79
+Saudi Arabia,SA,SAU,682,EMR,2021,newrel,0-14,a,74,,,,,80
+Saudi Arabia,SA,SAU,682,EMR,2022,newrel,0-14,a,63,,,,,68
+Saudi Arabia,SA,SAU,682,EMR,2023,newrel,0-14,a,65,,,,,70
+Saudi Arabia,SA,SAU,682,EMR,2024,newrel,0-14,a,72,0,2,1,0,75
+Saudi Arabia,SA,SAU,682,EMR,2024,newrel,a,m,1705,3,83,25,5,1821
+Saudi Arabia,SA,SAU,682,EMR,2024,newrel,a,f,729,0,35,8,3,775
+Senegal,SN,SEN,686,AFR,2018,newrel,0-14,a,498,,,,,581
+Senegal,SN,SEN,686,AFR,2019,newrel,0-14,a,514,,,,,592
+Senegal,SN,SEN,686,AFR,2020,newrel,0-14,a,422,,,,,669
+Senegal,SN,SEN,686,AFR,2021,newrel,0-14,a,355,,,,,384
+Senegal,SN,SEN,686,AFR,2022,newrel,0-14,a,430,,,,,587
+Senegal,SN,SEN,686,AFR,2023,newrel,0-14,a,333,,,,,568
+Senegal,SN,SEN,686,AFR,2024,newrel,0-14,a,574,5,12,42,54,687
+Senegal,SN,SEN,686,AFR,2024,newrel,a,m,9574,190,476,700,193,11133
+Senegal,SN,SEN,686,AFR,2024,newrel,a,f,5428,50,4,5,48,5535
+Serbia,RS,SRB,688,EUR,2010,newrel,0-14,a,15,0,0,0,2,17
+Serbia,RS,SRB,688,EUR,2011,newrel,0-14,a,11,0,0,1,1,13
+Serbia,RS,SRB,688,EUR,2012,newrel,0-14,a,15,0,0,2,1,18
+Serbia,RS,SRB,688,EUR,2013,newrel,0-14,a,54,0,0,1,0,55
+Serbia,RS,SRB,688,EUR,2014,newrel,0-14,a,40,0,1,0,1,42
+Serbia,RS,SRB,688,EUR,2015,newrel,0-14,a,27,0,0,0,1,28
+Serbia,RS,SRB,688,EUR,2016,newrel,0-14,a,16,1,0,0,0,17
+Serbia,RS,SRB,688,EUR,2017,newrel,0-14,a,36,0,0,0,0,36
+Serbia,RS,SRB,688,EUR,2018,newrel,0-14,a,29,0,0,0,0,29
+Serbia,RS,SRB,688,EUR,2022,newrel,0-14,a,47,0,0,1,1,49
+Serbia,RS,SRB,688,EUR,2023,newrel,0-14,a,47,0,1,0,0,48
+Seychelles,SC,SYC,690,AFR,2018,newrel,0-14,a,0,,,,,0
+Seychelles,SC,SYC,690,AFR,2020,newrel,0-14,a,0,,,,,0
+Seychelles,SC,SYC,690,AFR,2021,newrel,0-14,a,0,,,,,0
+Seychelles,SC,SYC,690,AFR,2023,newrel,0-14,a,0,,,,,0
+Seychelles,SC,SYC,690,AFR,2024,newrel,0-14,a,0,0,0,0,0,0
+Seychelles,SC,SYC,690,AFR,2024,newrel,a,m,17,0,1,0,0,18
+Seychelles,SC,SYC,690,AFR,2024,newrel,a,f,1,0,2,1,0,4
+Singapore,SG,SGP,702,WPR,2018,newrel,0-14,a,8,,,,,9
+Singapore,SG,SGP,702,WPR,2019,newrel,0-14,a,13,,,,,14
+Singapore,SG,SGP,702,WPR,2020,newrel,0-14,a,7,,,,,8
+Singapore,SG,SGP,702,WPR,2021,newrel,0-14,a,10,,,,,10
+Singapore,SG,SGP,702,WPR,2022,newrel,0-14,a,3,,,,,3
+Singapore,SG,SGP,702,WPR,2023,newrel,0-14,a,3,,,,,3
+Singapore,SG,SGP,702,WPR,2024,newrel,0-14,a,3,0,0,,0,3
+Singapore,SG,SGP,702,WPR,2024,newrel,a,m,1015,7,139,3,223,1387
+Singapore,SG,SGP,702,WPR,2024,newrel,a,f,605,5,44,1,178,833
+Sint Maarten (Dutch part),SX,SXM,534,AMR,2018,newrel,0-14,a,,,,,,0
+Sint Maarten (Dutch part),SX,SXM,534,AMR,2021,newrel,0-14,a,0,0,0,0,0,0
+Slovakia,SK,SVK,703,EUR,2010,newrel,0-14,a,5,0,0,0,0,5
+Slovakia,SK,SVK,703,EUR,2011,newrel,0-14,a,2,0,0,0,0,2
+Slovakia,SK,SVK,703,EUR,2012,newrel,0-14,a,18,1,0,0,0,19
+Slovakia,SK,SVK,703,EUR,2013,newrel,0-14,a,37,0,0,0,1,38
+Slovakia,SK,SVK,703,EUR,2014,newrel,0-14,a,37,1,1,0,5,44
+Slovakia,SK,SVK,703,EUR,2015,newrel,0-14,a,65,0,0,0,0,65
+Slovakia,SK,SVK,703,EUR,2016,newrel,0-14,a,57,0,0,0,3,60
+Slovakia,SK,SVK,703,EUR,2017,newrel,0-14,a,44,0,0,0,1,45
+Slovakia,SK,SVK,703,EUR,2018,newrel,0-14,a,40,0,0,0,0,40
+Slovakia,SK,SVK,703,EUR,2019,newrel,0-14,a,34,0,0,0,1,35
+Slovakia,SK,SVK,703,EUR,2020,newrel,0-14,a,34,0,0,1,0,35
+Slovakia,SK,SVK,703,EUR,2021,newrel,0-14,a,38,0,0,0,2,40
+Slovakia,SK,SVK,703,EUR,2022,newrel,0-14,a,38,0,1,1,0,40
+Slovakia,SK,SVK,703,EUR,2023,newrel,0-14,a,77,0,0,1,2,80
+Slovakia,SK,SVK,703,EUR,2024,newrel,0-14,a,47,0,1,0,1,49
+Slovakia,SK,SVK,703,EUR,2024,newrel,a,m,68,1,8,5,2,84
+Slovakia,SK,SVK,703,EUR,2024,newrel,a,f,46,1,2,0,2,51
+Slovenia,SI,SVN,705,EUR,2010,newrel,0-14,a,1,0,0,0,0,1
+Slovenia,SI,SVN,705,EUR,2011,newrel,0-14,a,2,0,0,0,0,2
+Slovenia,SI,SVN,705,EUR,2012,newrel,0-14,a,5,0,0,0,0,5
+Slovenia,SI,SVN,705,EUR,2013,newrel,0-14,a,2,0,0,0,0,2
+Slovenia,SI,SVN,705,EUR,2014,newrel,0-14,a,3,0,0,0,0,3
+Slovenia,SI,SVN,705,EUR,2015,newrel,0-14,a,1,0,0,0,0,1
+Slovenia,SI,SVN,705,EUR,2016,newrel,0-14,a,3,0,0,0,0,3
+Slovenia,SI,SVN,705,EUR,2017,newrel,0-14,a,2,0,0,0,0,2
+Slovenia,SI,SVN,705,EUR,2018,newrel,0-14,a,1,0,0,0,0,1
+Slovenia,SI,SVN,705,EUR,2019,newrel,0-14,a,2,0,0,0,0,2
+Slovenia,SI,SVN,705,EUR,2020,newrel,0-14,a,0,0,0,0,0,0
+Slovenia,SI,SVN,705,EUR,2021,newrel,0-14,a,2,0,0,0,0,2
+Slovenia,SI,SVN,705,EUR,2022,newrel,0-14,a,2,0,0,0,0,2
+Slovenia,SI,SVN,705,EUR,2023,newrel,0-14,a,1,0,0,0,0,1
+Slovenia,SI,SVN,705,EUR,2024,newrel,0-14,a,1,0,0,0,0,1
+Slovenia,SI,SVN,705,EUR,2024,newrel,a,m,14,1,7,2,0,24
+Slovenia,SI,SVN,705,EUR,2024,newrel,a,f,16,0,4,0,0,20
+Solomon Islands,SB,SLB,90,WPR,2018,newrel,0-14,a,65,,,,,65
+Solomon Islands,SB,SLB,90,WPR,2019,newrel,0-14,a,51,,,,,53
+Solomon Islands,SB,SLB,90,WPR,2020,newrel,0-14,a,62,,,,,62
+South Africa,ZA,ZAF,710,AFR,2019,newrel,0-14,a,21035,,,,,25155
+South Africa,ZA,ZAF,710,AFR,2019,newrel,a,m,133092,1330,13681,19005,4843,171951
+South Africa,ZA,ZAF,710,AFR,2019,newrel,a,f,37714,327,2239,3447,1047,44774
+South Africa,ZA,ZAF,710,AFR,2020,newrel,0-14,a,12821,,,,,16007
+South Africa,ZA,ZAF,710,AFR,2020,newrel,a,m,77124,908,8135,11739,2255,100161
+South Africa,ZA,ZAF,710,AFR,2020,newrel,a,f,53194,460,5302,5448,1499,65903
+South Africa,ZA,ZAF,710,AFR,2021,newrel,0-14,a,10308,,,,,11890
+South Africa,ZA,ZAF,710,AFR,2021,newrel,a,m,74417,733,7790,9516,3238,95694
+South Africa,ZA,ZAF,710,AFR,2021,newrel,a,f,53014,453,5071,4824,2303,65665
+South Africa,ZA,ZAF,710,AFR,2022,newrel,0-14,a,14544,,,,,17947
+South Africa,ZA,ZAF,710,AFR,2022,newrel,a,m,92856,892,8638,13067,8954,124407
+South Africa,ZA,ZAF,710,AFR,2022,newrel,a,f,68622,473,5988,7235,6618,88936
+South Africa,ZA,ZAF,710,AFR,2023,newrel,0-14,a,13046,,,,,14500
+South Africa,ZA,ZAF,710,AFR,2023,newrel,a,m,81206,982,4654,10812,29950,127604
+South Africa,ZA,ZAF,710,AFR,2023,newrel,a,f,56526,275,4795,4645,588,66829
+South Africa,ZA,ZAF,710,AFR,2024,newrel,0-14,a,12823,25,198,1391,146,14583
+South Africa,ZA,ZAF,710,AFR,2024,newrel,a,m,94346,796,8148,14230,1230,118750
+South Africa,ZA,ZAF,710,AFR,2024,newrel,a,f,67772,408,5571,7921,818,82490
+South Sudan,SS,SSD,728,AFR,2020,newrel,0-14,a,938,,,,,1032
+South Sudan,SS,SSD,728,AFR,2021,newrel,0-14,a,1883,,,,,3129
+South Sudan,SS,SSD,728,AFR,2022,newrel,0-14,a,2337,,,,,2593
+South Sudan,SS,SSD,728,AFR,2023,newrel,0-14,a,3084,,,,,3368
+South Sudan,SS,SSD,728,AFR,2024,newrel,0-14,a,3355,13,32,111,189,3700
+Spain,ES,ESP,724,EUR,2010,newrel,0-14,a,104,0,0,1,40,145
+Spain,ES,ESP,724,EUR,2011,newrel,0-14,a,132,0,1,0,41,174
+Spain,ES,ESP,724,EUR,2012,newrel,0-14,a,305,0,0,0,83,388
+Spain,ES,ESP,724,EUR,2013,newrel,0-14,a,326,0,1,0,50,377
+Spain,ES,ESP,724,EUR,2014,newrel,0-14,a,210,0,3,0,76,289
+Spain,ES,ESP,724,EUR,2016,newrel,0-14,a,245,0,0,1,74,320
+Spain,ES,ESP,724,EUR,2017,newrel,0-14,a,204,0,1,1,74,280
+Spain,ES,ESP,724,EUR,2018,newrel,0-14,a,170,0,1,0,130,301
+Spain,ES,ESP,724,EUR,2019,newrel,0-14,a,169,0,1,0,146,316
+Spain,ES,ESP,724,EUR,2020,newrel,0-14,a,123,0,1,0,61,185
+Spain,ES,ESP,724,EUR,2021,newrel,0-14,a,43,0,0,0,63,106
+Spain,ES,ESP,724,EUR,2022,newrel,0-14,a,175,0,0,4,20,199
+Spain,ES,ESP,724,EUR,2023,newrel,0-14,a,120,1,0,0,37,158
+Sri Lanka,LK,LKA,144,SEA,2024,newrel,0-14,a,198,1,4,8,12,223
+Sri Lanka,LK,LKA,144,SEA,2024,newrel,a,m,4404,77,561,391,287,5720
+Sri Lanka,LK,LKA,144,SEA,2024,newrel,a,f,2718,27,209,87,169,3210
+Suriname,SR,SUR,740,AMR,2013,newrel,0-14,a,9,0,1,0,1,11
+Suriname,SR,SUR,740,AMR,2014,newrel,0-14,a,3,0,1,3,0,7
+Suriname,SR,SUR,740,AMR,2015,newrel,0-14,a,8,0,0,1,0,9
+Suriname,SR,SUR,740,AMR,2016,newrel,0-14,a,4,0,0,2,0,6
+Suriname,SR,SUR,740,AMR,2017,newrel,0-14,a,13,0,0,4,0,17
+Suriname,SR,SUR,740,AMR,2018,newrel,0-14,a,19,0,1,1,0,21
+Suriname,SR,SUR,740,AMR,2019,newrel,0-14,a,4,0,0,2,0,6
+Suriname,SR,SUR,740,AMR,2020,newrel,0-14,a,3,0,0,2,0,5
+Suriname,SR,SUR,740,AMR,2021,newrel,0-14,a,5,0,0,1,0,6
+Suriname,SR,SUR,740,AMR,2022,newrel,0-14,a,1,0,0,1,0,2
+Suriname,SR,SUR,740,AMR,2023,newrel,0-14,a,3,0,0,2,0,5
+Suriname,SR,SUR,740,AMR,2024,newrel,0-14,a,6,0,0,0,0,6
+Suriname,SR,SUR,740,AMR,2024,newrel,a,m,63,1,17,10,2,93
+Suriname,SR,SUR,740,AMR,2024,newrel,a,f,24,0,3,3,2,32
+Sweden,SE,SWE,752,EUR,2010,newrel,0-14,a,22,0,0,2,2,26
+Sweden,SE,SWE,752,EUR,2011,newrel,0-14,a,16,0,0,0,3,19
+Sweden,SE,SWE,752,EUR,2012,newrel,0-14,a,21,0,0,0,4,25
+Sweden,SE,SWE,752,EUR,2013,newrel,0-14,a,45,0,0,0,1,46
+Sweden,SE,SWE,752,EUR,2014,newrel,0-14,a,44,0,0,0,3,47
+Sweden,SE,SWE,752,EUR,2015,newrel,0-14,a,42,1,0,0,3,46
+Sweden,SE,SWE,752,EUR,2016,newrel,0-14,a,52,2,0,0,0,54
+Sweden,SE,SWE,752,EUR,2017,newrel,0-14,a,24,0,0,1,1,26
+Sweden,SE,SWE,752,EUR,2018,newrel,0-14,a,27,0,0,0,3,30
+Sweden,SE,SWE,752,EUR,2019,newrel,0-14,a,11,0,0,0,7,18
+Sweden,SE,SWE,752,EUR,2020,newrel,0-14,a,12,0,0,0,4,16
+Sweden,SE,SWE,752,EUR,2021,newrel,0-14,a,13,0,0,0,1,14
+Sweden,SE,SWE,752,EUR,2022,newrel,0-14,a,16,0,0,0,2,18
+Sweden,SE,SWE,752,EUR,2023,newrel,0-14,a,9,0,0,0,0,9
+Sweden,SE,SWE,752,EUR,2024,newrel,0-14,a,9,0,0,0,0,9
+Sweden,SE,SWE,752,EUR,2024,newrel,a,m,132,0,10,5,8,155
+Sweden,SE,SWE,752,EUR,2024,newrel,a,f,130,3,4,4,4,145
+Switzerland,CH,CHE,756,EUR,2016,newrel,0-14,a,21,0,0,0,10,31
+Switzerland,CH,CHE,756,EUR,2017,newrel,0-14,a,21,0,0,1,1,23
+Switzerland,CH,CHE,756,EUR,2018,newrel,0-14,a,15,0,0,0,4,19
+Switzerland,CH,CHE,756,EUR,2019,newrel,0-14,a,11,0,0,0,4,15
+Switzerland,CH,CHE,756,EUR,2020,newrel,0-14,a,17,0,0,0,1,18
+Switzerland,CH,CHE,756,EUR,2021,newrel,0-14,a,4,0,0,0,3,7
+Switzerland,CH,CHE,756,EUR,2022,newrel,0-14,a,11,0,0,0,5,16
+Switzerland,CH,CHE,756,EUR,2023,newrel,0-14,a,10,,,,,16
+Switzerland,CH,CHE,756,EUR,2024,newrel,0-14,a,17,0,0,0,4,21
+Switzerland,CH,CHE,756,EUR,2024,newrel,a,m,170,1,6,3,74,254
+Switzerland,CH,CHE,756,EUR,2024,newrel,a,f,108,0,3,2,34,147
+Syrian Arab Republic,SY,SYR,760,EMR,2018,newrel,0-14,a,199,,,,,222
+Syrian Arab Republic,SY,SYR,760,EMR,2019,newrel,0-14,a,234,,,,,234
+Syrian Arab Republic,SY,SYR,760,EMR,2020,newrel,0-14,a,186,,,,,186
+Syrian Arab Republic,SY,SYR,760,EMR,2021,newrel,0-14,a,197,,,,,197
+Syrian Arab Republic,SY,SYR,760,EMR,2022,newrel,0-14,a,206,,,,,215
+Syrian Arab Republic,SY,SYR,760,EMR,2023,newrel,0-14,a,203,,,,,259
+Syrian Arab Republic,SY,SYR,760,EMR,2024,newrel,0-14,a,230,2,4,21,2,259
+Syrian Arab Republic,SY,SYR,760,EMR,2024,newrel,a,m,1794,8,60,209,142,2213
+Syrian Arab Republic,SY,SYR,760,EMR,2024,newrel,a,f,1164,12,26,106,8,1316
+Tajikistan,TJ,TJK,762,EUR,2011,newrel,0-14,a,525,12,7,17,8,569
+Tajikistan,TJ,TJK,762,EUR,2012,newrel,0-14,a,345,3,5,,7,360
+Tajikistan,TJ,TJK,762,EUR,2013,newrel,0-14,a,367,0,2,10,3,382
+Tajikistan,TJ,TJK,762,EUR,2014,newrel,0-14,a,304,2,4,1,6,317
+Tajikistan,TJ,TJK,762,EUR,2015,newrel,0-14,a,296,2,7,9,2,316
+Tajikistan,TJ,TJK,762,EUR,2016,newrel,0-14,a,343,3,4,6,4,360
+Tajikistan,TJ,TJK,762,EUR,2017,newrel,0-14,a,312,3,4,5,3,327
+Tajikistan,TJ,TJK,762,EUR,2018,newrel,0-14,a,278,4,2,13,5,302
+Tajikistan,TJ,TJK,762,EUR,2019,newrel,0-14,a,332,1,3,11,3,350
+Tajikistan,TJ,TJK,762,EUR,2020,newrel,0-14,a,188,0,5,7,40,240
+Tajikistan,TJ,TJK,762,EUR,2020,newrel,a,m,1734,25,90,60,-218,1691
+Tajikistan,TJ,TJK,762,EUR,2020,newrel,a,f,1598,19,83,37,218,1955
+Tajikistan,TJ,TJK,762,EUR,2021,newrel,0-14,a,194,0,6,4,0,204
+Tajikistan,TJ,TJK,762,EUR,2021,newrel,a,m,1730,21,89,61,0,1901
+Tajikistan,TJ,TJK,762,EUR,2021,newrel,a,f,1617,6,69,42,0,1734
+Tajikistan,TJ,TJK,762,EUR,2022,newrel,0-14,a,212,2,1,3,0,218
+Tajikistan,TJ,TJK,762,EUR,2022,newrel,a,m,1952,15,93,73,0,2133
+Tajikistan,TJ,TJK,762,EUR,2022,newrel,a,f,1545,12,73,46,0,1676
+Tajikistan,TJ,TJK,762,EUR,2023,newrel,0-14,a,232,0,1,8,0,241
+Tajikistan,TJ,TJK,762,EUR,2023,newrel,a,m,2022,8,94,61,0,2185
+Tajikistan,TJ,TJK,762,EUR,2023,newrel,a,f,1667,14,53,40,0,1774
+Tajikistan,TJ,TJK,762,EUR,2024,newrel,0-14,a,238,0,3,1,0,242
+Tajikistan,TJ,TJK,762,EUR,2024,newrel,a,m,2063,14,98,41,0,2216
+Tajikistan,TJ,TJK,762,EUR,2024,newrel,a,f,1729,9,95,34,0,1867
+Thailand,TH,THA,764,SEA,2018,newrel,0-14,a,769,,,,,840
+Thailand,TH,THA,764,SEA,2019,newrel,0-14,a,797,,,,,868
+Thailand,TH,THA,764,SEA,2019,newrel,a,m,49543,256,5085,2937,907,58728
+Thailand,TH,THA,764,SEA,2019,newrel,a,f,24478,92,2143,1069,573,28355
+Thailand,TH,THA,764,SEA,2020,newrel,0-14,a,781,,,,,885
+Thailand,TH,THA,764,SEA,2020,newrel,a,m,48210,193,5168,3097,1619,58287
+Thailand,TH,THA,764,SEA,2020,newrel,a,f,23225,83,2094,937,1211,27550
+Thailand,TH,THA,764,SEA,2021,newrel,0-14,a,550,,,,,629
+Thailand,TH,THA,764,SEA,2021,newrel,a,m,41479,98,4845,1298,890,48610
+Thailand,TH,THA,764,SEA,2021,newrel,a,f,19286,45,1875,846,826,22878
+Thailand,TH,THA,764,SEA,2022,newrel,0-14,a,536,,,,,607
+Thailand,TH,THA,764,SEA,2022,newrel,a,m,39077,197,5265,3130,1528,49197
+Thailand,TH,THA,764,SEA,2022,newrel,a,f,19176,92,1962,1062,785,23077
+Thailand,TH,THA,764,SEA,2023,newrel,0-14,a,590,,,,,652
+Thailand,TH,THA,764,SEA,2023,newrel,a,m,44064,244,5363,3393,1589,54653
+Thailand,TH,THA,764,SEA,2023,newrel,a,f,21467,77,2096,1099,817,25556
+Thailand,TH,THA,764,SEA,2024,newrel,0-14,a,637,1,9,28,25,700
+Thailand,TH,THA,764,SEA,2024,newrel,a,m,46645,170,5370,3421,901,56507
+Thailand,TH,THA,764,SEA,2024,newrel,a,f,21686,77,2121,1106,827,25817
+Timor-Leste,TL,TLS,626,SEA,2023,newrel,0-14,a,270,,,,,275
+Timor-Leste,TL,TLS,626,SEA,2024,newrel,0-14,a,251,0,7,5,0,263
+Timor-Leste,TL,TLS,626,SEA,2024,newrel,a,m,2384,3,117,75,41,2620
+Timor-Leste,TL,TLS,626,SEA,2024,newrel,a,f,2018,3,71,48,32,2172
+Togo,TG,TGO,768,AFR,2018,newrel,0-14,a,74,,,,,83
+Togo,TG,TGO,768,AFR,2019,newrel,0-14,a,79,,,,,85
+Togo,TG,TGO,768,AFR,2020,newrel,0-14,a,62,,,,,65
+Togo,TG,TGO,768,AFR,2021,newrel,0-14,a,78,,,,,85
+Togo,TG,TGO,768,AFR,2022,newrel,0-14,a,87,,,,,94
+Togo,TG,TGO,768,AFR,2023,newrel,0-14,a,100,,,,,112
+Togo,TG,TGO,768,AFR,2024,newrel,0-14,a,83,1,4,4,2,94
+Togo,TG,TGO,768,AFR,2024,newrel,a,m,1801,56,136,92,5,2090
+Togo,TG,TGO,768,AFR,2024,newrel,a,f,1001,14,56,36,3,1110
+Tokelau,TK,TKL,772,WPR,2019,newrel,0-14,a,0,,,,,0
+Tokelau,TK,TKL,772,WPR,2022,newrel,0-14,a,0,,,,,0
+Tonga,TO,TON,776,WPR,2018,newrel,0-14,a,0,,,,,0
+Tonga,TO,TON,776,WPR,2019,newrel,0-14,a,1,,,,,1
+Tonga,TO,TON,776,WPR,2020,newrel,0-14,a,1,,,,,1
+Trinidad and Tobago,TT,TTO,780,AMR,2018,newrel,0-14,a,5,0,1,0,0,6
+Trinidad and Tobago,TT,TTO,780,AMR,2019,newrel,0-14,a,3,0,1,2,0,6
+Trinidad and Tobago,TT,TTO,780,AMR,2020,newrel,0-14,a,3,0,0,0,0,3
+Trinidad and Tobago,TT,TTO,780,AMR,2021,newrel,0-14,a,5,0,0,0,0,5
+Trinidad and Tobago,TT,TTO,780,AMR,2024,newrel,a,m,158,0,17,26,4,205
+Trinidad and Tobago,TT,TTO,780,AMR,2024,newrel,a,f,49,0,2,7,1,59
+Tunisia,TN,TUN,788,EMR,2020,newrel,0-14,a,,,,,,205
+Turkmenistan,TM,TKM,795,EUR,2013,newrel,0-14,a,,,,,,51
+Turkmenistan,TM,TKM,795,EUR,2022,newrel,0-14,a,37,,,,,37
+Turkmenistan,TM,TKM,795,EUR,2023,newrel,0-14,a,32,1,2,0,1,36
+Turkmenistan,TM,TKM,795,EUR,2024,newrel,0-14,a,25,2,0,0,1,28
+Turks and Caicos Islands,TC,TCA,796,AMR,2022,newrel,0-14,a,0,0,0,0,0,0
+Tuvalu,TV,TUV,798,WPR,2018,newrel,0-14,a,4,,,,,4
+Tuvalu,TV,TUV,798,WPR,2019,newrel,0-14,a,5,,,,,5
+Tuvalu,TV,TUV,798,WPR,2021,newrel,0-14,a,1,,,,,1
+Tuvalu,TV,TUV,798,WPR,2022,newrel,0-14,a,2,,,,,2
+Türkiye,TR,TUR,792,EUR,2010,newrel,0-14,a,814,1,11,13,61,900
+Türkiye,TR,TUR,792,EUR,2011,newrel,0-14,a,681,1,13,13,53,761
+Türkiye,TR,TUR,792,EUR,2012,newrel,0-14,a,612,0,13,3,58,686
+Türkiye,TR,TUR,792,EUR,2013,newrel,0-14,a,494,0,10,12,65,581
+Türkiye,TR,TUR,792,EUR,2014,newrel,0-14,a,479,0,11,13,40,543
+Türkiye,TR,TUR,792,EUR,2015,newrel,0-14,a,545,1,15,11,51,623
+Türkiye,TR,TUR,792,EUR,2016,newrel,0-14,a,536,0,15,12,63,626
+Türkiye,TR,TUR,792,EUR,2017,newrel,0-14,a,482,1,11,12,38,544
+Türkiye,TR,TUR,792,EUR,2018,newrel,0-14,a,511,2,13,4,68,598
+Türkiye,TR,TUR,792,EUR,2019,newrel,0-14,a,397,0,21,8,64,490
+Türkiye,TR,TUR,792,EUR,2020,newrel,0-14,a,314,2,12,4,58,390
+Türkiye,TR,TUR,792,EUR,2021,newrel,0-14,a,285,1,14,6,81,387
+Türkiye,TR,TUR,792,EUR,2022,newrel,0-14,a,319,1,15,5,51,391
+Türkiye,TR,TUR,792,EUR,2023,newrel,0-14,a,318,1,15,5,68,407
+Türkiye,TR,TUR,792,EUR,2024,newrel,0-14,a,308,2,16,8,51,385
+Türkiye,TR,TUR,792,EUR,2024,newrel,a,m,4057,13,504,151,387,5112
+Türkiye,TR,TUR,792,EUR,2024,newrel,a,f,3060,8,292,87,243,3690
+Uganda,UG,UGA,800,AFR,2018,newrel,0-14,a,4949,,,,,7890
+Uganda,UG,UGA,800,AFR,2019,newrel,0-14,a,4747,,,,,5541
+Uganda,UG,UGA,800,AFR,2019,newrel,a,m,32228,258,2827,3324,631,39268
+Uganda,UG,UGA,800,AFR,2019,newrel,a,f,19580,136,1815,2005,224,23760
+Uganda,UG,UGA,800,AFR,2020,newrel,0-14,a,6218,,,,,7070
+Uganda,UG,UGA,800,AFR,2020,newrel,a,m,36415,259,3130,2335,948,43087
+Uganda,UG,UGA,800,AFR,2020,newrel,a,f,15202,80,1196,848,16,17342
+Uganda,UG,UGA,800,AFR,2021,newrel,0-14,a,8400,,,,,9476
+Uganda,UG,UGA,800,AFR,2021,newrel,a,m,48019,279,3338,2715,698,55049
+Uganda,UG,UGA,800,AFR,2021,newrel,a,f,17415,75,1031,875,259,19655
+Uganda,UG,UGA,800,AFR,2022,newrel,0-14,a,13991,,,,,15115
+Uganda,UG,UGA,800,AFR,2022,newrel,a,m,49880,256,2892,2268,472,55768
+Uganda,UG,UGA,800,AFR,2022,newrel,a,f,34293,104,1463,1423,309,37592
+Uganda,UG,UGA,800,AFR,2023,newrel,0-14,a,11110,,,,,11790
+Uganda,UG,UGA,800,AFR,2023,newrel,a,m,56822,216,2743,1740,511,62032
+Uganda,UG,UGA,800,AFR,2023,newrel,a,f,22158,72,935,599,205,23969
+Uganda,UG,UGA,800,AFR,2024,newrel,0-14,a,7267,7,202,191,149,7816
+Uganda,UG,UGA,800,AFR,2024,newrel,a,m,48708,213,2232,1660,230,53043
+Uganda,UG,UGA,800,AFR,2024,newrel,a,f,31018,85,1131,815,0,33049
+Ukraine,UA,UKR,804,EUR,2013,newrel,0-14,a,501,34,12,9,5,561
+Ukraine,UA,UKR,804,EUR,2014,newrel,0-14,a,429,22,6,37,0,494
+Ukraine,UA,UKR,804,EUR,2015,newrel,0-14,a,434,23,7,4,1,469
+Ukraine,UA,UKR,804,EUR,2016,newrel,0-14,a,395,28,5,6,1,435
+Ukraine,UA,UKR,804,EUR,2017,newrel,0-14,a,448,21,8,7,0,484
+Ukraine,UA,UKR,804,EUR,2018,newrel,0-14,a,437,9,8,4,0,458
+Ukraine,UA,UKR,804,EUR,2019,newrel,0-14,a,414,5,8,1,0,428
+Ukraine,UA,UKR,804,EUR,2020,newrel,0-14,a,277,6,5,1,0,289
+Ukraine,UA,UKR,804,EUR,2020,newrel,a,m,6904,669,1013,548,6,9140
+Ukraine,UA,UKR,804,EUR,2020,newrel,a,f,3328,183,364,196,7,4078
+Ukraine,UA,UKR,804,EUR,2021,newrel,0-14,a,346,9,5,4,0,364
+Ukraine,UA,UKR,804,EUR,2021,newrel,a,m,7325,824,1260,605,39,10053
+Ukraine,UA,UKR,804,EUR,2021,newrel,a,f,3430,236,472,195,10,4343
+Ukraine,UA,UKR,804,EUR,2022,newrel,0-14,a,299,7,11,12,1,330
+Ukraine,UA,UKR,804,EUR,2022,newrel,a,m,8142,586,1253,635,70,10686
+Ukraine,UA,UKR,804,EUR,2022,newrel,a,f,3392,179,383,229,20,4203
+Ukraine,UA,UKR,804,EUR,2023,newrel,0-14,a,464,4,6,8,1,483
+Ukraine,UA,UKR,804,EUR,2023,newrel,a,m,9465,1044,1139,762,70,12480
+Ukraine,UA,UKR,804,EUR,2023,newrel,a,f,3421,225,467,195,15,4323
+Ukraine,UA,UKR,804,EUR,2024,newrel,0-14,a,327,36,5,4,0,372
+Ukraine,UA,UKR,804,EUR,2024,newrel,a,m,9053,891,979,728,20,11671
+Ukraine,UA,UKR,804,EUR,2024,newrel,a,f,3138,269,380,153,11,3951
+United Arab Emirates,AE,ARE,784,EMR,2018,newrel,0-14,a,1,,,,,3
+United Arab Emirates,AE,ARE,784,EMR,2019,newrel,0-14,a,3,,,,,3
+United Arab Emirates,AE,ARE,784,EMR,2020,newrel,0-14,a,1,,,,,2
+United Arab Emirates,AE,ARE,784,EMR,2021,newrel,0-14,a,3,,,,,4
+United Arab Emirates,AE,ARE,784,EMR,2022,newrel,0-14,a,4,,,,,5
+United Arab Emirates,AE,ARE,784,EMR,2023,newrel,0-14,a,2,,,,,2
+United Arab Emirates,AE,ARE,784,EMR,2024,newrel,0-14,a,3,0,0,0,1,4
+United Arab Emirates,AE,ARE,784,EMR,2024,newrel,a,m,23,0,5,1,2,31
+United Arab Emirates,AE,ARE,784,EMR,2024,newrel,a,f,20,0,2,0,2,24
+United Kingdom,GB,GBR,826,EUR,2010,newrel,0-14,a,92,0,4,1,10,107
+United Kingdom,GB,GBR,826,EUR,2011,newrel,0-14,a,86,0,1,0,9,96
+United Kingdom,GB,GBR,826,EUR,2012,newrel,0-14,a,355,0,1,1,49,406
+United Kingdom,GB,GBR,826,EUR,2013,newrel,0-14,a,271,0,2,5,31,309
+United Kingdom,GB,GBR,826,EUR,2014,newrel,0-14,a,250,0,1,2,21,274
+United Kingdom,GB,GBR,826,EUR,2015,newrel,0-14,a,202,0,1,5,16,224
+United Kingdom,GB,GBR,826,EUR,2016,newrel,0-14,a,203,0,1,2,14,220
+United Kingdom,GB,GBR,826,EUR,2017,newrel,0-14,a,166,0,1,6,18,191
+United Kingdom,GB,GBR,826,EUR,2018,newrel,0-14,a,134,0,1,5,15,155
+United Kingdom,GB,GBR,826,EUR,2019,newrel,0-14,a,154,0,0,3,25,182
+United Kingdom,GB,GBR,826,EUR,2020,newrel,0-14,a,129,14,3,0,10,156
+United Kingdom,GB,GBR,826,EUR,2021,newrel,0-14,a,123,3,0,0,4,130
+United Kingdom,GB,GBR,826,EUR,2022,newrel,0-14,a,130,3,0,3,6,142
+United Kingdom,GB,GBR,826,EUR,2023,newrel,0-14,a,156,0,0,2,4,162
+United Kingdom,GB,GBR,826,EUR,2024,newrel,0-14,a,150,3,2,10,3,168
+United Kingdom,GB,GBR,826,EUR,2024,newrel,a,m,3048,50,176,175,115,3564
+United Kingdom,GB,GBR,826,EUR,2024,newrel,a,f,1963,57,64,99,72,2255
+United Republic of Tanzania,TZ,TZA,834,AFR,2018,newrel,0-14,a,9832,,,,,10487
+United Republic of Tanzania,TZ,TZA,834,AFR,2019,newrel,0-14,a,11685,,,,,12240
+United Republic of Tanzania,TZ,TZA,834,AFR,2019,newrel,a,m,45481,34,1949,515,639,48618
+United Republic of Tanzania,TZ,TZA,834,AFR,2019,newrel,a,f,30003,59,1283,268,521,32134
+United Republic of Tanzania,TZ,TZA,834,AFR,2020,newrel,0-14,a,13245,,,,,13591
+United Republic of Tanzania,TZ,TZA,834,AFR,2020,newrel,a,m,48023,24,1728,508,37,50320
+United Republic of Tanzania,TZ,TZA,834,AFR,2020,newrel,a,f,32686,51,1038,272,100,34147
+United Republic of Tanzania,TZ,TZA,834,AFR,2021,newrel,0-14,a,13710,,,,,14064
+United Republic of Tanzania,TZ,TZA,834,AFR,2021,newrel,a,m,49592,40,1753,475,149,52009
+United Republic of Tanzania,TZ,TZA,834,AFR,2021,newrel,a,f,32904,34,983,237,215,34373
+United Republic of Tanzania,TZ,TZA,834,AFR,2022,newrel,0-14,a,16534,,,,,16974
+United Republic of Tanzania,TZ,TZA,834,AFR,2022,newrel,a,m,57042,77,1708,508,74,59409
+United Republic of Tanzania,TZ,TZA,834,AFR,2022,newrel,a,f,38909,31,991,271,206,40408
+United Republic of Tanzania,TZ,TZA,834,AFR,2023,newrel,0-14,a,14188,,,,,14578
+United Republic of Tanzania,TZ,TZA,834,AFR,2023,newrel,a,m,53350,59,1500,435,415,55759
+United Republic of Tanzania,TZ,TZA,834,AFR,2023,newrel,a,f,34823,25,979,226,315,36368
+United Republic of Tanzania,TZ,TZA,834,AFR,2024,newrel,0-14,a,9974,3,125,78,52,10232
+United Republic of Tanzania,TZ,TZA,834,AFR,2024,newrel,a,m,45758,56,1351,403,321,47889
+United Republic of Tanzania,TZ,TZA,834,AFR,2024,newrel,a,f,27185,18,740,208,181,28332
+United States of America,US,USA,840,AMR,2018,newrel,0-14,a,342,0,2,0,27,371
+United States of America,US,USA,840,AMR,2019,newrel,0-14,a,320,0,2,2,40,364
+United States of America,US,USA,840,AMR,2020,newrel,0-14,a,271,0,3,2,31,307
+United States of America,US,USA,840,AMR,2021,newrel,0-14,a,257,0,3,4,37,301
+United States of America,US,USA,840,AMR,2022,newrel,0-14,a,283,0,5,3,59,350
+Uruguay,UY,URY,858,AMR,2013,newrel,0-14,a,49,0,0,1,0,50
+Uruguay,UY,URY,858,AMR,2014,newrel,0-14,a,55,0,0,1,1,57
+Uruguay,UY,URY,858,AMR,2015,newrel,0-14,a,52,0,0,1,0,53
+Uruguay,UY,URY,858,AMR,2016,newrel,0-14,a,45,0,0,6,0,51
+Uruguay,UY,URY,858,AMR,2017,newrel,0-14,a,45,0,2,4,0,51
+Uruguay,UY,URY,858,AMR,2018,newrel,0-14,a,45,0,0,1,1,47
+Uruguay,UY,URY,858,AMR,2019,newrel,0-14,a,39,0,1,2,0,42
+Uruguay,UY,URY,858,AMR,2020,newrel,0-14,a,61,0,0,0,0,61
+Uruguay,UY,URY,858,AMR,2021,newrel,0-14,a,31,0,1,2,0,34
+Uruguay,UY,URY,858,AMR,2022,newrel,0-14,a,57,0,2,4,0,63
+Uruguay,UY,URY,858,AMR,2023,newrel,0-14,a,76,0,0,1,0,77
+Uruguay,UY,URY,858,AMR,2024,newrel,0-14,a,122,0,0,6,0,128
+Uruguay,UY,URY,858,AMR,2024,newrel,a,m,651,1,146,213,2,1013
+Uruguay,UY,URY,858,AMR,2024,newrel,a,f,331,0,45,44,0,420
+Uzbekistan,UZ,UZB,860,EUR,2010,newrel,0-14,a,1832,100,24,9,33,1998
+Uzbekistan,UZ,UZB,860,EUR,2011,newrel,0-14,a,1435,2,10,92,30,1569
+Uzbekistan,UZ,UZB,860,EUR,2012,newrel,0-14,a,1535,2,15,66,30,1648
+Uzbekistan,UZ,UZB,860,EUR,2013,newrel,0-14,a,1867,5,14,42,32,1960
+Uzbekistan,UZ,UZB,860,EUR,2014,newrel,0-14,a,1335,6,2,11,559,1913
+Uzbekistan,UZ,UZB,860,EUR,2024,newrel,0-14,a,1376,15,3,51,45,1490
+Uzbekistan,UZ,UZB,860,EUR,2024,newrel,a,m,5813,162,370,2634,61,9040
+Uzbekistan,UZ,UZB,860,EUR,2024,newrel,a,f,5864,97,298,193,7,6459
+Vanuatu,VU,VUT,548,WPR,2018,newrel,0-14,a,23,,,,,23
+Vanuatu,VU,VUT,548,WPR,2020,newrel,0-14,a,8,,,,,8
+Vanuatu,VU,VUT,548,WPR,2021,newrel,0-14,a,2,,,,,4
+Vanuatu,VU,VUT,548,WPR,2022,newrel,0-14,a,9,,,,,10
+Vanuatu,VU,VUT,548,WPR,2023,newrel,0-14,a,6,,,,,6
+Vanuatu,VU,VUT,548,WPR,2024,newrel,0-14,a,8,0,0,0,0,8
+Vanuatu,VU,VUT,548,WPR,2024,newrel,a,m,52,0,4,2,0,58
+Vanuatu,VU,VUT,548,WPR,2024,newrel,a,f,20,0,5,1,0,26
+Venezuela (Bolivarian Republic of),VE,VEN,862,AMR,2013,newrel,0-14,a,383,0,21,53,0,457
+Venezuela (Bolivarian Republic of),VE,VEN,862,AMR,2014,newrel,0-14,a,341,0,16,40,5,402
+Venezuela (Bolivarian Republic of),VE,VEN,862,AMR,2015,newrel,0-14,a,389,0,9,33,7,438
+Venezuela (Bolivarian Republic of),VE,VEN,862,AMR,2016,newrel,0-14,a,406,0,1,30,11,448
+Venezuela (Bolivarian Republic of),VE,VEN,862,AMR,2017,newrel,0-14,a,435,0,2,13,0,450
+Venezuela (Bolivarian Republic of),VE,VEN,862,AMR,2018,newrel,0-14,a,506,0,6,45,41,598
+Venezuela (Bolivarian Republic of),VE,VEN,862,AMR,2019,newrel,0-14,a,474,0,11,68,12,565
+Venezuela (Bolivarian Republic of),VE,VEN,862,AMR,2020,newrel,0-14,a,325,0,3,33,1,362
+Venezuela (Bolivarian Republic of),VE,VEN,862,AMR,2021,newrel,0-14,a,319,0,5,35,15,374
+Venezuela (Bolivarian Republic of),VE,VEN,862,AMR,2022,newrel,0-14,a,439,0,12,56,0,507
+Venezuela (Bolivarian Republic of),VE,VEN,862,AMR,2023,newrel,0-14,a,462,0,3,71,0,536
+Venezuela (Bolivarian Republic of),VE,VEN,862,AMR,2024,newrel,0-14,a,559,0,8,28,3,598
+Venezuela (Bolivarian Republic of),VE,VEN,862,AMR,2024,newrel,a,m,5842,3,289,707,9,6850
+Venezuela (Bolivarian Republic of),VE,VEN,862,AMR,2024,newrel,a,f,3450,1,113,367,6,3937
+Viet Nam,VN,VNM,704,WPR,2018,newrel,0-14,a,1350,,,,,1656
+Viet Nam,VN,VNM,704,WPR,2019,newrel,0-14,a,1220,,,,,1704
+Viet Nam,VN,VNM,704,WPR,2019,newrel,a,m,71811,421,1962,2343,2745,79282
+Viet Nam,VN,VNM,704,WPR,2019,newrel,a,f,21382,95,531,555,575,23138
+Viet Nam,VN,VNM,704,WPR,2020,newrel,0-14,a,987,,,,,1395
+Viet Nam,VN,VNM,704,WPR,2020,newrel,a,m,70338,374,1909,1997,2895,77513
+Viet Nam,VN,VNM,704,WPR,2020,newrel,a,f,20691,87,478,479,604,22339
+Viet Nam,VN,VNM,704,WPR,2021,newrel,0-14,a,582,,,,,820
+Viet Nam,VN,VNM,704,WPR,2021,newrel,a,m,53249,591,1389,1828,2140,59197
+Viet Nam,VN,VNM,704,WPR,2021,newrel,a,f,16868,185,413,605,389,18460
+Viet Nam,VN,VNM,704,WPR,2022,newrel,0-14,a,699,,,,,982
+Viet Nam,VN,VNM,704,WPR,2022,newrel,a,m,68659,348,1874,3164,3213,77258
+Viet Nam,VN,VNM,704,WPR,2022,newrel,a,f,22553,95,588,1141,844,25221
+Viet Nam,VN,VNM,704,WPR,2023,newrel,0-14,a,861,,,,,1175
+Viet Nam,VN,VNM,704,WPR,2023,newrel,a,m,66709,771,2012,3592,2555,75639
+Viet Nam,VN,VNM,704,WPR,2023,newrel,a,f,25990,219,631,1202,836,28878
+Viet Nam,VN,VNM,704,WPR,2024,newrel,0-14,a,978,13,6,308,12,1317
+Viet Nam,VN,VNM,704,WPR,2024,newrel,a,m,69949,960,2105,3943,1974,78931
+Viet Nam,VN,VNM,704,WPR,2024,newrel,a,f,23914,223,633,1091,536,26397
+Wallis and Futuna,WF,WLF,876,WPR,2018,newrel,0-14,a,0,,,,,0
+Wallis and Futuna,WF,WLF,876,WPR,2019,newrel,0-14,a,0,,,,,0
+Zambia,ZM,ZMB,894,AFR,2018,newrel,0-14,a,1947,,,,,2206
+Zambia,ZM,ZMB,894,AFR,2019,newrel,0-14,a,2214,,,,,2473
+Zambia,ZM,ZMB,894,AFR,2020,newrel,0-14,a,2488,,,,,2726
+Zambia,ZM,ZMB,894,AFR,2020,newrel,a,m,23635,123,1345,615,350,26068
+Zambia,ZM,ZMB,894,AFR,2020,newrel,a,f,12745,51,657,284,195,13932
+Zambia,ZM,ZMB,894,AFR,2021,newrel,0-14,a,3631,,,,,3891
+Zambia,ZM,ZMB,894,AFR,2021,newrel,a,m,29776,96,1568,691,257,32388
+Zambia,ZM,ZMB,894,AFR,2021,newrel,a,f,16385,43,730,357,172,17687
+Zambia,ZM,ZMB,894,AFR,2022,newrel,0-14,a,5425,,,,,5796
+Zambia,ZM,ZMB,894,AFR,2022,newrel,a,m,31761,85,1532,594,292,34264
+Zambia,ZM,ZMB,894,AFR,2022,newrel,a,f,18448,30,804,398,183,19863
+Zambia,ZM,ZMB,894,AFR,2023,newrel,0-14,a,5751,,,,,6213
+Zambia,ZM,ZMB,894,AFR,2023,newrel,a,m,31200,71,1587,1038,38,33934
+Zambia,ZM,ZMB,894,AFR,2023,newrel,a,f,18963,30,842,266,311,20412
+Zambia,ZM,ZMB,894,AFR,2024,newrel,0-14,a,4454,4,138,0,19,4615
+Zambia,ZM,ZMB,894,AFR,2024,newrel,a,m,28559,50,1362,758,412,31141
+Zambia,ZM,ZMB,894,AFR,2024,newrel,a,f,15528,27,734,357,52,16698
+Zimbabwe,ZW,ZWE,716,AFR,2018,newrel,0-14,a,1253,,,,,1547
+Zimbabwe,ZW,ZWE,716,AFR,2019,newrel,0-14,a,1102,,,,,1171
+Zimbabwe,ZW,ZWE,716,AFR,2020,newrel,0-14,a,803,,,,,886
+Zimbabwe,ZW,ZWE,716,AFR,2020,newrel,a,m,9042,67,923,213,57,10302
+Zimbabwe,ZW,ZWE,716,AFR,2020,newrel,a,f,5121,35,493,87,18,5754
+Zimbabwe,ZW,ZWE,716,AFR,2021,newrel,0-14,a,831,,,,,922
+Zimbabwe,ZW,ZWE,716,AFR,2021,newrel,a,m,9535,71,637,82,150,10475
+Zimbabwe,ZW,ZWE,716,AFR,2021,newrel,a,f,5329,39,519,146,33,6066
+Zimbabwe,ZW,ZWE,716,AFR,2022,newrel,0-14,a,1082,,,,,1109
+Zimbabwe,ZW,ZWE,716,AFR,2023,newrel,0-14,a,1061,,,,,1136
+Zimbabwe,ZW,ZWE,716,AFR,2023,newrel,a,m,11002,31,1237,221,49,12540
+Zimbabwe,ZW,ZWE,716,AFR,2023,newrel,a,f,6463,25,100,30,5,6623
+Zimbabwe,ZW,ZWE,716,AFR,2024,newrel,0-14,a,1225,3,40,37,2,1307
+Zimbabwe,ZW,ZWE,716,AFR,2024,newrel,a,m,11971,33,680,364,6,13054
+Zimbabwe,ZW,ZWE,716,AFR,2024,newrel,a,f,6561,25,455,187,4,7232
+"occupied Palestinian terr., incl. east Jerusalem",PS,PSE,275,EMR,2018,newrel,0-14,a,3,,,,,3
+"occupied Palestinian terr., incl. east Jerusalem",PS,PSE,275,EMR,2019,newrel,0-14,a,2,,,,,2
+"occupied Palestinian terr., incl. east Jerusalem",PS,PSE,275,EMR,2020,newrel,0-14,a,6,,,,,6
+"occupied Palestinian terr., incl. east Jerusalem",PS,PSE,275,EMR,2021,newrel,0-14,a,0,,,,,0
+"occupied Palestinian terr., incl. east Jerusalem",PS,PSE,275,EMR,2022,newrel,0-14,a,1,,,,,2
+"occupied Palestinian terr., incl. east Jerusalem",PS,PSE,275,EMR,2023,newrel,0-14,a,1,,,,,1
+"occupied Palestinian terr., incl. east Jerusalem",PS,PSE,275,EMR,2024,newrel,0-14,a,0,0,0,0,0,0
+"occupied Palestinian terr., incl. east Jerusalem",PS,PSE,275,EMR,2024,newrel,a,m,0,0,0,0,0,0
+"occupied Palestinian terr., incl. east Jerusalem",PS,PSE,275,EMR,2024,newrel,a,f,0,0,0,0,0,0
