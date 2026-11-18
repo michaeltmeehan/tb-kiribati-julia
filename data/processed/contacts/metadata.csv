@@ -1,0 +1,11 @@
+key,value
+source_country,Solomon Islands
+target_country,Kiribati
+source_age_groups,"0-4,...,70-74,75+"
+target_ages,0-95
+orientation,recipient_source
+adaptation,source_band
+source_age_allocation,equal_within_band
+population_weighting,none
+reciprocity_adjustment,none
+normalisation,none_in_data_processing
