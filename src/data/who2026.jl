@@ -551,6 +551,8 @@ function build_surveillance(rawdir, outdir)
     )
 
     all_outcomes = treatment_outcomes(outcomes)
+    historical = historical_presentation(notifications)
+    historical_sites = historical_site_by_age(historical)
 
     tables = (
         tb_notifications_total=
@@ -568,17 +570,11 @@ function build_surveillance(rawdir, outdir)
         tb_notifications_by_site=
         site_notifications(notifications),
         tb_historical_new_notifications_by_age_and_type=
-        historical_presentation(notifications),
+        historical,
         tb_new_notifications_by_site_age_2007_2012=
-        historical_site_by_age(
-            historical_presentation(notifications)
-        ),
+        historical_sites,
         tb_pulmonary_fraction_by_age_2007_2012=
-        historical_pulmonary_fraction(
-            historical_site_by_age(
-                historical_presentation(notifications)
-            )
-        ),
+        historical_pulmonary_fraction(historical_sites),
     )
 
     checks = (

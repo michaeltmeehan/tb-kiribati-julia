@@ -1,6 +1,8 @@
 
 module PremReciprocity
 
+include(joinpath(@__DIR__, "..", "data", "prem_processing.jl"))
+
 using CSV
 using DataFrames
 using DelimitedFiles
@@ -101,21 +103,8 @@ end
 
 # Expand 16 source bands to single-year ages 0:95.
 # Last model age (95) represents 95+.
-function expand_contacts(C::AbstractMatrix; nages::Int=96)
-    size(C) == (16, 16) ||
-        throw(DimensionMismatch("Expected 16×16 matrix"))
-
-    nages >= 76 ||
-        throw(ArgumentError("At least 76 model ages required"))
-
-    groups = [band(a) for a in 0:(nages-1)]
-    sizes = [count(==(g), groups) for g in 1:16]
-
-    return [
-        C[groups[i], groups[j]] / sizes[groups[j]]
-        for i in 1:nages, j in 1:nages
-    ]
-end
+expand_contacts(C::AbstractMatrix; nages::Int=96) =
+    PremProcessing.expand_contacts(C; nages=nages)
 
 function contact_matrix(
     prem::PremContacts,
