@@ -63,6 +63,9 @@ include("visualisation/profiles.jl")
 
 include("inference/reporting.jl")
 
+include("models/Ragonnet/model.jl")
+include("models/Ragonnet/initial_conditions.jl")
+
 
 export load_contact_matrix,
     validate_contact_matrix,
@@ -124,5 +127,6 @@ export RecurrentTBObservation,
 export DoddExtendedTBModel, DoddExtendedTBParameters
 export extended_presentation, load_kiribati_presentation
 export extended_fixed_parameters, extend_initial_state
+export RagonnetTBModel, RagonnetTBParameters
 
 end
