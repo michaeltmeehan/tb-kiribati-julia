@@ -45,7 +45,7 @@ StatsBase = "0.34.13"
 Turing = "0.49.0"
 
 [extras]
-Test = "8dfed614-e22c-5e08-85e1-65c1169bcb3b"
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [targets]
 test = ["Test"]

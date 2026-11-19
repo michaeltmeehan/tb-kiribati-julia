@@ -21,7 +21,8 @@ end
     TB = TBKiribatiJulia
     F = CohortWPPFixture
 
-    data = TB.load_demographic_data("data")
+    data_dir = normpath(joinpath(@__DIR__, "..", "..", "data"))
+    data = TB.load_demographic_data(data_dir)
     nages = 101
 
     model = F.PopulationModel(
@@ -29,7 +30,7 @@ end
     )
 
     migration_age = TB.load_age_migration(
-        "data/raw/wpp2024/migration_age.csv";
+        joinpath(data_dir, "raw", "wpp2024", "migration_age.csv");
         first_year=2024,
         last_year=2050,
     )
