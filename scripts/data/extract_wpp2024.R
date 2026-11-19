@@ -96,6 +96,25 @@ migration <- migration[
 
 write_raw(migration, "migration")
 
+
+# --------------------------------------------------
+# Age-specific projected net migration
+# --------------------------------------------------
+
+migration_age <- kiribati("migprojAge1dt")
+
+migration_age <- migration_age[
+  migration_age$year >= 2024,
+  c("year", "age", "migM", "migF", "mig")
+]
+
+migration_age <- migration_age[
+  order(migration_age$year, migration_age$age),
+]
+
+write_raw(migration_age, "migration_age")
+
+
 # --------------------------------------------------
 # Auxiliary totals for demographic validation
 # --------------------------------------------------

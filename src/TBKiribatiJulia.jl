@@ -13,6 +13,7 @@ include("demography/data.jl")
 include("demography/operators.jl")
 include("demography/equilibrium.jl")
 include("demography/projected.jl")
+include("demography/cohort.jl")
 
 include("simulation/context.jl")
 
@@ -132,5 +133,7 @@ export extended_fixed_parameters
 export RagonnetTBModel, RagonnetTBParameters
 export normalise_model_contacts, adult_infectiousness
 export state_dimension, validate_model_interface
+export age_and_survive!, reconcile_population!
+export CohortDemography, load_age_migration, cohort_migration
 
 end
