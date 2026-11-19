@@ -16,8 +16,8 @@ const ROOT = normpath(
 
 data_path(name) = joinpath(ROOT, "data", name)
 
-include(joinpath(ROOT, "src", "parameters.jl"))
-include(joinpath(ROOT, "src", "model.jl"))
+include(joinpath(ROOT, "archive", "legacy_ragonnet", "parameters.jl"))
+include(joinpath(ROOT, "archive", "legacy_ragonnet", "model.jl"))
 
 end
 
