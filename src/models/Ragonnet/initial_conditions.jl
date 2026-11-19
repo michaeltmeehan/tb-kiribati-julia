@@ -37,6 +37,11 @@ function initial_state(
     layout = state_layout(model)
     idx = RagonnetIndices
 
+    StateT = promote_type(
+        eltype(params.progression_rate),
+        eltype(get_population(demography, year)),
+    )
+
     # --------------------------------------------------------
     # Initial population
     # --------------------------------------------------------
@@ -88,7 +93,7 @@ function initial_state(
             for a in 1:layout.nages
         )
     else
-        μ = Float64(turnover_rate)
+        μ = StateT(turnover_rate)
     end
 
     isfinite(μ) && μ > 0 ||
@@ -190,14 +195,14 @@ function initial_state(
     AI = g + a + d + mI + μ
     AJ = g + b + d + mJ + μ
 
-    M = [
-        AU -b -g 0.0
-        -a AV 0.0 -g
-        -h 0.0 AI -b
-        0.0 -h -a AJ
+    M = StateT[
+        AU -b -g 0
+        -a AV 0 -g
+        -h 0 AI -b
+        0 -h -a AJ
     ]
 
-    q = M \ (p .* [1 - f, f, 0.0, 0.0])
+    q = M \ (p .* StateT[1-f, f, 0, 0])
 
     all(x -> isfinite(x) && x >= 0, q) ||
         throw(ArgumentError(
@@ -230,7 +235,7 @@ function initial_state(
     H = p + μ + c*(μ + δ)/A
 
     # Disease-free state by default.
-    proportions = zeros(Float64, layout.nepi)
+    proportions = zeros(StateT, layout.nepi)
     proportions[idx.MtbNaive] = 1.0
 
     if β > 0 && W > 0 && β*W > H
@@ -292,10 +297,7 @@ function initial_state(
     # Construct age-specific initial state
     # --------------------------------------------------------
 
-    u0 = zeros(
-        Float64,
-        nstates(layout) * layout.nages,
-    )
+    u0 = zeros(StateT, state_dimension(layout))
 
     @inbounds for age in 1:layout.nages
         N = population[age]

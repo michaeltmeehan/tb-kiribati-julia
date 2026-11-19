@@ -222,3 +222,12 @@ function equilibrate(
         incidence_change=incidence_change,
     )
 end
+
+function equilibrium_parameter_check(
+    ::RagonnetTBModel,
+    ::RagonnetTBParameters,
+)
+    # All current Ragonnet epidemiological parameters
+    # are time-independent.
+    return nothing
+end

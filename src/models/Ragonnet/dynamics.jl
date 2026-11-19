@@ -43,14 +43,17 @@ function ragonnet_force_of_infection!(
     return λ
 end
 
-function ragonnet_rhs!(
+function tb_rhs!(
     du,
     u,
-    p::RagonnetTBParameters,
+    ctx::SimulationContext{<:RagonnetTBModel},
     t,
-    layout::StateLayout,
-    workspace::TBWorkspace,
 )
+    p = ctx.params
+    layout = state_layout(ctx.model)
+    workspace = ctx.workspace
+
+    λ = workspace.foi
     λ = workspace.foi
     ragonnet_force_of_infection!(
         λ, u, p, layout, workspace

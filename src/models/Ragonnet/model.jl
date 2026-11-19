@@ -1,5 +1,4 @@
 
-include("kernel.jl")
 include("indices.jl")
 
 struct RagonnetTBModel <: AbstractTBModel
@@ -8,11 +7,11 @@ struct RagonnetTBModel <: AbstractTBModel
 end
 
 function RagonnetTBModel(
-    contact::AbstractMatrix{<:Real}
+    contact::AbstractMatrix{<:Real},
 )
     size(contact) == (96, 96) ||
         throw(DimensionMismatch(
-            "Ragonnet currently requires a 96×96 contact matrix"
+            "Ragonnet requires a 96×96 contact matrix"
         ))
 
     all(x -> isfinite(x) && x >= 0, contact) ||
@@ -20,6 +19,8 @@ function RagonnetTBModel(
             "Contact matrix must be finite and nonnegative"
         ))
 
+    # Preserve the original contact scale.
+    # Unlike Dodd, Ragonnet does not normalise contacts.
     return RagonnetTBModel(
         StateLayout(10, 7, 96),
         Matrix{Float64}(contact),
@@ -30,19 +31,3 @@ state_layout(model::RagonnetTBModel) = model.layout
 
 include("parameters.jl")
 include("dynamics.jl")
-
-function tb_rhs!(
-    du,
-    u,
-    ctx::SimulationContext{<:RagonnetTBModel},
-    t,
-)
-    return ragonnet_rhs!(
-        du,
-        u,
-        ctx.params,
-        t,
-        state_layout(ctx.model),
-        ctx.workspace,
-    )
-end
