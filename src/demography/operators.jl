@@ -209,7 +209,7 @@ function apply_demography!(
         u,
         layout,
         demography.data,
-        year,
+        demographic_mortality_year(demography, year),
     )
 
     reconcile_population!(
@@ -229,3 +229,20 @@ function apply_demography!(
 
     return nothing
 end
+
+"""
+Reference year used for background mortality during an
+annual demographic update.
+
+Equilibrium demography freezes mortality at its reference
+year. Projected demography uses the evolving calendar year.
+"""
+demographic_mortality_year(
+    ::AbstractDemography,
+    year::Real,
+) = year
+
+demographic_mortality_year(
+    demography::EquilibriumDemography,
+    year::Real,
+) = demography.reference_year

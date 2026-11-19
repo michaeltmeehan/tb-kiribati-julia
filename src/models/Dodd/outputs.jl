@@ -1,47 +1,200 @@
 
-"""
-    model_outputs(model::DoddTBModel, solution; years, age_breaks=nothing)
+default_output_variables(::DoddTBModel) = (
+    :incidence,
+    :notifications,
+    :mortality,
+    :primary_infections,
+    :reinfections,
+    :fast_progression,
+    :slow_progression,
+    :relapse,
+)
 
-Compute annual expected TB outcomes. Results contain `years`, `age_breaks`,
-and n_age_groups × n_years matrices. Counts, not rates, are returned.
+function model_output(
+    model::DoddTBModel,
+    ex::OutputExtraction,
+    ::Val{:primary_infections},
+)
+    return counter_output(ex, CumPrimaryInfections)
+end
 
-Incidence, notifications, and TB mortality are inflated from explicitly
-modelled pulmonary TB to all-form TB using `model.pulmonary_fraction`.
-Infection counters remain unscaled because these describe transmission
-within the pulmonary-TB model rather than all-form disease events.
-"""
-function model_outputs(model::DoddTBModel, solution; years, age_breaks=nothing)
-    yy = collect(years)
-    layout = state_layout(model)
-    extract(c) = annual_events(solution, layout, c; years=yy)
+function model_output(
+    model::DoddTBModel,
+    ex::OutputExtraction,
+    ::Val{:reinfections},
+)
+    return counter_output(ex, CumReinfections)
+end
 
-    primary = extract(CumPrimaryInfections)
-    reinfections = extract(CumReinfections)
-    fast = extract(CumFastProgression)
-    slow = extract(CumSlowProgression)
-    relapse = extract(CumRelapse)
-    treatment = extract(CumTreatmentInitiation)
-    untreated_deaths = extract(CumUntreatedTBDeaths)
-    treatment_deaths = extract(CumTreatmentTBDeaths)
+function model_output(
+    model::DoddTBModel,
+    ex::OutputExtraction,
+    ::Val{:fast_progression},
+)
+    return counter_output(ex, CumFastProgression)
+end
 
-    η = model.pulmonary_fraction
-    incidence = (fast .+ slow .+ relapse) ./ η
-    notifications = treatment ./ η
-    mortality = (untreated_deaths .+ treatment_deaths) ./ η
+function model_output(
+    model::DoddTBModel,
+    ex::OutputExtraction,
+    ::Val{:slow_progression},
+)
+    return counter_output(ex, CumSlowProgression)
+end
 
-    # Aggregate after differencing the single-year age-specific counters.
-    group(x) = isnothing(age_breaks) ? x : aggregate_age_groups(x, age_breaks)
+function model_output(
+    model::DoddTBModel,
+    ex::OutputExtraction,
+    ::Val{:relapse},
+)
+    return counter_output(ex, CumRelapse)
+end
 
-    return (
-        years = yy,
-        age_breaks = isnothing(age_breaks) ? collect(0:layout.nages) : collect(age_breaks),
-        incidence = group(incidence),
-        notifications = group(notifications),
-        mortality = group(mortality),
-        primary_infections = group(primary),
-        reinfections = group(reinfections),
-        fast_progression = group(fast),
-        slow_progression = group(slow),
-        relapse = group(relapse),
+function model_output(
+    model::DoddTBModel,
+    ex::OutputExtraction,
+    ::Val{:incidence},
+)
+    fast = counter_output(ex, CumFastProgression)
+    slow = counter_output(ex, CumSlowProgression)
+    relapse = counter_output(ex, CumRelapse)
+
+    return (fast .+ slow .+ relapse) ./
+        model.pulmonary_fraction
+end
+
+function model_output(
+    model::DoddTBModel,
+    ex::OutputExtraction,
+    ::Val{:notifications},
+)
+    return counter_output(
+        ex, CumTreatmentInitiation
+    ) ./ model.pulmonary_fraction
+end
+
+function model_output(
+    model::DoddTBModel,
+    ex::OutputExtraction,
+    ::Val{:mortality},
+)
+    untreated = counter_output(
+        ex, CumUntreatedTBDeaths
+    )
+
+    treated = counter_output(
+        ex, CumTreatmentTBDeaths
+    )
+
+    return (untreated .+ treated) ./
+        model.pulmonary_fraction
+end
+
+function model_output(
+    model::DoddTBModel,
+    ex::OutputExtraction,
+    ::Val{:active_prevalence},
+)
+    return model_output(
+        model, ex, Val(:untreated_active_prevalence)
     )
 end
+
+
+# ------------------------------------------------------------
+# Direct epidemiological events
+# ------------------------------------------------------------
+
+"""
+Active TB disease onsets, including relapse.
+
+This is the directly modelled pulmonary disease-onset
+count, without all-form extrapolation.
+"""
+function model_output(
+    model::DoddTBModel,
+    ex::OutputExtraction,
+    ::Val{:disease_onsets},
+)
+    return counter_output(ex, CumFastProgression) .+
+        counter_output(ex, CumSlowProgression) .+
+        counter_output(ex, CumRelapse)
+end
+
+
+"""
+Direct treatment initiations, without correction for the
+unmodelled extrapulmonary disease fraction.
+"""
+function model_output(
+    model::DoddTBModel,
+    ex::OutputExtraction,
+    ::Val{:treatment_initiations},
+)
+    return counter_output(ex, CumTreatmentInitiation)
+end
+
+
+"""
+Direct TB-attributable deaths in the explicitly modelled
+pulmonary disease population.
+"""
+function model_output(
+    model::DoddTBModel,
+    ex::OutputExtraction,
+    ::Val{:tb_deaths},
+)
+    return counter_output(ex, CumUntreatedTBDeaths) .+
+        counter_output(ex, CumTreatmentTBDeaths)
+end
+
+
+function model_output(
+    model::DoddTBModel,
+    ex::OutputExtraction,
+    ::Val{:treatment_deaths},
+)
+    return counter_output(ex, CumTreatmentTBDeaths)
+end
+
+
+# ------------------------------------------------------------
+# Epidemiological stocks
+# ------------------------------------------------------------
+
+"""
+Untreated active TB population at the post-demographic
+state of each requested calendar year.
+"""
+function model_output(
+    model::DoddTBModel,
+    ex::OutputExtraction,
+    ::Val{:untreated_active_prevalence},
+)
+    return stock_output(ex, (I,))
+end
+
+
+"""
+Early and late latent infection populations.
+"""
+function model_output(
+    model::DoddTBModel,
+    ex::OutputExtraction,
+    ::Val{:latent_prevalence},
+)
+    return stock_output(ex, (E, L))
+end
+
+
+"""
+Population currently receiving TB treatment.
+"""
+function model_output(
+    model::DoddTBModel,
+    ex::OutputExtraction,
+    ::Val{:treatment_prevalence},
+)
+    return stock_output(ex, (T,))
+end
+

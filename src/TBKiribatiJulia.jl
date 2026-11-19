@@ -37,6 +37,7 @@ include("simulation/equilibrium.jl")
 
 include("outputs/counters.jl")
 include("outputs/aggregation.jl")
+include("outputs/extraction.jl")
 
 include("models/DoddExtended/outputs.jl")
 
@@ -136,5 +137,8 @@ export state_dimension, validate_model_interface
 export age_and_survive!, reconcile_population!
 export CohortDemography, load_age_migration, cohort_migration
 export PreparedSimulation, prepare_simulation
+export annual_windows, model_output, model_outputs
+export equilibrium_parameter_check
+export demographic_mortality_year
 
 end

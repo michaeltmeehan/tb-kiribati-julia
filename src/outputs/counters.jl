@@ -1,64 +1,152 @@
+
 """
-    annual_events(sol, layout::StateLayout, counter::Integer; years)
+Saved solution indices for annual event extraction.
 
-Return an `nages × length(years)` matrix of annual event counts from a cumulative
-counter. Entry `[a,j]` counts events in age class `a-1` during `[years[j], years[j]+1)`.
-
-At a demographic discontinuity, take the *last* saved state at the interval's
-start (t⁺), and the *first* saved state at its end ((t+1)⁻). The simulation
-must save both states at each demographic update (`save_positions=(true,true)`).
+For year y:
+- start_index refers to y⁺
+- end_index refers to (y+1)⁻
 """
-function annual_events(sol, layout::StateLayout, counter::Integer; years)
-    layout.nepi < counter <= nstates(layout) ||
-        throw(ArgumentError("counter must index a cumulative event state"))
+struct AnnualWindows
+    years::Vector{Int}
+    start_indices::Vector{Int}
+    end_indices::Vector{Int}
+end
 
-    yy = collect(years)
-    all(y -> y isa Integer, yy) ||
-        throw(ArgumentError("years must contain integer calendar years"))
+function annual_windows(sol; years)
+    raw_years = collect(years)
+
+    all(y -> y isa Integer, raw_years) ||
+        throw(ArgumentError("Years must be integers"))
+
+    yy = Int.(raw_years)
+
     length(unique(yy)) == length(yy) ||
-        throw(ArgumentError("years must not contain duplicates"))
+        throw(ArgumentError("Duplicate years"))
 
     length(sol.t) == length(sol.u) ||
-        throw(DimensionMismatch("solution times and states differ in length"))
-    isempty(sol.t) && throw(ArgumentError("solution has no saved states"))
-    all(u -> length(u) == layout.nages * nstates(layout), sol.u) ||
-        throw(DimensionMismatch("saved state length does not match layout"))
+        throw(DimensionMismatch(
+            "Solution times and states differ in length"
+        ))
 
-    out = Matrix{Float64}(undef, layout.nages, length(yy))
+    isempty(sol.t) &&
+        throw(ArgumentError("Solution contains no saved states"))
+
     tol = 1e-7
+    starts = Int[]
+    ends = Int[]
 
-    for (j, y) in enumerate(yy)
-        # Exact calendar boundaries (within solver floating-point tolerance).
-        start_indices = findall(t -> abs(t - y) <= tol, sol.t)
-        end_indices = findall(t -> abs(t - (y + 1)) <= tol, sol.t)
-        isempty(start_indices) &&
-            throw(ArgumentError("no saved state at start of year $y"))
-        isempty(end_indices) &&
-            throw(ArgumentError("no saved state at end of year $y"))
+    for y in yy
 
-        # Interior boundaries must have BOTH sides saved.
-        if y > first(sol.t) + tol && length(start_indices) < 2
-            throw(ArgumentError("no pre/post demographic pair at year $y"))
+        si = findall(t -> abs(t - y) <= tol, sol.t)
+        ei = findall(t -> abs(t - (y + 1)) <= tol, sol.t)
+
+        isempty(si) &&
+            throw(ArgumentError("Missing start of year $y"))
+
+        isempty(ei) &&
+            throw(ArgumentError("Missing end of year $y"))
+
+        if y > first(sol.t) + tol && length(si) < 2
+            throw(ArgumentError(
+                "Missing demographic boundary pair at $y"
+            ))
         end
-        if y + 1 < last(sol.t) - tol && length(end_indices) < 2
-            throw(ArgumentError("no pre/post demographic pair at year $(y+1)"))
+
+        if y + 1 < last(sol.t) - tol && length(ei) < 2
+            throw(ArgumentError(
+                "Missing demographic boundary pair at $(y+1)"
+            ))
         end
 
-        before = sol.u[last(start_indices)]  # y⁺
-        after  = sol.u[first(end_indices)]   # (y+1)⁻
+        push!(starts, last(si))
+        push!(ends, first(ei))
+    end
+
+    return AnnualWindows(yy, starts, ends)
+end
+
+
+"""
+Extract annual increments of a cumulative event counter.
+
+A small negative increment caused by numerical error is
+permitted, but is not clipped. Larger decreases are rejected.
+
+This avoids introducing a nondifferentiable max operation
+into the inference-facing extraction.
+"""
+function annual_events(
+    sol,
+    layout::StateLayout,
+    counter::Integer,
+    windows::AnnualWindows,
+)
+    layout.nepi < counter <= nstates(layout) ||
+        throw(ArgumentError("Invalid cumulative counter"))
+
+    expected_length = state_dimension(layout)
+
+    all(u -> length(u) == expected_length, sol.u) ||
+        throw(DimensionMismatch(
+            "Solution state dimensions do not match layout"
+        ))
+
+    T = eltype(first(sol.u))
+
+    out = Matrix{T}(
+        undef,
+        layout.nages,
+        length(windows.years),
+    )
+
+    for j in eachindex(windows.years)
+        before = sol.u[windows.start_indices[j]]
+        after = sol.u[windows.end_indices[j]]
+
         for a in 1:layout.nages
             i = state_index(layout, a, Int(counter))
-            diff = Float64(after[i] - before[i])
+            diff = after[i] - before[i]
+
             isfinite(diff) ||
-                throw(ArgumentError("nonfinite event count in age $a, year $y"))
-            # Permit negligible solver roundoff, but reject real counter decreases.
-            diff >= -1e-8 * max(1.0, abs(before[i]), abs(after[i])) ||
-                throw(ArgumentError("cumulative counter decreased in age $a, year $y"))
-            out[a, j] = max(0.0, diff)
+                throw(ArgumentError(
+                    "Nonfinite event increment"
+                ))
+
+            tolerance = 1e-8 * max(
+                one(diff),
+                abs(before[i]),
+                abs(after[i]),
+            )
+
+            diff >= -tolerance ||
+                throw(ArgumentError(
+                    "Cumulative counter decreased"
+                ))
+
+            out[a, j] = diff
         end
     end
+
     return out
 end
 
-annual_events(sol, model::AbstractTBModel, counter::Integer; years) =
-    annual_events(sol, state_layout(model), counter; years)
+
+function annual_events(
+    sol,
+    layout::StateLayout,
+    counter::Integer;
+    years,
+)
+    windows = annual_windows(sol; years)
+    return annual_events(sol, layout, counter, windows)
+end
+
+
+annual_events(
+    sol,
+    model::AbstractTBModel,
+    counter::Integer;
+    years,
+) = annual_events(
+    sol, state_layout(model), counter; years
+)

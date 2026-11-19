@@ -97,7 +97,8 @@ function initial_state(
     # Construct initial state
     # --------------------------------------------------------
 
-    u0 = zeros(Float64, nstates(layout) * layout.nages)
+    StateT = promote_type(eltype(population), typeof(params.beta))
+    u0 = zeros(StateT, state_dimension(layout))
 
     @inbounds for a in 1:layout.nages
 

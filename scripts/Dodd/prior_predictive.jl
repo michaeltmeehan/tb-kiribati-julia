@@ -65,6 +65,7 @@ result = simulate_ensemble(
     end_year=end_year,
     output_years=output_years,
     age_breaks=age_breaks,
+    variables=(:incidence, :notifications, :mortality),
 )
 
 n_success = count(!isnothing, result.outputs)
