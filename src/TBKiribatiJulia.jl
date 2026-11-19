@@ -135,5 +135,6 @@ export normalise_model_contacts, adult_infectiousness
 export state_dimension, validate_model_interface
 export age_and_survive!, reconcile_population!
 export CohortDemography, load_age_migration, cohort_migration
+export PreparedSimulation, prepare_simulation
 
 end

@@ -1,146 +1,294 @@
-# src/simulation/simulate.jl
 
 using OrdinaryDiffEq
 using DiffEqCallbacks: PresetTimeCallback
-using SciMLBase: ODEProblem, solve, u_modified!
+using SciMLBase: ODEProblem, solve, remake, u_modified!
+
+# ------------------------------------------------------------
+# Numerical type inference
+# ------------------------------------------------------------
+
+function simulation_parameter_type(x)
+    if x isa Real
+        return typeof(x)
+    elseif x isa AbstractArray{<:Real}
+        return eltype(x)
+    elseif x isa Tuple
+        return foldl(
+            promote_type,
+            (simulation_parameter_type(v) for v in x);
+            init=Float64,
+        )
+    elseif isstructtype(typeof(x)) &&
+        !(x isa AbstractString)
+        return foldl(
+            promote_type,
+            (
+                simulation_parameter_type(getfield(x, i))
+                for i in 1:fieldcount(typeof(x))
+            );
+            init=Float64,
+        )
+    else
+        return Float64
+    end
+end
+
+
+# ------------------------------------------------------------
+# Prepared simulation
+# ------------------------------------------------------------
 
 """
-    simulate(model, params, demography; u0, tspan, saveat, ...)
+    PreparedSimulation
 
-Simulate an age-structured TB model with annual demographic updates.
+Reusable deterministic simulation configuration.
 
-Time is expressed in calendar years.
+Contains:
+- Fixed model and demographic scenario
+- ODE problem template
+- Annual demographic callback schedule
+- Solver and numerical tolerances
+- Output-saving configuration
 
-At each integer-year boundary after the initial year,
-the demographic operator advances the population from
-the preceding year to the current year.
-
-Saved states at demographic update times are post-update.
+Individual solves receive fresh parameters, initial states,
+contexts and workspaces.
 """
-function simulate(
+struct PreparedSimulation{M,D,P,C,S,A,R,V}
+    model::M
+    demography::D
+    problem::P
+    callback::C
+    solver::S
+    abstol::A
+    reltol::R
+    saveat::V
+    save_end::Bool
+end
+
+
+"""
+    prepare_simulation(model, demography;
+                       start_year, end_year, ...)
+
+Prepare an ODE problem for repeated parameter evaluations.
+
+The callback reads the current integrator context rather
+than capturing any proposal-specific parameter values.
+"""
+function prepare_simulation(
     model::AbstractTBModel,
-    params,
     demography::AbstractDemography;
-    u0::AbstractVector,
-    tspan::Tuple{<:Real,<:Real},
-    saveat=nothing,
+    start_year::Real,
+    end_year::Real,
     solver=Tsit5(),
     abstol::Real=1e-8,
     reltol::Real=1e-6,
+    saveat=nothing,
 )
-    layout = state_layout(model)
+    t0 = Float64(start_year)
+    t1 = Float64(end_year)
 
-    length(u0) == layout.nages * nstates(layout) ||
-        throw(DimensionMismatch(
-            "Initial state length does not match model layout"
-        ))
-
-    t0, t1 = Float64.(tspan)
-
-    t0 < t1 ||
-        throw(ArgumentError("tspan must have positive duration"))
+    isfinite(t0) && isfinite(t1) && t0 < t1 ||
+        throw(ArgumentError("Invalid simulation interval"))
 
     isinteger(t0) ||
         throw(ArgumentError(
             "Simulation must begin at an integer calendar year"
         ))
 
-    all(isfinite, u0) ||
-        throw(ArgumentError("Initial state contains nonfinite values"))
+    layout = state_layout(model)
 
-    # --------------------------------------------------------
-    # Simulation context
-    # --------------------------------------------------------
-
-    workspace = TBWorkspace(layout.nages)
-
-    context = SimulationContext(
+    # Placeholder values are never integrated directly.
+    # remake substitutes the actual state and context.
+    prototype_context = SimulationContext(
         model,
-        params,
+        nothing,
         demography,
-        workspace,
+        TBWorkspace(layout.nages),
     )
 
-    # --------------------------------------------------------
-    # Annual demographic updates
-    # --------------------------------------------------------
-
-    # First demographic update occurs at t0 + 1.
-    # An update at year y advances the population from y-1 to y.
+    problem = ODEProblem(
+        tb_rhs!,
+        zeros(Float64, state_dimension(layout)),
+        (t0, t1),
+        prototype_context,
+    )
 
     update_times = collect(
         (t0+1.0):1.0:floor(t1)
     )
 
     function demographic_affect!(integrator)
-        transition_year = Int(round(integrator.t)) - 1
+        ctx = integrator.p
+        previous_year = Int(round(integrator.t)) - 1
 
         apply_demography!(
             integrator.u,
-            model,
-            demography,
-            transition_year,
+            ctx.model,
+            ctx.demography,
+            previous_year,
         )
 
         u_modified!(integrator, true)
-
         return nothing
     end
 
-    callback = PresetTimeCallback(
+    callback = isempty(update_times) ?
+               nothing :
+               PresetTimeCallback(
         update_times,
         demographic_affect!;
         save_positions=(true, true),
     )
 
-    # --------------------------------------------------------
-    # ODE problem
-    # --------------------------------------------------------
+    save_end = isempty(update_times) || !isinteger(t1)
 
-    problem = ODEProblem(
-        tb_rhs!,
-        copy(u0),
-        (t0, t1),
-        context,
-    )
-
-    # --------------------------------------------------------
-    # Solve
-    # --------------------------------------------------------
-
-    return solve(
+    return PreparedSimulation(
+        model,
+        demography,
         problem,
-        solver;
-        callback=callback,
-        save_start=true,
-        save_everystep=false,
-        save_end=false,
-        abstol=abstol,
-        reltol=reltol,
+        callback,
+        solver,
+        abstol,
+        reltol,
+        saveat,
+        save_end,
     )
 end
 
 
+# ------------------------------------------------------------
+# Repeated parameter evaluation
+# ------------------------------------------------------------
 
 """
-    simulate_from_draw(
-        model::AbstractTBModel,
-        draw::NamedTuple,
-        demography::AbstractDemography;
-        start_year,
-        end_year,
-        kwargs...
+    simulate(setup::PreparedSimulation, params; u0=nothing)
+
+Run a prepared simulation with new model parameters.
+
+If u0 is omitted, initial_state is dispatched on the model.
+No model reconstruction occurs.
+
+A fresh workspace is allocated for every solve, avoiding
+shared mutable state between parameter evaluations.
+"""
+function simulate(
+    setup::PreparedSimulation,
+    params;
+    u0=nothing,
+)
+    layout = state_layout(setup.model)
+
+    initial = isnothing(u0) ?
+              initial_state(
+        setup.model,
+        params,
+        setup.demography;
+        year=setup.problem.tspan[1],
+    ) :
+              u0
+
+    initial isa AbstractVector{<:Real} ||
+        throw(ArgumentError(
+            "Initial state must be a real-valued vector"
+        ))
+
+    length(initial) == state_dimension(layout) ||
+        throw(DimensionMismatch(
+            "Initial state has incorrect dimension"
+        ))
+
+    all(isfinite, initial) ||
+        throw(ArgumentError(
+            "Initial state contains nonfinite values"
+        ))
+
+    T = promote_type(
+        eltype(initial),
+        simulation_parameter_type(params),
     )
 
-Transform a set of free model parameters, construct initial
-conditions, and simulate the model.
+    context = SimulationContext(
+        setup.model,
+        params,
+        setup.demography,
+        TBWorkspace(T, layout.nages),
+    )
 
-Model-specific operations are handled through dispatch:
-- `make_parameters(model, draw)`
-- `initial_state(model, params, demography; year)`
+    problem = remake(
+        setup.problem;
+        u0=T.(initial),
+        p=context,
+    )
 
-Additional keyword arguments are forwarded to `simulate`.
+    options = (
+        save_start=true,
+        save_everystep=false,
+        save_end=setup.save_end,
+        abstol=setup.abstol,
+        reltol=setup.reltol,
+    )
+
+    if !isnothing(setup.callback)
+        options = merge(
+            options,
+            (callback=setup.callback,),
+        )
+    end
+
+    if !isnothing(setup.saveat)
+        options = merge(
+            options,
+            (saveat=setup.saveat,),
+        )
+    end
+
+    return solve(
+        problem,
+        setup.solver;
+        options...,
+    )
+end
+
+
 """
+    simulate_from_draw(setup::PreparedSimulation, draw)
+
+Construct parameters and solve using a prepared simulation.
+"""
+function simulate_from_draw(
+    setup::PreparedSimulation,
+    draw::NamedTuple,
+)
+    params = make_parameters(setup.model, draw)
+    return simulate(setup, params)
+end
+
+
+# ------------------------------------------------------------
+# Backward-compatible convenience interfaces
+# ------------------------------------------------------------
+
+function simulate(
+    model::AbstractTBModel,
+    params,
+    demography::AbstractDemography;
+    u0::AbstractVector,
+    tspan::Tuple{<:Real,<:Real},
+    kwargs...,
+)
+    setup = prepare_simulation(
+        model,
+        demography;
+        start_year=tspan[1],
+        end_year=tspan[2],
+        kwargs...,
+    )
+
+    return simulate(setup, params; u0=u0)
+end
+
+
 function simulate_from_draw(
     model::AbstractTBModel,
     draw::NamedTuple,
@@ -149,29 +297,13 @@ function simulate_from_draw(
     end_year::Real,
     kwargs...,
 )
-    start_year < end_year ||
-        throw(ArgumentError(
-            "start_year must precede end_year"
-        ))
-
-    # Transform sampled parameters.
-    params = make_parameters(model, draw)
-
-    # Construct model-specific initial conditions.
-    u0 = initial_state(
+    setup = prepare_simulation(
         model,
-        params,
         demography;
-        year=start_year,
-    )
-
-    # Execute generic deterministic simulation.
-    return simulate(
-        model,
-        params,
-        demography;
-        u0=u0,
-        tspan=(start_year, end_year),
+        start_year,
+        end_year,
         kwargs...,
     )
+
+    return simulate_from_draw(setup, draw)
 end
