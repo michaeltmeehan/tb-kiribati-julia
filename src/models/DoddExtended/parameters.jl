@@ -1,103 +1,219 @@
 
-using Distributions: LogNormal
+using Distributions: Beta, Gamma, LogNormal, Normal
 
-struct DoddExtendedTBParameters
-    base::DoddTBParameters
-
-    # Age-specific fractions at active disease onset.
-    # Columns: smear-positive, smear-negative, extrapulmonary.
-    presentation::Matrix{Float64}
-
-    # Relative infectiousness of the three presentations.
-    relative_infectiousness::NTuple{3,Float64}
-
-    # Relative detection hazards.
-    relative_detection::NTuple{3,Float64}
+struct DoddExtendedDetection{T<:Real}
+    K::T
+    trend::T
+    reference_year::T
+    maximum::T
 end
 
+function DoddExtendedDetection(;
+    K::Real,
+    trend::Real,
+    reference_year::Real=1970.0,
+    maximum::Real=0.9,
+)
+    0 < K < 1 ||
+        throw(ArgumentError("K must lie in (0, 1)"))
 
-"""
-Additional priors for the extended model.
+    0 < maximum < 1 ||
+        throw(ArgumentError("maximum must lie in (0, 1)"))
 
-These are provisional modelling priors rather than
-estimates obtained from Kiribati data.
+    k, tr, yr, mx = promote(
+        float(K), float(trend),
+        float(reference_year), float(maximum),
+    )
 
-Initially, fix the corresponding parameters during
-calibration using extended_fixed_parameters().
-"""
+    return DoddExtendedDetection(k, tr, yr, mx)
+end
+
+@inline function detection_probability(
+    d::DoddExtendedDetection, t
+)
+    z = log(d.K / (1 - d.K)) +
+        d.trend * (t - d.reference_year)
+
+    logistic = if z >= 0
+        inv(1 + exp(-z))
+    else
+        ez = exp(z)
+        ez / (1 + ez)
+    end
+
+    return d.maximum * logistic
+end
+
+struct DoddExtendedTBParameters{T<:Real}
+    Lambda0::T
+    beta::T
+    psi::T
+    kappa::T
+
+    epsilon::Vector{T}
+    nu::Vector{T}
+    omega::Vector{T}
+
+    self_cure::Vector{T}
+    tb_mortality::Vector{T}
+    detection_multiplier::Vector{T}
+
+    treatment_rate::T
+    treatment_cfr::T
+    detection::DoddExtendedDetection{T}
+
+    presentation::Matrix{T}
+    relative_infectiousness::NTuple{3,T}
+    relative_detection::NTuple{3,T}
+end
+
 function priors(model::DoddExtendedTBModel)
-    base = priors(model.reference)
+    base = (
+        beta=LogNormal(log(10), 0.75),
+        psi=Beta(20.7, 77.9),
+        Lambda0=LogNormal(log(3e-2), 0.75),
+        kappa=LogNormal(0.62, 0.068),
+        epsilon=LogNormal(-2.837, 0.32),
+        epsilon_child=Beta(5.153, 21.967),
+        nu=LogNormal(-6.89, 0.58),
+        omega=LogNormal(-3.95, 0.27),
+        detection_logitK=Normal(0.0, 0.3),
+        detection_trend=Gamma(0.5, 0.04),
+        detection_or_0_4=LogNormal(-0.100, 0.626),
+        detection_or_5_14=LogNormal(-0.567, 0.458),
+        duration=LogNormal(1.1, 0.2),
+        untreated_cfr=Beta(25.48, 33.78),
+        treatment_cfr=Beta(2.71, 87.55),
+    )
 
     if !model.reinfection
-        names = Tuple(
-            name for name in keys(base)
-                     if name != :psi
+        keys_without_psi = Tuple(
+            key for key in keys(base) if key != :psi
         )
-
-        base = NamedTuple{names}(
-            Tuple(getproperty(base, name) for name in names)
+        base = NamedTuple{keys_without_psi}(
+            Tuple(getproperty(base, k) for k in keys_without_psi)
         )
     end
 
-    additional = (
+    return merge(base, (
         smear_negative_infectiousness=
         LogNormal(log(0.35), 0.4),
         smear_negative_detection=
         LogNormal(0.0, 0.5),
         extrapulmonary_detection=
         LogNormal(0.0, 0.5),
-    )
-
-    return merge(base, additional)
+    ))
 end
 
-
-"""
-Initial fixed values for the additional parameters.
-"""
 extended_fixed_parameters() = (
     smear_negative_infectiousness=0.35,
     smear_negative_detection=1.0,
     extrapulmonary_detection=1.0,
 )
 
-
 function make_parameters(
     model::DoddExtendedTBModel,
     draw::NamedTuple,
 )
-    # Reinfection can be completely excluded from the
-    # reduced model without retaining an unused psi prior.
-    base_draw = model.reinfection ?
-                draw :
-                merge(draw, (psi=0.0,))
+    nages = state_layout(model).nages
 
-    base = make_parameters(
-        model.reference,
-        base_draw,
+    # Promote every sampled quantity to a common numerical
+    # type, including ForwardDiff.Dual when applicable.
+    scalar_values = (
+        v for v in Base.values(draw) if v isa Real
     )
 
-    q_negative =
-        Float64(draw.smear_negative_infectiousness)
+    T = promote_type(
+        Float64,
+        (typeof(v) for v in scalar_values)...,
+    )
 
-    d_negative =
-        Float64(draw.smear_negative_detection)
+    x(name) = T(getproperty(draw, name))
 
-    d_extra =
-        Float64(draw.extrapulmonary_detection)
+    Λ0 = x(:Lambda0)
+    β = x(:beta)
+    ψ = model.reinfection ? x(:psi) : zero(T)
+    κ = x(:kappa)
 
-    all(x -> isfinite(x) && x > 0, (
-        q_negative,
-        d_negative,
-        d_extra,
-    )) || throw(ArgumentError(
-        "Invalid presentation-specific parameters"
-    ))
+    ε = T[
+        age < 5 ? x(:epsilon_child) : x(:epsilon)
+        for age in 0:(nages-1)
+    ]
+
+    ν = fill(x(:nu), nages)
+    ω = fill(x(:omega), nages)
+
+    duration = T[
+        age < 15 ? T(0.5) : x(:duration)
+        for age in 0:(nages-1)
+    ]
+
+    fatality = x(:untreated_cfr)
+
+    relative_detection_age = T[
+        age < 5 ? x(:detection_or_0_4) :
+        age < 15 ? x(:detection_or_5_14) :
+        one(T)
+        for age in 0:(nages-1)
+    ]
+
+    z = x(:detection_logitK)
+
+    K = if z >= 0
+        inv(one(T) + exp(-z))
+    else
+        ez = exp(z)
+        ez / (one(T) + ez)
+    end
+
+    detection = DoddExtendedDetection(
+        K=K,
+        trend=x(:detection_trend),
+        reference_year=T(1970),
+        maximum=T(0.9),
+    )
+
+    q_negative = x(:smear_negative_infectiousness)
+    d_negative = x(:smear_negative_detection)
+    d_extra = x(:extrapulmonary_detection)
+
+    all(v -> isfinite(v) && v >= 0,
+        (Λ0, β, ψ, κ, x(:treatment_cfr))) ||
+        throw(ArgumentError("Invalid nonnegative parameter"))
+
+    0 <= fatality <= 1 ||
+        throw(ArgumentError("Invalid untreated CFR"))
+
+    0 <= x(:treatment_cfr) <= 1 ||
+        throw(ArgumentError("Invalid treatment CFR"))
+
+    all(v -> isfinite(v) && v > 0,
+        (x(:duration), q_negative, d_negative, d_extra)) ||
+        throw(ArgumentError("Invalid duration or presentation rate"))
+
+    all(v -> isfinite(v) && v >= 0, ε) ||
+        throw(ArgumentError("Invalid fast progression"))
+
+    all(v -> isfinite(v) && v >= 0, ν) ||
+        throw(ArgumentError("Invalid slow progression"))
+
+    all(v -> isfinite(v) && v >= 0, ω) ||
+        throw(ArgumentError("Invalid relapse rate"))
+
+    all(v -> isfinite(v) && v >= 0, relative_detection_age) ||
+        throw(ArgumentError("Invalid detection multipliers"))
+
+    γ = (one(T) - fatality) ./ duration
+    μ = fatality ./ duration
+    detection_multiplier = relative_detection_age ./ duration
 
     return DoddExtendedTBParameters(
-        base,
-        model.presentation,
-        (1.0, q_negative, 0.0),
-        (1.0, d_negative, d_extra),
+        Λ0, β, ψ, κ,
+        ε, ν, ω,
+        γ, μ, detection_multiplier,
+        T(2), x(:treatment_cfr), detection,
+        T.(model.presentation),
+        (one(T), q_negative, zero(T)),
+        (one(T), d_negative, d_extra),
     )
 end

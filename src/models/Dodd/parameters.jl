@@ -2,11 +2,11 @@
 # Detection trajectory
 # ------------------------------------------------------------
 
-struct DoddDetection
-    K::Float64
-    trend::Float64
-    reference_year::Float64
-    maximum::Float64
+struct DoddDetection{T<:Real}
+    K::T
+    trend::T
+    reference_year::T
+    maximum::T
 end
 
 function DoddDetection(;
@@ -21,12 +21,14 @@ function DoddDetection(;
     0 < maximum < 1 ||
         throw(ArgumentError("maximum must lie in (0, 1)"))
 
-    return DoddDetection(
-        Float64(K),
-        Float64(trend),
-        Float64(reference_year),
-        Float64(maximum),
+    k, tr, yr, maxval = promote(
+        float(K),
+        float(trend),
+        float(reference_year),
+        float(maximum),
     )
+
+    return DoddDetection(k, tr, yr, maxval)
 end
 
 @inline function detection_probability(d::DoddDetection, t)
@@ -48,24 +50,24 @@ end
 # Dodd model parameters
 # ------------------------------------------------------------
 
-struct DoddTBParameters
-    Lambda0::Float64
-    beta::Float64
-    psi::Float64
-    kappa::Float64
+struct DoddTBParameters{T<:Real}
+    Lambda0::T
+    beta::T
+    psi::T
+    kappa::T
 
-    epsilon::Vector{Float64}
-    nu::Vector{Float64}
-    omega::Vector{Float64}
+    epsilon::Vector{T}
+    nu::Vector{T}
+    omega::Vector{T}
 
-    self_cure::Vector{Float64}
-    tb_mortality::Vector{Float64}
-    detection_multiplier::Vector{Float64}
+    self_cure::Vector{T}
+    tb_mortality::Vector{T}
+    detection_multiplier::Vector{T}
 
-    treatment_rate::Float64
-    treatment_cfr::Float64
+    treatment_rate::T
+    treatment_cfr::T
 
-    detection::DoddDetection
+    detection::DoddDetection{T}
 end
 
 
@@ -123,27 +125,56 @@ function make_parameters(
             throw(ArgumentError("Age-specific rates and multipliers must be nonnegative"))
     end
 
-    D = Float64.(duration)
-    Φ = Float64.(fatality)
+    # Promote all numerical inputs to a common type.
+    # A differentiated parameter therefore propagates
+    # its AD type through the complete parameter object.
 
-    self_cure = (1 .- Φ) ./ D
+    T = promote_type(
+        Float64,
+        typeof(Lambda0),
+        typeof(beta),
+        typeof(psi),
+        typeof(kappa),
+        eltype(epsilon),
+        eltype(nu),
+        eltype(omega),
+        eltype(duration),
+        eltype(fatality),
+        eltype(relative_detection),
+        typeof(treatment_rate),
+        typeof(treatment_cfr),
+        typeof(detection.K),
+        typeof(detection.trend),
+    )
+
+    D = T.(duration)
+    Φ = T.(fatality)
+
+    self_cure = (one(T) .- Φ) ./ D
     tb_mortality = Φ ./ D
-    detection_multiplier = Float64.(relative_detection) ./ D
+    detection_multiplier = T.(relative_detection) ./ D
+
+    typed_detection = DoddDetection(
+        K=T(detection.K),
+        trend=T(detection.trend),
+        reference_year=T(detection.reference_year),
+        maximum=T(detection.maximum),
+    )
 
     return DoddTBParameters(
-        Float64(Lambda0),
-        Float64(beta),
-        Float64(psi),
-        Float64(kappa),
-        Float64.(epsilon),
-        Float64.(nu),
-        Float64.(omega),
+        T(Lambda0),
+        T(beta),
+        T(psi),
+        T(kappa),
+        T.(epsilon),
+        T.(nu),
+        T.(omega),
         self_cure,
         tb_mortality,
         detection_multiplier,
-        Float64(treatment_rate),
-        Float64(treatment_cfr),
-        detection,
+        T(treatment_rate),
+        T(treatment_cfr),
+        typed_detection,
     )
 end
 

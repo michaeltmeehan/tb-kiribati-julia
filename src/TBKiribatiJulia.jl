@@ -16,6 +16,8 @@ include("demography/projected.jl")
 
 include("simulation/context.jl")
 
+include("mixing/model_mixing.jl")
+
 include("models/Dodd/model.jl")
 include("models/Dodd/parameters.jl")
 include("models/Dodd/dynamics.jl")
@@ -126,7 +128,9 @@ export RecurrentTBObservation,
     recurrence_loglikelihood
 export DoddExtendedTBModel, DoddExtendedTBParameters
 export extended_presentation, load_kiribati_presentation
-export extended_fixed_parameters, extend_initial_state
+export extended_fixed_parameters
 export RagonnetTBModel, RagonnetTBParameters
+export normalise_model_contacts, adult_infectiousness
+export state_dimension, validate_model_interface
 
 end

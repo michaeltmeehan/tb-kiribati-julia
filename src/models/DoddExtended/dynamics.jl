@@ -37,19 +37,19 @@ function compute_force_of_infection!(
 
         work.infectious_prevalence[a] =
             population > 0 ?
-            model.reference.infectiousness[a] *
+            model.infectiousness[a] *
                 infectious / population :
             0.0
     end
 
     mul!(
         work.foi,
-        model.reference.contact,
+        model.contact,
         work.infectious_prevalence,
     )
 
     @inbounds for a in 1:layout.nages
-        work.foi[a] *= p.base.beta
+        work.foi[a] *= p.beta
     end
 
     return nothing
@@ -64,7 +64,7 @@ function tb_rhs!(
 )
     model = ctx.model
     p = ctx.params
-    dodd = p.base
+
     layout = model.layout
 
     compute_force_of_infection!(u, ctx)
@@ -72,13 +72,13 @@ function tb_rhs!(
     nstate = nstates(layout)
 
     probability = detection_probability(
-        dodd.detection, t
+        p.detection, t
     )
 
     detection_odds = probability / (1 - probability)
 
-    τ = dodd.treatment_rate
-    θ = dodd.treatment_cfr
+    τ = p.treatment_rate
+    θ = p.treatment_cfr
 
     @inbounds for a in 1:layout.nages
         base = (a - 1) * nstate
@@ -97,34 +97,34 @@ function tb_rhs!(
         primary_infections = λ * susceptible
 
         reinfections_latent_0 =
-            dodd.psi * λ * late_latent_0
+            p.psi * λ * late_latent_0
 
         reinfections_latent_1 =
-            dodd.psi * λ * late_latent_1
+            p.psi * λ * late_latent_1
 
         reinfections_recovered =
-            dodd.psi * λ * recovered
+            p.psi * λ * recovered
 
         # Latent TB transitions.
         early_to_late_0 =
-            dodd.kappa * early_latent_0
+            p.kappa * early_latent_0
 
         early_to_late_1 =
-            dodd.kappa * early_latent_1
+            p.kappa * early_latent_1
 
         fast_progression_0 =
-            dodd.epsilon[a] * early_latent_0
+            p.epsilon[a] * early_latent_0
 
         fast_progression_1 =
-            dodd.epsilon[a] * early_latent_1
+            p.epsilon[a] * early_latent_1
 
         slow_progression_0 =
-            dodd.nu[a] * late_latent_0
+            p.nu[a] * late_latent_0
 
         slow_progression_1 =
-            dodd.nu[a] * late_latent_1
+            p.nu[a] * late_latent_1
 
-        relapse = dodd.omega[a] * recovered
+        relapse = p.omega[a] * recovered
 
         onset_0 =
             fast_progression_0 + slow_progression_0
@@ -142,7 +142,7 @@ function tb_rhs!(
         treatment_initiation = 0.0
 
         base_detection =
-            dodd.detection_multiplier[a] *
+            p.detection_multiplier[a] *
                 detection_odds
 
         for k in 1:3
@@ -155,8 +155,8 @@ function tb_rhs!(
             δ = base_detection *
                 p.relative_detection[k]
 
-            γ = dodd.self_cure[a]
-            μ = dodd.tb_mortality[a]
+            γ = p.self_cure[a]
+            μ = p.tb_mortality[a]
 
             detection_0 = δ * active_0
             detection_1 = δ * active_1

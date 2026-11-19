@@ -38,7 +38,7 @@ end
 
 function DoddTBModel(
     contact::Matrix{Float64};
-    pulmonary_fraction::Float64 = 0.83,
+    pulmonary_fraction::Float64=0.83,
 )
     nages = size(contact, 1)
 
@@ -58,27 +58,15 @@ function DoddTBModel(
             "Pulmonary fraction must lie in (0, 1]"
         ))
 
-    # Dodd et al. computational normalisation:
-    # mean age-specific total contact rate equals one.
-    mean_contacts = sum(contact) / nages
+    nages = size(contact, 1)
 
-    mean_contacts > 0 ||
-        throw(ArgumentError(
-            "Contact matrix must contain positive contact rates"
-        ))
-
-    normalized_contact = contact ./ mean_contacts
-
-    infectiousness = [
-        age < 15 ? 0.0 : 1.0
-        for age in 0:(nages - 1)
-    ]
-
+    normalised_contact = normalise_model_contacts(contact)
+    infectiousness = adult_infectiousness(nages)
     layout = StateLayout(6, 10, nages)
 
     return DoddTBModel(
         layout,
-        normalized_contact,
+        normalised_contact,
         infectiousness,
         pulmonary_fraction,
     )
