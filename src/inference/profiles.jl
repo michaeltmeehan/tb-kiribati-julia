@@ -21,6 +21,7 @@ function profile_likelihood(
     fit::MLEFit,
     parameter::Symbol;
     grid,
+    optimizer::Symbol=:nelder_mead,
     nstarts::Int=2,
     iterations::Int=3000,
     rng::AbstractRNG=Random.default_rng(),
@@ -63,6 +64,7 @@ function profile_likelihood(
 
             candidate = fit_mle(
                 problem;
+                optimizer=optimizer,
                 fixed=fixed,
                 initial=initial,
                 nstarts=nstarts,

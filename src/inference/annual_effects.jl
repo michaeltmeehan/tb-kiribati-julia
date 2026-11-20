@@ -2,11 +2,13 @@
 """
     quadrature_convergence(fit; orders=(30, 50, 70, 100))
 
-Reevaluate the fitted marginal log-likelihood at
-different Gauss-Hermite quadrature orders.
+Reevaluate the fitted notification log likelihood
+using different Gauss-Hermite quadrature orders.
 
 The epidemiological model is simulated only once.
-Parameters are held fixed at their MAP estimates.
+Parameters are held fixed at their fitted values.
+
+Differences are relative to the final supplied order.
 """
 function quadrature_convergence(
     fit::AbstractCalibrationFit;
@@ -19,37 +21,38 @@ function quadrature_convergence(
             "Requires AnnualRandomEffectNB2Observation"
         ))
 
-    all(n -> n >= 1, orders) ||
+    orders = collect(orders)
+
+    isempty(orders) &&
+        throw(ArgumentError(
+            "At least one quadrature order is required"
+        ))
+
+    all(n -> n isa Integer && n >= 1, orders) ||
         throw(ArgumentError("Invalid quadrature order"))
 
+    # Only one epidemiological simulation.
     output = predict(fit)
-    rows = notification_fit_rows(fit.problem, output)
 
-    results = NamedTuple[]
-
-    for n in orders
+    results = map(orders) do n
         model = AnnualRandomEffectNB2Observation(
             obsmodel.sigma_prior,
             obsmodel.tau_prior;
-            quadrature_order=n,
+            quadrature_order=Int(n),
         )
 
-        ll = 0.0
+        ll_notifications = notification_loglikelihood(
+            model,
+            fit.problem.observations,
+            output,
+            fit.problem.age_breaks,
+            fit.parameters,
+        )
 
-        for obs in fit.problem.observations
-            yearly = filter(r -> r.year == obs.year, rows)
-
-            ll += observation_year_loglikelihood(
-                model,
-                yearly,
-                fit.parameters,
-            )
-        end
-
-        push!(results, (
+        return (
             order=Int(n),
-            log_likelihood=ll,
-        ))
+            log_likelihood=ll_notifications,
+        )
     end
 
     reference = last(results).log_likelihood
@@ -150,8 +153,11 @@ end
         level=0.95,
     )
 
-Calculate the conditional posterior distribution of each
-annual notification multiplier at the MAP parameter values.
+Calculate the conditional distribution of each annual
+notification multiplier given the fitted parameter values.
+
+Parameter uncertainty is not integrated out.
+Both MAPFit and MLEFit objects are supported.
 
 Returns annual posterior means, equal-tailed intervals,
 and expected notification counts conditional on the

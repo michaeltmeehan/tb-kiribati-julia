@@ -1,3 +1,29 @@
+function _check_comparable_observations(reduced, full)
+    a = reduced.problem
+    b = full.problem
+
+    a.observations == b.observations ||
+        throw(ArgumentError(
+            "Fits use different notification observations"
+        ))
+
+    isequal(a.treatment_deaths, b.treatment_deaths) ||
+        throw(ArgumentError(
+            "Fits use different treatment-death observations"
+        ))
+
+    isequal(a.recurrence, b.recurrence) ||
+        throw(ArgumentError(
+            "Fits use different recurrence observations"
+        ))
+
+    a.age_breaks == b.age_breaks ||
+        throw(ArgumentError(
+            "Fits use different age groupings"
+        ))
+
+    return nothing
+end
 
 """
     compare_calibrations(fits)
@@ -7,13 +33,18 @@ Summarise maximum-likelihood fits.
 Accepts a NamedTuple of MLEFit objects.
 """
 function compare_calibrations(fits::NamedTuple)
+    all(fit -> fit isa MLEFit, values(fits)) ||
+        throw(ArgumentError(
+            "Model comparison requires MLEFit objects"
+        ))
+
     return [
         (
             model=String(name),
             log_likelihood=fit.log_likelihood,
             n_parameters=fit.n_parameters,
-            aic=-2fit.log_likelihood +
-                2fit.n_parameters,
+            aic=-2 * fit.log_likelihood +
+                2 * fit.n_parameters,
             converged=fit.converged,
         )
         for (name, fit) in pairs(fits)
@@ -34,11 +65,7 @@ function likelihood_ratio(
     reduced::MLEFit,
     full::MLEFit,
 )
-    reduced.problem.observations ==
-        full.problem.observations ||
-        throw(ArgumentError(
-            "Fits must use the same observations"
-        ))
+    _check_comparable_observations(reduced, full)
 
     df = full.n_parameters - reduced.n_parameters
 

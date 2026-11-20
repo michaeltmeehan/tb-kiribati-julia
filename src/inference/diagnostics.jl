@@ -4,8 +4,12 @@ using Statistics: mean, std
 """
     calibration_diagnostics(fit)
 
-Return the fitted predictions, detailed observation
-records, annual national totals and Pearson residuals.
+Return fitted predictions, detailed observation records,
+annual totals across reported age groups, and Pearson
+residuals.
+
+Annual totals include only the reported age groups.
+Pearson residuals use the marginal observation variance.
 """
 function calibration_diagnostics(
     fit::AbstractCalibrationFit,
