@@ -147,28 +147,35 @@ function make_parameters(
         typeof(detection.trend),
     )
 
-    D = T.(duration)
-    Φ = T.(fatality)
 
-    self_cure = (one(T) .- Φ) ./ D
-    tb_mortality = Φ ./ D
-    detection_multiplier = T.(relative_detection) ./ D
+    # Explicitly construct every field using the
+    # promoted numerical type T.
 
-    typed_detection = DoddDetection(
-        K=T(detection.K),
-        trend=T(detection.trend),
-        reference_year=T(detection.reference_year),
-        maximum=T(detection.maximum),
+    D = Vector{T}(duration)
+    Φ = Vector{T}(fatality)
+
+    self_cure = Vector{T}((one(T) .- Φ) ./ D)
+    tb_mortality = Vector{T}(Φ ./ D)
+
+    detection_multiplier = Vector{T}(
+        Vector{T}(relative_detection) ./ D
     )
 
-    return DoddTBParameters(
+    typed_detection = DoddDetection{T}(
+        T(detection.K),
+        T(detection.trend),
+        T(detection.reference_year),
+        T(detection.maximum),
+    )
+
+    return DoddTBParameters{T}(
         T(Lambda0),
         T(beta),
         T(psi),
         T(kappa),
-        T.(epsilon),
-        T.(nu),
-        T.(omega),
+        Vector{T}(epsilon),
+        Vector{T}(nu),
+        Vector{T}(omega),
         self_cure,
         tb_mortality,
         detection_multiplier,
@@ -202,13 +209,18 @@ function make_parameters(
     # Age-specific progression rates
     # --------------------------------------------------------
 
-    epsilon = [
+    NumericT = promote_type(
+        Float64,
+        map(typeof, values(draw))...,
+    )
+
+    epsilon = NumericT[
         age < 5 ? draw.epsilon_child : draw.epsilon
         for age in 0:(nages-1)
     ]
 
-    nu = fill(draw.nu, nages)
-    omega = fill(draw.omega, nages)
+    nu = fill(NumericT(draw.nu), nages)
+    omega = fill(NumericT(draw.omega), nages)
 
     # --------------------------------------------------------
     # Untreated disease duration
@@ -217,18 +229,20 @@ function make_parameters(
     # Dodd assumes a six-month untreated duration
     # for children younger than 15 years.
 
-    duration = [
+    duration = NumericT[
         age < 15 ? 0.5 : draw.duration
         for age in 0:(nages-1)
     ]
 
-    fatality = fill(draw.untreated_cfr, nages)
+    fatality = fill(
+        NumericT(draw.untreated_cfr), nages
+    )
 
     # --------------------------------------------------------
     # Age-specific detection odds ratios
     # --------------------------------------------------------
 
-    relative_detection = [
+    relative_detection = NumericT[
         age < 5 ? draw.detection_or_0_4 :
         age < 15 ? draw.detection_or_5_14 :
         1.0

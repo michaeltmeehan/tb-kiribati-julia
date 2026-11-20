@@ -2,6 +2,8 @@
 using Random
 using Distributions: median, quantile
 using Optim
+using ADTypes: AutoForwardDiff, AutoFiniteDiff
+using LineSearches
 
 abstract type AbstractCalibrationFit end
 
@@ -130,9 +132,57 @@ end
 # Unified optimisation
 # ------------------------------------------------------------
 
+function _optimise(objective, z0, optimizer, options)
+    if optimizer == :nelder_mead
+        return Optim.optimize(
+            objective, z0, Optim.NelderMead(), options
+        )
+    end
+
+    backend = if optimizer == :lbfgs
+        AutoForwardDiff()
+    elseif optimizer == :lbfgs_fd
+        AutoFiniteDiff()
+    else
+        throw(ArgumentError("Unknown optimiser: $optimizer"))
+    end
+
+    return Optim.optimize(
+        objective,
+        z0,
+        Optim.LBFGS(
+            linesearch=LineSearches.BackTracking(),
+        ),
+        options;
+        autodiff=backend,
+    )
+end
+
+function _invalid_calibration_trial(err)
+    if err isa ErrorException
+        return startswith(err.msg, "ODE simulation failed:")
+    end
+
+    if err isa ArgumentError
+        message = sprint(showerror, err)
+
+        return any(
+            text -> occursin(text, message),
+            (
+                "K must lie in (0, 1)",
+                "Initialisation produces a negative latent population",
+                "Negative epidemiological population",
+            ),
+        )
+    end
+
+    return false
+end
+
 function _fit_calibration(
     problem::CalibrationProblem;
     method::Symbol,
+    optimizer::Symbol=:nelder_mead,
     fixed::NamedTuple=NamedTuple(),
     initial=nothing,
     rng::AbstractRNG=Random.default_rng(),
@@ -142,6 +192,12 @@ function _fit_calibration(
 )
     method in (:map, :mle) ||
         throw(ArgumentError("Unknown fitting method"))
+
+    optimizer in (
+        :nelder_mead,
+        :lbfgs,
+        :lbfgs_fd,
+    ) || throw(ArgumentError("Unknown optimiser"))
 
     nstarts >= 1 ||
         throw(ArgumentError("nstarts must be positive"))
@@ -199,35 +255,8 @@ function _fit_calibration(
             end
 
         catch err
-            # An unsuccessful simulation is an invalid trial point.
-            if err isa ErrorException &&
-                startswith(err.msg, "ODE simulation failed:")
-                return 1e100
-            end
-
-            # Floating-point saturation of the detection-logit
-            # transformation can produce K = 0 or K = 1.
-            if err isa ArgumentError &&
-                occursin(
-                "K must lie in (0, 1)",
-                sprint(showerror, err),
-            )
-                return 1e100
-            end
-
-            # The Dodd initialization heuristic is only valid
-            # when all initial epidemiological states are
-            # nonnegative.
-            if err isa ArgumentError &&
-                occursin(
-                "Initialisation produces a negative latent population",
-                sprint(showerror, err),
-            )
-                return 1e100
-            end
-
-            # Do not silently suppress unrelated programming errors.
-            rethrow()
+            _invalid_calibration_trial(err) || rethrow()
+            return 1e100
         end
 
         return isfinite(value) ? -value : 1e100
@@ -252,29 +281,24 @@ function _fit_calibration(
     runs = Any[]
     best = nothing
 
+    options = Optim.Options(
+        iterations=iterations,
+        show_trace=show_trace,
+    )
+
     for z0 in starting_points
-        result = Optim.optimize(
-            objective,
-            z0,
-            Optim.NelderMead(),
-            Optim.Options(
-                iterations=iterations,
-                show_trace=show_trace,
-            ),
-        )
+        result = _optimise(objective, z0, optimizer, options)
 
         push!(runs, result)
 
-        if isfinite(Optim.minimum(result)) &&
-            Optim.minimum(result) < 1e100 &&
-            (isnothing(best) ||
-                Optim.minimum(result) < Optim.minimum(best))
+        value = Optim.minimum(result)
+
+        if isfinite(value) &&
+            value < 1e100 &&
+            (isnothing(best) || value < Optim.minimum(best))
             best = result
         end
     end
-
-    isnothing(best) &&
-        error("No finite optimisation result")
 
     theta = unpack(Optim.minimizer(best))
     ll = calibration_loglikelihood(problem, theta)

@@ -20,11 +20,11 @@ function TreatmentDeathObservation(
     treatment_duration::Real=0.5,
     background_hazard::Real=0.0,
 )
-    treatment_duration > 0 ||
+    isfinite(treatment_duration) && treatment_duration > 0 ||
         throw(ArgumentError("Invalid treatment duration"))
 
-    background_hazard >= 0 ||
-        throw(ArgumentError("Negative background mortality"))
+    isfinite(background_hazard) && background_hazard >= 0 ||
+        throw(ArgumentError("Invalid background mortality"))
 
     selected = [
         r for r in rows
@@ -40,10 +40,24 @@ function TreatmentDeathObservation(
 
     for r in selected
         ismissing(r.died) &&
-            throw(ArgumentError("Missing deaths in $(r.year)"))
+            throw(ArgumentError(
+                "Missing deaths in $(r.year)"
+            ))
+
+        ismissing(r.cohort_size) &&
+            throw(ArgumentError(
+                "Missing cohort size in $(r.year)"
+            ))
+
+        r.cohort_size > 0 ||
+            throw(ArgumentError(
+                "Nonpositive cohort size in $(r.year)"
+            ))
 
         0 <= r.died <= r.cohort_size ||
-            throw(ArgumentError("Invalid deaths in $(r.year)"))
+            throw(ArgumentError(
+                "Invalid deaths in $(r.year)"
+            ))
     end
 
     return TreatmentDeathObservation(

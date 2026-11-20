@@ -15,23 +15,29 @@ using SciMLBase: successful_retcode
 
 Generic calibration configuration.
 
-Model-specific simulation, parameter mapping and output
-extraction are provided by existing model dispatch.
+Model-specific simulation, parameter mapping and
+output extraction are provided by model dispatch.
 """
-struct CalibrationProblem{M,D,O,A,Q,P,T,R}
+struct CalibrationProblem{M,D,O,Q,P,S}
     model::M
     demography::D
     observations::O
-    age_breaks::A
     observation_model::Q
     prior::P
+    simulation::S
+
+    age_breaks::Vector{Int}
     start_year::Int
     end_year::Int
 
-    treatment_deaths::T
-    recurrence::R
-end
+    treatment_deaths::Union{
+        Nothing,TreatmentDeathObservation
+    }
 
+    recurrence::Union{
+        Nothing,RecurrentTBObservation
+    }
+end
 
 
 function CalibrationProblem(
@@ -46,53 +52,86 @@ function CalibrationProblem(
     observation_model=NB2Observation(
         truncated(Normal(0, 0.3), 0, Inf)
     ),
+    simulation_kwargs...,
 )
     start_year < end_year ||
+        throw(ArgumentError("Invalid simulation interval"))
+
+    obs_data = collect(observations)
+
+    isempty(obs_data) &&
+        throw(ArgumentError("No observations supplied"))
+
+    breaks = Int.(collect(age_breaks))
+    layout = state_layout(model)
+
+    length(breaks) >= 2 &&
+        first(breaks) == 0 &&
+        last(breaks) == layout.nages &&
+        all(diff(breaks) .> 0) ||
         throw(ArgumentError(
-            "Invalid simulation interval"
+            "Age breaks must strictly increase " *
+                "from 0 to the final model age"
         ))
 
-    isempty(observations) &&
-        throw(ArgumentError(
-            "No observations supplied"
-        ))
-
-    years = [obs.year for obs in observations]
+    ngroups = length(breaks) - 1
+    years = [obs.year for obs in obs_data]
 
     length(unique(years)) == length(years) ||
         throw(ArgumentError(
-            "Repeated observation year"
+            "Duplicate observation years"
         ))
 
-    all(
-        y -> start_year <= y && y + 1 <= end_year,
-        years,
-    ) || throw(ArgumentError(
-        "Observation year outside simulation interval"
-    ))
+    all(y -> start_year <= y < end_year, years) ||
+        throw(ArgumentError(
+            "Observation years outside simulation interval"
+        ))
 
-    ngroups = length(age_breaks) - 1
+    for obs in obs_data
+        n = length(obs.counts)
 
-    for obs in observations
-
-        if length(obs.counts) != length(obs.groups) ||
-            length(obs.counts) != length(obs.labels)
+        n > 0 &&
+            n == length(obs.groups) &&
+            n == length(obs.labels) ||
             throw(DimensionMismatch(
-                "Observation dimensions differ"
+                "Invalid observation dimensions"
             ))
-        end
+
+        all(y -> y isa Integer && y >= 0, obs.counts) ||
+            throw(ArgumentError(
+                "Invalid notification counts"
+            ))
+
+        used = Set{Int}()
 
         for group in obs.groups
             isempty(group) &&
-                throw(ArgumentError(
-                    "Empty observation age group"
-                ))
+                throw(ArgumentError("Empty age group"))
 
-            all(g -> 1 <= g <= ngroups, group) ||
-                throw(ArgumentError(
-                    "Invalid age group index"
-                ))
+            for g in group
+                g isa Integer && 1 <= g <= ngroups ||
+                    throw(ArgumentError(
+                        "Invalid age group index"
+                    ))
+
+                g in used &&
+                    throw(ArgumentError(
+                        "Overlapping observed age groups " *
+                            "in year $(obs.year)"
+                    ))
+
+                push!(used, g)
+            end
         end
+    end
+
+    if !isnothing(recurrence)
+        all(
+            r -> start_year <= r.year < end_year,
+            recurrence.rows,
+        ) || throw(ArgumentError(
+            "Recurrence year outside simulation interval"
+        ))
     end
 
     prior = merge(
@@ -100,13 +139,22 @@ function CalibrationProblem(
         observation_priors(observation_model),
     )
 
+    simulation = prepare_simulation(
+        model,
+        demography;
+        start_year,
+        end_year,
+        simulation_kwargs...,
+    )
+
     return CalibrationProblem(
         model,
         demography,
-        observations,
-        collect(age_breaks),
+        obs_data,
         observation_model,
         prior,
+        simulation,
+        breaks,
         Int(start_year),
         Int(end_year),
         treatment_deaths,
@@ -118,8 +166,8 @@ end
 """
     model_draw(problem, theta)
 
-Extract only epidemiological model parameters from
-the full calibration parameter set.
+Extract epidemiological model parameters from the
+full calibration parameter set.
 """
 function model_draw(
     problem::CalibrationProblem,
@@ -145,107 +193,59 @@ end
     predict(problem, theta)
 
 Simulate the model and calculate annual predictions
-in the standard calibration age groups.
+required by the calibration likelihood.
 """
 function predict(
     problem::CalibrationProblem,
     theta::NamedTuple,
 )
     sol = simulate_from_draw(
-        problem.model,
+        problem.simulation,
         model_draw(problem, theta),
-        problem.demography;
-        start_year=problem.start_year,
-        end_year=problem.end_year,
     )
 
-    successful_retcode(sol.retcode) ||
+    successful_retcode(sol) ||
         throw(ErrorException(
             "ODE simulation failed: $(sol.retcode)"
         ))
 
-
     years = [obs.year for obs in problem.observations]
+    variables = (:notifications,)
 
     if !isnothing(problem.recurrence)
         append!(
             years,
-            [r.year for r in problem.recurrence.rows],
+            (r.year for r in problem.recurrence.rows),
+        )
+
+        variables = (
+            :notifications,
+            :recurrent_notifications,
         )
     end
 
-    sort!(unique!(years))
+    sort!(years)
+    unique!(years)
 
     return model_outputs(
         problem.model,
         sol;
-        years=years,
+        variables,
+        years,
         age_breaks=problem.age_breaks,
     )
-
 end
 
 
-"""
-    notification_fit_rows(problem, output)
-
-Aggregate model predictions into the observed
-age categories, including combined categories.
-
-Returns one record per observed count.
-"""
-function notification_fit_rows(
+# Preserve the existing public convenience method.
+notification_fit_rows(
     problem::CalibrationProblem,
     output,
+) = notification_fit_rows(
+    problem.observations,
+    problem.age_breaks,
+    output,
 )
-    hasproperty(output, :notifications) ||
-        throw(ArgumentError(
-            "Missing notification output"
-        ))
-
-    predicted = output.notifications
-
-    size(predicted, 1) ==
-        length(problem.age_breaks) - 1 ||
-        throw(DimensionMismatch(
-            "Age dimension mismatch"
-        ))
-
-    rows = NamedTuple[]
-
-    for obs in problem.observations
-
-        j = findfirst(
-            ==(obs.year),
-            output.years,
-        )
-
-        isnothing(j) &&
-            throw(ArgumentError(
-                "Missing prediction year $(obs.year)"
-            ))
-
-        for (label, y, groups) in zip(
-            obs.labels,
-            obs.counts,
-            obs.groups,
-        )
-            mu = sum(
-                predicted[g, j]
-                for g in groups
-            )
-
-            push!(rows, (
-                year=obs.year,
-                age_group=label,
-                observed=y,
-                expected=Float64(mu),
-            ))
-        end
-    end
-
-    return rows
-end
 
 
 """
@@ -255,13 +255,10 @@ end
         output=nothing,
     )
 
-Evaluate the observation likelihood.
+Evaluate the combined observation likelihood.
 
-Supply a previously computed model output to avoid
+Supply previously computed model outputs to avoid
 repeating the ODE simulation.
-
-Annual random effects are integrated jointly across
-all reported age groups within each year.
 """
 function calibration_loglikelihood(
     problem::CalibrationProblem,
@@ -272,33 +269,16 @@ function calibration_loglikelihood(
           predict(problem, theta) :
           output
 
-    rows = notification_fit_rows(problem, out)
+    ll_notifications = notification_loglikelihood(
+        problem.observation_model,
+        problem.observations,
+        out,
+        problem.age_breaks,
+        theta,
+    )
 
-    ll = 0.0
-    offset = 1
+    isfinite(ll_notifications) || return -Inf
 
-    for observation in problem.observations
-
-        n = length(observation.counts)
-
-        yearly_rows = @view rows[
-            offset:(offset+n-1)
-        ]
-
-        term = observation_year_loglikelihood(
-            problem.observation_model,
-            yearly_rows,
-            theta,
-        )
-
-        isfinite(term) || return -Inf
-
-        ll += term
-        offset += n
-    end
-
-
-    # Conditional treatment-death likelihood.
     ll_deaths = treatment_death_loglikelihood(
         problem.treatment_deaths,
         theta,
@@ -306,7 +286,6 @@ function calibration_loglikelihood(
 
     isfinite(ll_deaths) || return -Inf
 
-    # Conditional recurrent-notification likelihood.
     ll_recurrence = recurrence_loglikelihood(
         problem.recurrence,
         out,
@@ -314,8 +293,7 @@ function calibration_loglikelihood(
 
     isfinite(ll_recurrence) || return -Inf
 
-    return ll + ll_deaths + ll_recurrence
-
+    return ll_notifications + ll_deaths + ll_recurrence
 end
 
 

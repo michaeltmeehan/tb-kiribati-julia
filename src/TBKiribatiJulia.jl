@@ -94,11 +94,20 @@ include("simulation/ensemble.jl")
 # ============================================================
 
 include("inference/sampling.jl")
+
+# Observation distributions and likelihood primitives
 include("inference/likelihoods.jl")
+
+# Observation-specific likelihoods
+include("inference/notifications.jl")
 include("inference/treatment_deaths.jl")
 include("inference/recurrence.jl")
+
+# Calibration and optimisation
 include("inference/calibration.jl")
 include("inference/optimisation.jl")
+
+# Inference diagnostics and reporting
 include("inference/profiles.jl")
 include("inference/model_comparison.jl")
 include("inference/diagnostics.jl")

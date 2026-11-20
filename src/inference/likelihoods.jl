@@ -199,6 +199,7 @@ end
 # Shared annual random-effect likelihood
 # ------------------------------------------------------------
 
+
 function observation_year_loglikelihood(
     obs::AnnualRandomEffectNB2Observation,
     rows,
@@ -212,8 +213,8 @@ function observation_year_loglikelihood(
         return -Inf
     end
 
-    # Exact reduction to independent NB2 when tau = 0.
-    if tau == 0
+    # Exact independent-NB2 limit.
+    if iszero(tau)
         return observation_year_loglikelihood(
             NB2Observation(obs.sigma_prior),
             rows,
@@ -221,13 +222,9 @@ function observation_year_loglikelihood(
         )
     end
 
-    logs = Vector{Float64}(
-        undef,
-        length(obs.nodes),
-    )
-
-    for k in eachindex(obs.nodes)
-
+    # map preserves parameter-dependent numerical types,
+    # including ForwardDiff.Dual.
+    logs = map(eachindex(obs.nodes)) do k
         multiplier = exp(
             tau * obs.nodes[k] - tau^2 / 2
         )
@@ -241,18 +238,23 @@ function observation_year_loglikelihood(
                 sigma,
             )
 
-            isfinite(term) || return -Inf
+            # An impossible node contributes zero
+            # likelihood, represented by log(0) = -Inf.
+            if !isfinite(term)
+                return -Inf
+            end
 
             ll += term
         end
 
-        logs[k] = ll
+        return ll
     end
 
-    # Numerically stable log-sum-exp.
+    # Stable log-sum-exp over the quadrature nodes.
     m = maximum(logs)
 
-    isfinite(m) || return m
+    # Every quadrature node has zero likelihood.
+    isfinite(m) || return -Inf
 
     return m + log(
         sum(exp(x - m) for x in logs)

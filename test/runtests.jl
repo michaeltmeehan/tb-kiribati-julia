@@ -33,4 +33,8 @@ using TBKiribatiJulia
         include("models/outputs.jl")
         include("models/output_definitions.jl")
     end
+
+    @testset "Inference" begin
+        include("inference/likelihoods.jl")
+    end
 end

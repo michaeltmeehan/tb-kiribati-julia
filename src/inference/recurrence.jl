@@ -33,10 +33,13 @@ function RecurrentTBObservation(
         total = totals[year]
         recurrent = r.cases
 
-        0 <= recurrent <= total ||
-            throw(ArgumentError(
-                "Invalid recurrent count in $year"
-            ))
+        (
+            total isa Integer &&
+                recurrent isa Integer &&
+                0 <= recurrent <= total
+        ) || throw(ArgumentError(
+            "Invalid recurrent or national count in $year"
+        ))
 
         push!(rows, (
             year=year,
