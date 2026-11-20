@@ -7,7 +7,7 @@ using CSV
 using Test
 
 include(joinpath(
-    @__DIR__, "..", "common", "kiribati_setup.jl"
+    @__DIR__, "..", "common", "observation_models.jl"
 ))
 
 setup = setup_dodd_analysis(

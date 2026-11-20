@@ -3,19 +3,28 @@
 
 using TBKiribatiJulia
 using Random
-using Distributions: Normal, truncated
 using DataFrames
 using CSV
 using CairoMakie
 
 include(joinpath(
-    @__DIR__, "..", "common", "kiribati_setup.jl"
+    @__DIR__, "..", "common", "observation_models.jl"
 ))
 
-setup = setup_dodd_analysis()
+setup = setup_dodd_analysis(
+    start_year=1970,
+    end_year=2025,
+    output_years=2013:2024,
+    use_historical_notifications=false,
+)
 
-sigma_prior = truncated(Normal(0, 0.3), 0, Inf)
-tau_prior = truncated(Normal(0, 0.2), 0, Inf)
+obs_independent = kiribati_observation_model(
+    annual_effects=false,
+)
+
+obs_annual = kiribati_observation_model(
+    annual_effects=true,
+)
 
 # Independent NB2 observation model.
 problem_independent = CalibrationProblem(
@@ -25,7 +34,7 @@ problem_independent = CalibrationProblem(
     start_year=setup.start_year,
     end_year=setup.end_year,
     age_breaks=setup.age_breaks,
-    observation_model=NB2Observation(sigma_prior),
+    observation_model=obs_independent,
 )
 
 # NB2 with shared annual random effects.
@@ -36,11 +45,7 @@ problem_annual = CalibrationProblem(
     start_year=setup.start_year,
     end_year=setup.end_year,
     age_breaks=setup.age_breaks,
-    observation_model=AnnualRandomEffectNB2Observation(
-        sigma_prior,
-        tau_prior;
-        quadrature_order=30,
-    ),
+    observation_model=obs_annual,
 )
 
 # Maximum-likelihood model comparison.

@@ -9,10 +9,7 @@ using DataFrames
 using CairoMakie
 
 include(joinpath(
-    @__DIR__,
-    "..",
-    "common",
-    "kiribati_setup.jl",
+    @__DIR__, "..", "common", "observation_models.jl"
 ))
 
 # ------------------------------------------------------------
@@ -25,22 +22,6 @@ setup = setup_dodd_analysis(
     output_years=2013:2025,
     use_historical_notifications=true,
     national_start_year=1980,
-)
-
-# ------------------------------------------------------------
-# Observation-model priors
-# ------------------------------------------------------------
-
-sigma_prior = truncated(
-    Normal(0.0, 0.3),
-    0.0,
-    Inf,
-)
-
-tau_prior = truncated(
-    Normal(0.0, 0.2),
-    0.0,
-    Inf,
 )
 
 # ------------------------------------------------------------
@@ -58,11 +39,7 @@ problem = CalibrationProblem(
         include_2024=false,
     ),
     age_breaks=setup.age_breaks,
-    observation_model=AnnualRandomEffectNB2Observation(
-        sigma_prior,
-        tau_prior;
-        quadrature_order=30,
-    ),
+    observation_model=kiribati_observation_model(),
 )
 
 # ------------------------------------------------------------

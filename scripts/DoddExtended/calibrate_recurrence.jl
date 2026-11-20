@@ -10,26 +10,10 @@ include(joinpath(
 const START_YEAR = 1970
 const END_YEAR = 2026
 
-data_dir = normpath(joinpath(@__DIR__, "..", "..", "data"))
-file(name) = joinpath(data_dir, name)
-
-age_breaks = [0, 5, 15, 25, 35, 45, 55, 65, 96]
-age_labels = [
-    "0-4", "5-14", "15-24", "25-34",
-    "35-44", "45-54", "55-64", "65+"
-]
 
 # ------------------------------------------------------------
 # Build model and load observations
 # ------------------------------------------------------------
-
-age_file = file("tb_notifications_by_age.csv")
-
-age_years = sort(unique(
-    Int(r.year)
-    for r in CSV.File(age_file)
-    if 2013 <= r.year < END_YEAR
-))
 
 setup = setup_dodd_analysis(
     start_year=START_YEAR,
@@ -51,6 +35,7 @@ model = DoddExtendedTBModel(
     reinfection=true,
 )
 
+# National and age-specific notifications
 national_counts = filter(
     r -> 1980 <= r.year <= 2025,
     setup.surveillance.national_notifications,
@@ -66,6 +51,7 @@ notifications = combine_notification_observations(
     end_year=END_YEAR,
 )
 
+# Recurrent notifications
 recurrence = RecurrentTBObservation(
     filter(
         r -> 1996 <= r.year <= 2024,
@@ -74,6 +60,7 @@ recurrence = RecurrentTBObservation(
     national_counts,
 )
 
+# Treatment outcomes
 treatment_deaths = TreatmentDeathObservation(
     filter(
         r -> 2012 <= r.year <= 2023,
