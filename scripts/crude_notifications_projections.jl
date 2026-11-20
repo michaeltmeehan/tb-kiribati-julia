@@ -29,7 +29,7 @@ using CairoMakie
 using Printf
 
 let
-    data_dir = normpath(joinpath(@__DIR__, "..", "data"))
+    data_dir = normpath(joinpath(@__DIR__, "..", "data", "processed", "surveillance"))
     output_dir = normpath(joinpath(@__DIR__, "..", "results", "notification_ageing"))
     mkpath(output_dir)
 
@@ -88,7 +88,7 @@ let
     # Properly pooled rates are weighted by the population exposure in each
     # age group. For annual population estimates, the summed populations serve
     # as the approximate total person-years of exposure.
-    rates_by_specification = Dict{String, Vector{Float64}}()
+    rates_by_specification = Dict{String,Vector{Float64}}()
     for (specification, years) in specifications
         summed_cases = zeros(n_ages)
         summed_exposures = zeros(n_ages)
@@ -101,14 +101,14 @@ let
         rates_by_specification[specification] = 1e5 .* summed_cases ./ summed_exposures
     end
 
-    rate_table = DataFrame(age_group = age_labels)
+    rate_table = DataFrame(age_group=age_labels)
     for (specification, _) in specifications
         rate_table[!, specification] = rates_by_specification[specification]
     end
     CSV.write(joinpath(output_dir, "fixed_age_specific_rates.csv"), rate_table)
 
     # Population-demography table, useful for checking the underlying change.
-    population_table = DataFrame(year = Int[], total_population = Float64[], share_65_plus = Float64[])
+    population_table = DataFrame(year=Int[], total_population=Float64[], share_65_plus=Float64[])
     for year in baseline_year:final_year
         pop = populations[year]
         push!(population_table, (year, sum(pop), pop[end] / sum(pop)))
@@ -117,19 +117,19 @@ let
 
     # Comprehensive annual projection table.
     projection = DataFrame(
-        specification = String[],
-        year = Int[],
-        total_population = Float64[],
-        share_65_plus = Float64[],
-        weighted_notification_rate = Float64[],
-        baseline_expected_cases = Float64[],
-        ageing_only_expected_cases = Float64[],
-        population_only_expected_cases = Float64[],
-        combined_expected_cases = Float64[],
-        ageing_pct = Float64[],
-        population_growth_pct = Float64[],
-        combined_pct = Float64[],
-        interaction_pct = Float64[],
+        specification=String[],
+        year=Int[],
+        total_population=Float64[],
+        share_65_plus=Float64[],
+        weighted_notification_rate=Float64[],
+        baseline_expected_cases=Float64[],
+        ageing_only_expected_cases=Float64[],
+        population_only_expected_cases=Float64[],
+        combined_expected_cases=Float64[],
+        ageing_pct=Float64[],
+        population_growth_pct=Float64[],
+        combined_pct=Float64[],
+        interaction_pct=Float64[],
     )
 
     for (specification, _) in specifications
@@ -154,19 +154,19 @@ let
             interaction_pct = combined_pct - ageing_pct - population_growth_pct
 
             push!(projection, (
-                specification = specification,
-                year = year,
-                total_population = total,
-                share_65_plus = proportions[end],
-                weighted_notification_rate = weighted_rate,
-                baseline_expected_cases = baseline_cases,
-                ageing_only_expected_cases = ageing_only_cases,
-                population_only_expected_cases = population_only_cases,
-                combined_expected_cases = combined_cases,
-                ageing_pct = ageing_pct,
-                population_growth_pct = population_growth_pct,
-                combined_pct = combined_pct,
-                interaction_pct = interaction_pct,
+                specification=specification,
+                year=year,
+                total_population=total,
+                share_65_plus=proportions[end],
+                weighted_notification_rate=weighted_rate,
+                baseline_expected_cases=baseline_cases,
+                ageing_only_expected_cases=ageing_only_cases,
+                population_only_expected_cases=population_only_cases,
+                combined_expected_cases=combined_cases,
+                ageing_pct=ageing_pct,
+                population_growth_pct=population_growth_pct,
+                combined_pct=combined_pct,
+                interaction_pct=interaction_pct,
             ))
         end
     end
@@ -188,14 +188,14 @@ let
     # Per-age contribution to the ageing-only change in expected notifications.
     # These contributions sum to ageing_only_expected_cases - baseline_expected_cases.
     contributions = DataFrame(
-        specification = String[],
-        year = Int[],
-        age_group = String[],
-        baseline_share = Float64[],
-        projected_share = Float64[],
-        fixed_notification_rate = Float64[],
-        ageing_only_case_change = Float64[],
-        ageing_pct_point_contribution = Float64[],
+        specification=String[],
+        year=Int[],
+        age_group=String[],
+        baseline_share=Float64[],
+        projected_share=Float64[],
+        fixed_notification_rate=Float64[],
+        ageing_only_case_change=Float64[],
+        ageing_pct_point_contribution=Float64[],
     )
     for (specification, _) in specifications
         rates = rates_by_specification[specification]
@@ -204,7 +204,7 @@ let
             future_proportions = populations[year] ./ sum(populations[year])
             for i in eachindex(age_labels)
                 case_change = baseline_total / 1e5 *
-                              (future_proportions[i] - baseline_proportions[i]) * rates[i]
+                    (future_proportions[i] - baseline_proportions[i]) * rates[i]
                 push!(contributions, (
                     specification, year, age_labels[i], baseline_proportions[i],
                     future_proportions[i], rates[i], case_change,
@@ -227,71 +227,71 @@ let
 
     # Figure 1: isolated effect of demographic ageing, for all rate specifications.
     colors = [:royalblue, :darkorange, :seagreen]
-    fig1 = Figure(size = (1050, 640))
+    fig1 = Figure(size=(1050, 640))
     ax1 = Axis(
         fig1[1, 1],
-        xlabel = "Year",
-        ylabel = "Change in expected notifications (%)",
-        title = "Kiribati TB: effect of changing age composition alone",
-        subtitle = "Total population fixed at 2023; age-specific notification rates held constant",
-        xticks = [2023, 2030, 2040, 2050],
+        xlabel="Year",
+        ylabel="Change in expected notifications (%)",
+        title="Kiribati TB: effect of changing age composition alone",
+        subtitle="Total population fixed at 2023; age-specific notification rates held constant",
+        xticks=[2023, 2030, 2040, 2050],
     )
-    hlines!(ax1, [0.0], color = (:gray, 0.6), linestyle = :dash)
+    hlines!(ax1, [0.0], color=(:gray, 0.6), linestyle=:dash)
     for (i, (specification, _)) in enumerate(specifications)
         sub = projection[projection.specification .== specification, :]
         lines!(ax1, sub.year, sub.ageing_pct,
-               linewidth = 3, color = colors[i], label = specification)
+            linewidth=3, color=colors[i], label=specification)
         points = [only(sub[sub.year .== year, :ageing_pct]) for year in milestones]
-        CairoMakie.scatter!(ax1, milestones, points, color = colors[i], markersize = 12)
+        CairoMakie.scatter!(ax1, milestones, points, color=colors[i], markersize=12)
     end
-    axislegend(ax1, position = :lt)
-    save(joinpath(output_dir, "ageing_only_three_specifications.png"), fig1, px_per_unit = 2)
+    axislegend(ax1, position=:lt)
+    save(joinpath(output_dir, "ageing_only_three_specifications.png"), fig1, px_per_unit=2)
 
     # Figure 2: separate population-size and age-composition effects, using
     # the recent (2019-2023) pooled rate specification as the primary analysis.
     sub = projection[projection.specification .== primary_specification, :]
-    fig2 = Figure(size = (1050, 640))
+    fig2 = Figure(size=(1050, 640))
     ax2 = Axis(
         fig2[1, 1],
-        xlabel = "Year",
-        ylabel = "Change in expected notifications (%)",
-        title = "Kiribati TB: demographic decomposition",
-        subtitle = "Fixed 2019-2023 pooled age-specific rates; 2023 population baseline",
-        xticks = [2023, 2030, 2040, 2050],
+        xlabel="Year",
+        ylabel="Change in expected notifications (%)",
+        title="Kiribati TB: demographic decomposition",
+        subtitle="Fixed 2019-2023 pooled age-specific rates; 2023 population baseline",
+        xticks=[2023, 2030, 2040, 2050],
     )
-    hlines!(ax2, [0.0], color = (:gray, 0.6), linestyle = :dash)
+    hlines!(ax2, [0.0], color=(:gray, 0.6), linestyle=:dash)
     scenarios = [
         ("Age composition only", :ageing_pct, :royalblue),
         ("Population size only", :population_growth_pct, :darkorange),
         ("Combined demographic effect", :combined_pct, :seagreen),
     ]
     for (label, column, color) in scenarios
-        lines!(ax2, sub.year, sub[!, column], linewidth = 3, color = color, label = label)
+        lines!(ax2, sub.year, sub[!, column], linewidth=3, color=color, label=label)
         points = [only(sub[sub.year .== year, column]) for year in milestones]
-        CairoMakie.scatter!(ax2, milestones, points, color = color, markersize = 12)
+        CairoMakie.scatter!(ax2, milestones, points, color=color, markersize=12)
     end
-    axislegend(ax2, position = :lt)
-    save(joinpath(output_dir, "demographic_decomposition_recent_pooled.png"), fig2, px_per_unit = 2)
+    axislegend(ax2, position=:lt)
+    save(joinpath(output_dir, "demographic_decomposition_recent_pooled.png"), fig2, px_per_unit=2)
 
     # Print requested horizon results without asserting that any increase must occur.
     println("\nTB notification demographic counterfactual (baseline: $baseline_year)")
     println("Age-specific rates held fixed; all percentage changes are relative to")
     println("the specification-specific expected notifications in $baseline_year.")
     @printf("2023 population: %.0f; share aged 65+: %.2f%%\n",
-            baseline_total, 100 * baseline_proportions[end])
+        baseline_total, 100 * baseline_proportions[end])
     println()
     for (specification, _) in specifications
         println(specification)
         @printf("  %-6s %12s %12s %12s %12s %15s\n",
-                "Year", "Ageing %", "Size %", "Total %", "Interact %", "Expected cases")
+            "Year", "Ageing %", "Size %", "Total %", "Interact %", "Expected cases")
         for year in milestones
             row = only(eachrow(projection[
                 (projection.specification .== specification) .& (projection.year .== year), :,
             ]))
             @printf("  %-6d %12.2f %12.2f %12.2f %12.2f %15.1f\n",
-                    year, row.ageing_pct, row.population_growth_pct,
-                    row.combined_pct, row.interaction_pct,
-                    row.combined_expected_cases)
+                year, row.ageing_pct, row.population_growth_pct,
+                row.combined_pct, row.interaction_pct,
+                row.combined_expected_cases)
         end
         println()
     end

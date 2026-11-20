@@ -78,13 +78,13 @@ function tbtrend_build_data(notifications, age_breaks, age_labels, years)
 
             exposure = pop_grouped[g]
             push!(rows, (
-                year = Int(year),
-                age_group = label,
-                age_index = g,
-                t = Float64(year - 2018),
-                cases = Int(c),
-                population = exposure,
-                observed_rate = 1e5 * c / exposure,
+                year=Int(year),
+                age_group=label,
+                age_index=g,
+                t=Float64(year - 2018),
+                cases=Int(c),
+                population=exposure,
+                observed_rate=1e5 * c / exposure,
             ))
         end
     end
@@ -118,15 +118,15 @@ function tbtrend_qpoisson(X, counts, population)
     V = Matrix{Float64}(GLM.vcov(model)) .* phi
 
     return (
-        model = model,
-        beta = beta,
-        vcov = V,
-        mu = mu,
-        df = df,
-        dispersion_pearson = phi_pearson,
-        dispersion_used = phi,
-        deviance = GLM.deviance(model),
-        pearson_chisq = pearson_chisq,
+        model=model,
+        beta=beta,
+        vcov=V,
+        mu=mu,
+        df=df,
+        dispersion_pearson=phi_pearson,
+        dispersion_used=phi,
+        deviance=GLM.deviance(model),
+        pearson_chisq=pearson_chisq,
     )
 end
 
@@ -143,16 +143,16 @@ function tbtrend_slope_summary(fit, k)
     p = 2 * ccdf(td, abs(b / se))
 
     return (
-        log_rate_ratio = b,
-        se_log_rate_ratio = se,
-        annual_rate_ratio = exp(b),
-        annual_rr_lower95 = exp(lo),
-        annual_rr_upper95 = exp(hi),
-        annual_change_pct = 100 * expm1(b),
-        annual_change_lower95_pct = 100 * expm1(lo),
-        annual_change_upper95_pct = 100 * expm1(hi),
-        decade_rate_ratio = exp(10 * b),
-        p_value = p,
+        log_rate_ratio=b,
+        se_log_rate_ratio=se,
+        annual_rate_ratio=exp(b),
+        annual_rr_lower95=exp(lo),
+        annual_rr_upper95=exp(hi),
+        annual_change_pct=100 * expm1(b),
+        annual_change_lower95_pct=100 * expm1(lo),
+        annual_change_upper95_pct=100 * expm1(hi),
+        decade_rate_ratio=exp(10 * b),
+        p_value=p,
     )
 end
 
@@ -160,7 +160,7 @@ end
 function tbtrend_by_age(data, age_labels, analysis)
     summary_rows = NamedTuple[]
     pred_rows = NamedTuple[]
-    fits = Dict{String, Any}()
+    fits = Dict{String,Any}()
 
     for label in age_labels
         d = data[data.age_group .== label, :]
@@ -172,15 +172,15 @@ function tbtrend_by_age(data, age_labels, analysis)
         stats = tbtrend_slope_summary(fit, 2)
 
         push!(summary_rows, merge((
-            analysis = analysis,
-            age_group = label,
-            start_year = minimum(d.year),
-            end_year = maximum(d.year),
-            n_years = n,
-            total_cases = sum(d.cases),
-            dispersion_pearson = fit.dispersion_pearson,
-            dispersion_used = fit.dispersion_used,
-            residual_df = fit.df,
+            analysis=analysis,
+            age_group=label,
+            start_year=minimum(d.year),
+            end_year=maximum(d.year),
+            n_years=n,
+            total_cases=sum(d.cases),
+            dispersion_pearson=fit.dispersion_pearson,
+            dispersion_used=fit.dispersion_used,
+            residual_df=fit.df,
         ), stats))
 
         tdcrit = quantile(TDist(fit.df), 0.975)
@@ -194,17 +194,17 @@ function tbtrend_by_age(data, age_labels, analysis)
                 sqrt(fit.dispersion_used * fitted_cases)
 
             push!(pred_rows, (
-                analysis = analysis,
-                year = d.year[i],
-                age_group = label,
-                cases = d.cases[i],
-                population = d.population[i],
-                observed_rate = d.observed_rate[i],
-                fitted_cases = fitted_cases,
-                fitted_rate = rate,
-                fitted_rate_lower95 = 1e5 * exp(eta - tdcrit * se_eta),
-                fitted_rate_upper95 = 1e5 * exp(eta + tdcrit * se_eta),
-                scaled_pearson_residual = pearson_resid,
+                analysis=analysis,
+                year=d.year[i],
+                age_group=label,
+                cases=d.cases[i],
+                population=d.population[i],
+                observed_rate=d.observed_rate[i],
+                fitted_cases=fitted_cases,
+                fitted_rate=rate,
+                fitted_rate_lower95=1e5 * exp(eta - tdcrit * se_eta),
+                fitted_rate_upper95=1e5 * exp(eta + tdcrit * se_eta),
+                scaled_pearson_residual=pearson_resid,
             ))
         end
     end
@@ -243,15 +243,15 @@ function tbtrend_joint_tests(data, age_labels)
         f_statistic = numerator / full.dispersion_used
         pvalue = ccdf(FDist(q, full.df), f_statistic)
         return (
-            comparison = label,
-            numerator_df = q,
-            denominator_df = full.df,
-            reduced_deviance = reduced.deviance,
-            full_deviance = full.deviance,
-            dispersion_pearson = full.dispersion_pearson,
-            dispersion_used = full.dispersion_used,
-            F_statistic = f_statistic,
-            p_value = pvalue,
+            comparison=label,
+            numerator_df=q,
+            denominator_df=full.df,
+            reduced_deviance=reduced.deviance,
+            full_deviance=full.deviance,
+            dispersion_pearson=full.dispersion_pearson,
+            dispersion_used=full.dispersion_used,
+            F_statistic=f_statistic,
+            p_value=pvalue,
         )
     end
 
@@ -262,39 +262,39 @@ function tbtrend_joint_tests(data, age_labels)
     ])
 
     common_slope = tbtrend_slope_summary(m1, g + 1)
-    return tests, common_slope, (m0 = m0, m1 = m1, m2 = m2)
+    return tests, common_slope, (m0=m0, m1=m1, m2=m2)
 end
 
 
 function tbtrend_plot_rates(predictions, age_labels, outdir)
     fig = Figure(size=(1360, 1500), fontsize=18)
     Label(fig[0, 1:2],
-          "Kiribati TB notification rates: observed and quasi-Poisson trends (2013–2023)";
-          fontsize=23, tellwidth=false)
+        "Kiribati TB notification rates: observed and quasi-Poisson trends (2013–2023)";
+        fontsize=23, tellwidth=false)
 
     for (g, label) in enumerate(age_labels)
         row = div(g - 1, 2) + 1
         col = mod(g - 1, 2) + 1
         ax = Axis(fig[row, col];
-                  title="Age $label", xlabel="Year",
-                  ylabel="Notifications per 100,000",
-                  xticks=2013:2:2023)
+            title="Age $label", xlabel="Year",
+            ylabel="Notifications per 100,000",
+            xticks=2013:2:2023)
         sub = predictions[predictions.age_group .== label, :]
         sort!(sub, :year)
         years = Float64.(sub.year)
 
         CairoMakie.band!(ax, years, sub.fitted_rate_lower95,
-                         sub.fitted_rate_upper95; color=(:steelblue, 0.20))
+            sub.fitted_rate_upper95; color=(:steelblue, 0.20))
         CairoMakie.lines!(ax, years, sub.fitted_rate;
-                          color=:steelblue, linewidth=3)
+            color=:steelblue, linewidth=3)
         CairoMakie.scatter!(ax, years, sub.observed_rate;
-                            color=:black, markersize=11)
+            color=:black, markersize=11)
         CairoMakie.xlims!(ax, 2012.5, 2023.5)
     end
 
     Label(fig[5, 1:2],
-          "Dots: observed rates  |  Blue: fitted log-linear rate  |  Shading: 95% CI for fitted mean";
-          fontsize=15, tellwidth=false)
+        "Dots: observed rates  |  Blue: fitted log-linear rate  |  Shading: 95% CI for fitted mean";
+        fontsize=15, tellwidth=false)
     save(joinpath(outdir, "rates_observed_and_fitted.png"), fig)
     return fig
 end
@@ -309,9 +309,9 @@ function tbtrend_plot_slope_sensitivity(trends, age_labels, outdir)
 
     fig = Figure(size=(1200, 670), fontsize=18)
     ax = Axis(fig[1, 1];
-              title="Estimated annual change in age-specific TB notification rates",
-              ylabel="Annual change (%)", xlabel="Age group",
-              xticks=(1:length(age_labels), age_labels))
+        title="Estimated annual change in age-specific TB notification rates",
+        ylabel="Annual change (%)", xlabel="Age group",
+        xticks=(1:length(age_labels), age_labels))
     CairoMakie.hlines!(ax, [0.0]; color=:gray50, linestyle=:dash, linewidth=2)
 
     for (which, caption, col, marker, shift) in analyses
@@ -325,11 +325,11 @@ function tbtrend_plot_slope_sensitivity(trends, age_labels, outdir)
         end
         for j in eachindex(xpos)
             CairoMakie.lines!(ax, [xpos[j], xpos[j]],
-                              [d.annual_change_lower95_pct[j], d.annual_change_upper95_pct[j]];
-                              color=col, linewidth=2)
+                [d.annual_change_lower95_pct[j], d.annual_change_upper95_pct[j]];
+                color=col, linewidth=2)
         end
         CairoMakie.scatter!(ax, xpos, d.annual_change_pct;
-                            color=col, marker=marker, markersize=16, label=caption)
+            color=col, marker=marker, markersize=16, label=caption)
     end
     CairoMakie.axislegend(ax; position=:rt)
     CairoMakie.xlims!(ax, 0.5, length(age_labels) + 0.5)
@@ -341,18 +341,18 @@ end
 function tbtrend_plot_residuals(predictions, age_labels, outdir)
     fig = Figure(size=(1100, 540), fontsize=17)
     ax = Axis(fig[1, 1];
-              title="Scaled Pearson residuals: main 2013–2023 age-specific fits",
-              xlabel="Year", ylabel="Age group",
-              xticks=(2013:2023, string.(2013:2023)),
-              yticks=(1:length(age_labels), age_labels))
+        title="Scaled Pearson residuals: main 2013–2023 age-specific fits",
+        xlabel="Year", ylabel="Age group",
+        xticks=(2013:2023, string.(2013:2023)),
+        yticks=(1:length(age_labels), age_labels))
 
     xs = Float64.(predictions.year)
     ys = Float64[findfirst(==(label), age_labels) for label in predictions.age_group]
     cs = Float64.(predictions.scaled_pearson_residual)
     bound = max(2.0, maximum(abs.(cs)))
     hm = CairoMakie.scatter!(ax, xs, ys;
-                             color=cs, colormap=:balance, colorrange=(-bound, bound),
-                             marker=:rect, markersize=29)
+        color=cs, colormap=:balance, colorrange=(-bound, bound),
+        marker=:rect, markersize=29)
     Colorbar(fig[1, 2], hm; label="Scaled Pearson residual")
     save(joinpath(outdir, "scaled_pearson_residuals.png"), fig)
     return fig
@@ -365,7 +365,7 @@ function tbtrend_main()
     isdefined(Main, :aggregate_age_groups) || error(
         "Load the project's aggregate_age_groups(population, breaks) function before including this script.")
 
-    data_dir = normpath(joinpath(@__DIR__, "..", "data"))
+    data_dir = normpath(joinpath(@__DIR__, "..", "data", "processed", "surveillance"))
     output_dir = normpath(joinpath(@__DIR__, "..", "results", "notification_temporal_trends"))
     mkpath(output_dir)
 
@@ -397,7 +397,7 @@ function tbtrend_main()
         end
     end
     trends = vcat(all_summaries...)
-    trends[!, :p_bh_age8] = fill!(Vector{Union{Missing, Float64}}(undef, nrow(trends)), missing)
+    trends[!, :p_bh_age8] = fill!(Vector{Union{Missing,Float64}}(undef, nrow(trends)), missing)
     idx = findall(trends.analysis .== "all_2013_2023")
     trends[idx, :p_bh_age8] = tbtrend_bh(trends.p_value[idx])
 
@@ -416,24 +416,24 @@ function tbtrend_main()
     println("Phi used = max(1, Pearson χ² / residual df).")
     println("\nAge-specific annual rate changes, main 2013–2023 fit:")
     @printf("%-9s %12s %24s %12s %11s %11s\n",
-            "Age", "Change %/yr", "95% CI (%)", "p", "BH p", "phi")
+        "Age", "Change %/yr", "95% CI (%)", "p", "BH p", "phi")
     main_rows = trends[trends.analysis .== "all_2013_2023", :]
     for row in eachrow(main_rows)
         @printf("%-9s %+11.2f%%  [%+8.2f, %+8.2f]  %11.4g %11.4g %11.2f\n",
-                row.age_group, row.annual_change_pct,
-                row.annual_change_lower95_pct, row.annual_change_upper95_pct,
-                row.p_value, row.p_bh_age8, row.dispersion_used)
+            row.age_group, row.annual_change_pct,
+            row.annual_change_lower95_pct, row.annual_change_upper95_pct,
+            row.p_value, row.p_bh_age8, row.dispersion_used)
     end
 
     println("\nShared annual trend (pooled quasi-Poisson model, adjusted for age group):")
     @printf("  %+0.2f%% per year [95%% CI %+0.2f%% to %+0.2f%%]\n",
-            common_trend.annual_change_pct,
-            common_trend.annual_change_lower95_pct,
-            common_trend.annual_change_upper95_pct)
+        common_trend.annual_change_pct,
+        common_trend.annual_change_lower95_pct,
+        common_trend.annual_change_upper95_pct)
     println("\nNested-model quasi-deviance approximate F tests:")
     for row in eachrow(tests)
         @printf("  %-49s F(%d, %d)=%.3f; p=%.4g\n", row.comparison,
-                row.numerator_df, row.denominator_df, row.F_statistic, row.p_value)
+            row.numerator_df, row.denominator_df, row.F_statistic, row.p_value)
     end
     println("\nOutputs: ", output_dir)
     println("  counts_and_population_offsets.csv")
@@ -447,7 +447,7 @@ function tbtrend_main()
     println("observation-process changes and period effects remain possible. These CIs")
     println("are conditional on the denominators supplied by get_population().")
     return (data=data, trends=trends, predictions=full_predictions,
-            tests=tests, common_trend=common_trend)
+        tests=tests, common_trend=common_trend)
 end
 
 # Results are returned so they can be inspected interactively if desired.

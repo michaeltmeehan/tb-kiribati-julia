@@ -20,12 +20,8 @@ setup = setup_dodd_analysis(
     output_years=2013:2025,
 )
 
-data_dir = normpath(
-    joinpath(@__DIR__, "..", "..", "data")
-)
-
 presentation = load_kiribati_presentation(
-    data_dir;
+    setup.surveillance_dir;
     years=2007:2012,
 ).presentation
 

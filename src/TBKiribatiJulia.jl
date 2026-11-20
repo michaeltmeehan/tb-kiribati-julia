@@ -193,7 +193,6 @@ export model_output, model_outputs
 export sample_prior
 
 export nb2_loglikelihood, notification_loglikelihood
-export calibration_predictions
 export NB2Observation
 
 export CalibrationProblem, model_draw, predict,

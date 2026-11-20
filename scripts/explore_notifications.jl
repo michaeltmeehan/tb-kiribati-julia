@@ -3,7 +3,7 @@ using DataFrames
 using Statistics
 using CairoMakie
 
-const DATA_DIR = normpath(joinpath(@__DIR__, "..", "data"))
+const DATA_DIR = normpath(joinpath(@__DIR__, "..", "data", "processed", "surveillance"))
 
 notifications = CSV.read(
     joinpath(DATA_DIR, "tb_notifications_by_age.csv"),
@@ -32,9 +32,9 @@ const YEARS = 2013.:2023.
 # ---------------------------------------------------------------------------
 
 rates = DataFrame(
-    year = Float64[],
-    age_group = String[],
-    notification_rate = Float64[],
+    year=Float64[],
+    age_group=String[],
+    notification_rate=Float64[],
 )
 
 for year in YEARS
@@ -69,9 +69,9 @@ for year in YEARS
         push!(
             rates,
             (
-                year = year,
-                age_group = age_group,
-                notification_rate = rate,
+                year=year,
+                age_group=age_group,
+                notification_rate=rate,
             ),
         )
     end
@@ -88,14 +88,14 @@ age_index = Dict(label => i for (i, label) in enumerate(AGE_LABELS))
 x = [age_index[a] for a in rates.age_group]
 y = rates.notification_rate
 
-fig = Figure(size = (1000, 600))
+fig = Figure(size=(1000, 600))
 
 ax = Axis(
     fig[1, 1],
-    xlabel = "Age group",
-    ylabel = "TB notifications per 100,000",
-    title = "Age-specific TB notification rates, Kiribati 2013–2023",
-    xticks = (1:length(AGE_LABELS), AGE_LABELS),
+    xlabel="Age group",
+    ylabel="TB notifications per 100,000",
+    title="Age-specific TB notification rates, Kiribati 2013–2023",
+    xticks=(1:length(AGE_LABELS), AGE_LABELS),
 )
 
 CairoMakie.boxplot!(
@@ -109,13 +109,13 @@ jitter_width = 0.12
 
 x_jittered =
     x .+
-    jitter_width .* (2 .* rand(length(x)) .- 1)
+        jitter_width .* (2 .* rand(length(x)) .- 1)
 
 CairoMakie.scatter!(
     ax,
     x_jittered,
     y,
-    markersize = 8,
+    markersize=8,
 )
 
 fig

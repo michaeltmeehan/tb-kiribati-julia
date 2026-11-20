@@ -34,11 +34,14 @@ age_years = sort(unique(
 setup = setup_dodd_analysis(
     start_year=START_YEAR,
     end_year=END_YEAR,
-    output_years=age_years,
+    output_years=2013:2025,
 )
 
+age_breaks = setup.age_breaks
+age_labels = setup.age_labels
+
 presentation_data = load_kiribati_presentation(
-    data_dir;
+    setup.surveillance_dir;
     years=2007:2012,
 )
 
@@ -48,37 +51,33 @@ model = DoddExtendedTBModel(
     reinfection=true,
 )
 
-national_counts = load_annual_counts(
-    file("tb_notifications_total.csv");
-    years=1980:2025,
+national_counts = filter(
+    r -> 1980 <= r.year <= 2025,
+    setup.surveillance.national_notifications,
 )
 
-age_observations = load_notification_observations(
-    age_file;
-    age_labels=age_labels,
-    years=age_years,
-)
+age_observations = setup.age_observations
 
 notifications = combine_notification_observations(
     age_observations,
     national_counts;
-    n_age_groups=8,
+    n_age_groups=length(age_labels),
     start_year=START_YEAR,
     end_year=END_YEAR,
 )
 
 recurrence = RecurrentTBObservation(
-    load_annual_counts(
-        file("tb_recurrent_notifications.csv");
-        years=1996:2024,
+    filter(
+        r -> 1996 <= r.year <= 2024,
+        setup.surveillance.recurrent_notifications,
     ),
     national_counts,
 )
 
 treatment_deaths = TreatmentDeathObservation(
-    load_treatment_outcomes(
-        file("tb_treatment_outcomes_main.csv");
-        years=2012:2023,
+    filter(
+        r -> 2012 <= r.year <= 2023,
+        setup.surveillance.treatment_outcomes,
     ),
 )
 

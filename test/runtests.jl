@@ -36,5 +36,7 @@ using TBKiribatiJulia
 
     @testset "Inference" begin
         include("inference/likelihoods.jl")
+        include("inference/calibration_foundation.jl")
+        include("inference/optimisation.jl")
     end
 end

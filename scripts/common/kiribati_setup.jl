@@ -3,6 +3,8 @@ using TBKiribatiJulia
 using CSV
 using DataFrames
 
+include(joinpath(@__DIR__, "kiribati_paths.jl"))
+
 """
     setup_dodd_analysis(;
         start_year=1970,
@@ -35,14 +37,17 @@ function setup_dodd_analysis(;
 
     root = normpath(joinpath(@__DIR__, "..", ".."))
 
-    data_dir = joinpath(root, "data")
+    paths = kiribati_data_paths(root)
+
+    data_dir = paths.data
+    surveillance_dir = paths.surveillance
     output_dir = joinpath(root, "results", "Dodd")
 
-    demographic_dir = data_dir
-    contact_file = joinpath(data_dir, "contact")
+    demographic_dir = paths.legacy_demography
+    contact_file = paths.legacy_contact
 
     notification_file = joinpath(
-        data_dir,
+        surveillance_dir,
         "tb_notifications_by_age.csv",
     )
 
@@ -109,7 +114,7 @@ function setup_dodd_analysis(;
     )
 
     surveillance = load_kiribati_surveillance(
-        data_dir;
+        surveillance_dir;
         age_labels=age_labels,
         age_years=years,
     )
@@ -161,5 +166,9 @@ function setup_dodd_analysis(;
         output_years=years,
         data_dir=data_dir,
         output_dir=output_dir,
+        paths=paths,
+        surveillance_dir=surveillance_dir,
+        demographic_dir=demographic_dir,
+        contact_file=contact_file,
     )
 end

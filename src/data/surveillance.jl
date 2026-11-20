@@ -272,7 +272,6 @@ end
     load_kiribati_surveillance(data_dir;
         age_labels,
         age_years=2013:2025,
-        historical_age_years=2007:2011,
     )
 
 Load all eight cleaned WHO datasets.
@@ -284,7 +283,6 @@ function load_kiribati_surveillance(
     data_dir::AbstractString;
     age_labels,
     age_years=2013:2025,
-    historical_age_years=2007:2011,
 )
     file(name) = joinpath(data_dir, name)
 
@@ -308,11 +306,6 @@ function load_kiribati_surveillance(
         ),
         treatment_outcomes_all=load_treatment_outcomes(
             file("tb_treatment_outcomes.csv"),
-        ),
-        historical_new_by_age=load_notification_observations(
-            file("tb_new_notifications_by_age_2007_2011.csv");
-            age_labels,
-            years=historical_age_years,
         ),
         historical_new_by_type=load_historical_notification_types(
             file("tb_historical_new_notifications_by_age_and_type.csv"),
