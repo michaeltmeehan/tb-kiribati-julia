@@ -37,6 +37,8 @@ struct CalibrationProblem{M,D,O,Q,P,S}
     recurrence::Union{
         Nothing,RecurrentTBObservation
     }
+
+    site::Union{Nothing,SiteTBObservation}
 end
 
 
@@ -48,6 +50,7 @@ function CalibrationProblem(
     end_year::Integer,
     treatment_deaths=nothing,
     recurrence=nothing,
+    site=nothing,
     age_breaks,
     observation_model=NB2Observation(
         truncated(Normal(0, 0.3), 0, Inf)
@@ -134,6 +137,11 @@ function CalibrationProblem(
         ))
     end
 
+    if !isnothing(site)
+        all(r -> start_year <= r.year < end_year, site.rows) ||
+            throw(ArgumentError("Site year outside simulation interval"))
+    end
+
     prior = merge(
         priors(model),
         observation_priors(observation_model),
@@ -159,6 +167,7 @@ function CalibrationProblem(
         Int(end_year),
         treatment_deaths,
         recurrence,
+        site,
     )
 end
 
@@ -189,49 +198,110 @@ function model_draw(
 end
 
 
-"""
-    predict(problem, theta)
+calibration_diagnostic_variables(model::AbstractTBModel) =
+    default_output_variables(model)
 
-Simulate the model and calculate annual predictions
-required by the calibration likelihood.
+calibration_diagnostic_variables(model::DoddExtendedTBModel) = (
+    default_output_variables(model)...,
+    :active_prevalence,
+    :untreated_active_prevalence,
+    :latent_prevalence,
+    :treatment_prevalence,
+    :disease_onsets,
+    :treatment_initiations,
+    :tb_deaths,
+    :treatment_deaths,
+)
+
+"""
+    predict(problem, theta; variables=:likelihood, years=nothing)
+
+Simulate once and extract age-aggregated annual predictions.
+
+`variables=:likelihood` extracts only likelihood-required outputs.
+`variables=nothing` extracts the full diagnostic output set.
+An explicit tuple selects additional outputs.
+
+`years` can extend the prediction period, provided all observation
+years remain included and the simulation interval is respected.
 """
 function predict(
     problem::CalibrationProblem,
-    theta::NamedTuple,
+    theta::NamedTuple;
+    variables=:likelihood,
+    years=nothing,
 )
+    required = Symbol[:notifications]
+    observation_years = [obs.year for obs in problem.observations]
+
+    if !isnothing(problem.recurrence)
+        push!(required, :recurrent_notifications)
+        append!(
+            observation_years,
+            (r.year for r in problem.recurrence.rows),
+        )
+    end
+
+    if !isnothing(problem.site)
+        append!(
+            required,
+            (:pulmonary_notifications, :extrapulmonary_notifications),
+        )
+        append!(
+            observation_years,
+            (r.year for r in problem.site.rows),
+        )
+    end
+
+    sort!(observation_years)
+    unique!(observation_years)
+
+    requested = if variables === :likelihood
+        Tuple(required)
+    elseif isnothing(variables)
+        calibration_diagnostic_variables(problem.model)
+    elseif variables isa Tuple && all(v -> v isa Symbol, variables)
+        variables
+    else
+        throw(ArgumentError(
+            "variables must be :likelihood, nothing, or a tuple of Symbols"
+        ))
+    end
+
+    selected = Tuple(unique(vcat(collect(requested), required)))
+
+    prediction_years = isnothing(years) ?
+                       observation_years : Int.(collect(years))
+
+    isempty(prediction_years) &&
+        throw(ArgumentError("No prediction years"))
+
+    length(unique(prediction_years)) == length(prediction_years) ||
+        throw(ArgumentError("Duplicate prediction years"))
+
+    all(y -> problem.start_year <= y < problem.end_year, prediction_years) ||
+        throw(ArgumentError("Prediction year outside simulation interval"))
+
+    all(y -> y in prediction_years, observation_years) ||
+        throw(ArgumentError(
+            "Prediction years must include all observation years"
+        ))
+
+    sort!(prediction_years)
+
     sol = simulate_from_draw(
         problem.simulation,
         model_draw(problem, theta),
     )
 
     successful_retcode(sol) ||
-        throw(ErrorException(
-            "ODE simulation failed: $(sol.retcode)"
-        ))
-
-    years = [obs.year for obs in problem.observations]
-    variables = (:notifications,)
-
-    if !isnothing(problem.recurrence)
-        append!(
-            years,
-            (r.year for r in problem.recurrence.rows),
-        )
-
-        variables = (
-            :notifications,
-            :recurrent_notifications,
-        )
-    end
-
-    sort!(years)
-    unique!(years)
+        throw(ErrorException("ODE simulation failed: $(sol.retcode)"))
 
     return model_outputs(
         problem.model,
         sol;
-        variables,
-        years,
+        variables=selected,
+        years=prediction_years,
         age_breaks=problem.age_breaks,
     )
 end
@@ -293,7 +363,11 @@ function calibration_loglikelihood(
 
     isfinite(ll_recurrence) || return -Inf
 
-    return ll_notifications + ll_deaths + ll_recurrence
+    ll_site = site_loglikelihood(problem.site, out)
+
+    isfinite(ll_site) || return -Inf
+
+    return ll_notifications + ll_deaths + ll_recurrence + ll_site
 end
 
 

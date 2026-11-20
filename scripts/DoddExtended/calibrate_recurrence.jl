@@ -60,6 +60,12 @@ recurrence = RecurrentTBObservation(
     national_counts,
 )
 
+# Site-specific notifications
+site = SiteTBObservation(filter(
+    r -> START_YEAR <= r.year < END_YEAR,
+    setup.surveillance.site_notifications,
+))
+
 # Treatment outcomes
 treatment_deaths = TreatmentDeathObservation(
     filter(
@@ -85,6 +91,7 @@ function make_problem(recurrence_observation)
         observation_model=observation_model,
         treatment_deaths=treatment_deaths,
         recurrence=recurrence_observation,
+        site=site,
     )
 end
 

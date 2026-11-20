@@ -102,6 +102,7 @@ include("inference/likelihoods.jl")
 include("inference/notifications.jl")
 include("inference/treatment_deaths.jl")
 include("inference/recurrence.jl")
+include("inference/site.jl")
 
 # Calibration and optimisation
 include("inference/calibration.jl")
@@ -222,6 +223,8 @@ export TreatmentDeathObservation,
 
 export RecurrentTBObservation,
     recurrence_loglikelihood
+
+export SiteTBObservation, site_loglikelihood
 
 # Analysis
 export sensitivity_data,

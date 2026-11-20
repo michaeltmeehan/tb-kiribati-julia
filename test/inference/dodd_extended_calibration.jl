@@ -56,6 +56,11 @@ include(joinpath(
         ),
     )
 
+    site = SiteTBObservation(filter(
+        r -> 2013 <= r.year <= 2025,
+        setup.surveillance.site_notifications,
+    ))
+
     observation_model = AnnualRandomEffectNB2Observation(
         truncated(Normal(0.0, 0.3), 0.0, Inf),
         truncated(Normal(0.0, 0.3), 0.0, Inf);
@@ -72,6 +77,7 @@ include(joinpath(
         observation_model,
         treatment_deaths=deaths,
         recurrence,
+        site,
     )
 
     # Parameter construction
@@ -90,6 +96,51 @@ include(joinpath(
 
     # One simulation, all required outputs
     output = predict(problem, theta)
+
+    @test :pulmonary_notifications in keys(output)
+    @test :extrapulmonary_notifications in keys(output)
+
+    @test all(isfinite, output.pulmonary_notifications)
+    @test all(isfinite, output.extrapulmonary_notifications)
+
+    @test all(isapprox.(
+        output.notifications,
+        output.pulmonary_notifications .+
+            output.extrapulmonary_notifications;
+        atol=1e-5,
+    ))
+
+    # Full diagnostic extraction
+    full = predict(problem, theta; variables=nothing)
+
+    @test :incidence in keys(full)
+    @test :mortality in keys(full)
+    @test :reinfections in keys(full)
+    @test :active_prevalence in keys(full)
+    @test :latent_prevalence in keys(full)
+
+    @test full.notifications ≈ output.notifications
+
+    @test calibration_loglikelihood(
+        problem, theta; output=full
+    ) ≈ calibration_loglikelihood(
+        problem, theta; output=output
+    )
+
+    # Selected outputs
+    selected = predict(
+        problem, theta;
+        variables=(:incidence,),
+    )
+
+    @test :incidence in keys(selected)
+    @test :recurrent_notifications in keys(selected)
+    @test :pulmonary_notifications in keys(selected)
+    @test :extrapulmonary_notifications in keys(selected)
+
+    @test_throws ArgumentError predict(
+        problem, theta; years=[2024]
+    )
 
     @test :notifications in keys(output)
     @test :recurrent_notifications in keys(output)
@@ -125,6 +176,9 @@ include(joinpath(
         output,
     )
 
+    ll_site = site_loglikelihood(problem.site, output)
+    @test isfinite(ll_site)
+
     @test isfinite(ll_notifications)
     @test isfinite(ll_deaths)
     @test isfinite(ll_recurrence)
@@ -137,7 +191,7 @@ include(joinpath(
     )
 
     @test ll_total ≈
-        ll_notifications + ll_deaths + ll_recurrence
+        ll_notifications + ll_deaths + ll_recurrence + ll_site
 
     @test isfinite(calibration_logprior(
         problem, theta

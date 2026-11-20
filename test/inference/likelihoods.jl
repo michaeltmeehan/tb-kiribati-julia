@@ -351,5 +351,50 @@ const TB = TBKiribatiJulia
         )
     end
 
+    @testset "Conditional pulmonary / extrapulmonary likelihood" begin
+        TB = TBKiribatiJulia
+
+        obs = TB.SiteTBObservation([
+            (year=2023, pulmonary=70, extrapulmonary=30, total=100),
+            (year=2024, pulmonary=24, extrapulmonary=16, total=40),
+        ])
+
+        output = (
+            years=[2023, 2024],
+            pulmonary_notifications=[20.0 6.0; 50.0 18.0],
+            extrapulmonary_notifications=[10.0 4.0; 20.0 12.0],
+        )
+
+        expected = logpdf(Binomial(100, 0.7), 70) +
+            logpdf(Binomial(40, 0.6), 24)
+
+        @test TB.site_loglikelihood(obs, output) ≈ expected
+        @test TB.site_loglikelihood(nothing, output) == 0.0
+
+        @test_throws ArgumentError TB.SiteTBObservation([
+            (year=2023, pulmonary=70, extrapulmonary=31, total=100),
+        ])
+
+        @test_throws ArgumentError TB.SiteTBObservation([
+            (year=2023, pulmonary=70, extrapulmonary=30, total=100),
+            (year=2023, pulmonary=70, extrapulmonary=30, total=100),
+        ])
+
+        @test_throws ArgumentError TB.site_loglikelihood(obs, (
+            years=[2023, 2024],
+            pulmonary_notifications=output.pulmonary_notifications,
+        ))
+
+        @test_throws ArgumentError TB.site_loglikelihood(
+            obs,
+            merge(output, (years=[2025, 2024],)),
+        )
+
+        invalid = merge(output, (
+            extrapulmonary_notifications=fill(-1.0, 2, 2),
+        ))
+
+        @test TB.site_loglikelihood(obs, invalid) == -Inf
+    end
 
 end
