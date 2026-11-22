@@ -96,12 +96,21 @@ function draw(beta; extended=false)
     )
 
     return extended ? merge(
-        Base.structdiff(base, (; untreated_cfr=base.untreated_cfr)),
+        Base.structdiff(
+            base,
+            (
+                duration=base.duration,
+                untreated_cfr=base.untreated_cfr,
+            ),
+        ),
         TB.extended_fixed_parameters(),
         (
-            untreated_cfr_sp=0.70,
-            untreated_cfr_sn=0.20,
-            untreated_cfr_ep=0.20,
+            duration_sp=1.6,
+            duration_sn=5.35,
+            duration_ep=3.0,
+            untreated_cfr_sp=0.7,
+            untreated_cfr_sn=0.2,
+            untreated_cfr_ep=0.2,
         ),
     ) : base
 end
@@ -161,7 +170,7 @@ end # module
 
             @test layout.nages == 96
             @test layout.nepi == (extended ? 13 : 6)
-            @test layout.ncum == (extended ? 16 : 10)
+            @test layout.ncum == (extended ? 25 : 10)
 
             params, u0 = F.initialise(
                 model, demography, 3.0;

@@ -81,7 +81,9 @@ function priors(model::DoddExtendedTBModel)
         detection_trend=Gamma(1., 0.02),
         detection_or_0_4=LogNormal(-0.100, 0.626),
         detection_or_5_14=LogNormal(-0.567, 0.458),
-        duration=LogNormal(1.1, 0.2),
+        duration_sp=LogNormal(log(1.6), 0.20),
+        duration_sn=LogNormal(log(5.35), 0.30),
+        duration_ep=LogNormal(log(3.0), 0.40),
         untreated_cfr_sp=Beta(14, 6),
         untreated_cfr_sn=Beta(4, 16),
         untreated_cfr_ep=Beta(4, 16),
@@ -145,10 +147,20 @@ function make_parameters(
     ν = fill(x(:nu), nages)
     ω = fill(x(:omega), nages)
 
-    duration = T[
-        age < 15 ? T(0.5) : x(:duration)
-        for age in 0:(nages-1)
+    adult_duration = T[
+        x(:duration_sp),
+        x(:duration_sn),
+        x(:duration_ep),
     ]
+
+    # Preserve the existing 0.5-year childhood assumption.
+    # Presentation-specific durations apply from age 15 onward.
+    duration = Matrix{T}(undef, nages, 3)
+
+    for a in 1:nages, k in 1:3
+        duration[a, k] =
+            a <= 15 ? T(0.5) : adult_duration[k]
+    end
 
     fatality = T[
         x(:untreated_cfr_sp),
@@ -196,8 +208,11 @@ function make_parameters(
         throw(ArgumentError("Invalid treatment CFR"))
 
     all(v -> isfinite(v) && v > 0,
-        (x(:duration), q_negative, d_negative, d_extra)) ||
-        throw(ArgumentError("Invalid duration or presentation rate"))
+        (adult_duration...,
+            q_negative, d_negative, d_extra)) ||
+        throw(ArgumentError(
+            "Invalid untreated duration or presentation parameter"
+        ))
 
     all(v -> isfinite(v) && v >= 0, ε) ||
         throw(ArgumentError("Invalid fast progression"))
@@ -211,12 +226,21 @@ function make_parameters(
     all(v -> isfinite(v) && v >= 0, relative_detection_age) ||
         throw(ArgumentError("Invalid detection multipliers"))
 
-    γ = (one(T) .- reshape(fatality, 1, 3)) ./
-        reshape(duration, :, 1)
+    γ = (one(T) .- reshape(fatality, 1, 3)) ./ duration
+    μ = reshape(fatality, 1, 3) ./ duration
 
-    μ = reshape(fatality, 1, 3) ./
-        reshape(duration, :, 1)
-    detection_multiplier = relative_detection_age ./ duration
+    # Detection hazards are not determined by the
+    # presentation-specific natural-history durations.
+    #
+    # Preserve the original reference scale:
+    # 0.5 years for children, 3 years for adults.
+    detection_reference_duration = T[
+        age < 15 ? T(0.5) : T(3.0)
+        for age in 0:(nages-1)
+    ]
+
+    detection_multiplier =
+        relative_detection_age ./ detection_reference_duration
 
     return DoddExtendedTBParameters(
         Λ0, β, ψ, κ,

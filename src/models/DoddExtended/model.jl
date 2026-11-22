@@ -108,8 +108,15 @@ function DoddExtendedTBModel(
     # Model construction
     # -------------------------------------------------------
 
+    nepi = DE.R
+    nstates_total = DE.CumSelfCureEP
+    ncum = nstates_total - nepi
+
+    @assert nepi == 13
+    @assert ncum == 25
+
     return DoddExtendedTBModel(
-        StateLayout(13, 35, nages),
+        StateLayout(nepi, ncum, nages),
         contact_matrix,
         infectiousness,
         P,

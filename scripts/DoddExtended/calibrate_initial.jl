@@ -140,7 +140,9 @@ fixed = merge(
     fixed,
     (
         kappa=1.85893,
-        duration=3.0,
+        duration_sp=1.6,
+        duration_sn=5.35,
+        duration_ep=3.0,
         treatment_cfr=304 / 4928,
         detection_trend=0.0,
         untreated_cfr_sp=0.70,

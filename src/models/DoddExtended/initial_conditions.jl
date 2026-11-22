@@ -37,13 +37,16 @@ function initial_state(
     ν = sum(weights .* params.nu)
     ω = sum(weights .* params.omega)
 
-    total_exit_hazard =
-        @view(params.self_cure[:, 1]) .+
-            @view(params.tb_mortality[:, 1])
+    duration = one(params.beta) ./
+        (params.self_cure .+ params.tb_mortality)
 
-    duration = one(params.beta) ./ total_exit_hazard
-
-    mean_duration = sum(weights .* duration)
+    # Population- and presentation-weighted untreated duration.
+    mean_duration = sum(
+        weights .* vec(sum(
+            params.presentation .* duration;
+            dims=2,
+        ))
+    )
 
     Λ0 = params.Lambda0
     detection = detection_probability(

@@ -16,7 +16,8 @@ const TB = TBKiribatiJulia
     model = TB.DoddExtendedTBModel(C, P)
 
     @test TB.state_layout(model).nepi == 13
-    @test TB.state_layout(model).ncum == 16
+    @test TB.state_layout(model).ncum == 25
+    @test TB.nstates(TB.state_layout(model)) == 38
     @test size(model.contact) == (n, n)
     @test sum(model.contact) / n ≈ 1.0
 
@@ -32,7 +33,9 @@ const TB = TBKiribatiJulia
         epsilon_child=0.2,
         nu=0.02,
         omega=0.05,
-        duration=3.0,
+        duration_sp=1.6,
+        duration_sn=5.35,
+        duration_ep=3.0,
         untreated_cfr_sp=0.70,
         untreated_cfr_sn=0.20,
         untreated_cfr_ep=0.20,
@@ -48,6 +51,24 @@ const TB = TBKiribatiJulia
 
     p = TB.make_parameters(model, draw)
 
+    for (k, (d, c)) in enumerate((
+        (1.6, 0.7),
+        (5.35, 0.2),
+        (3.0, 0.2),
+    ))
+        @test p.self_cure[16, k] ≈ (1 - c) / d
+        @test p.tb_mortality[16, k] ≈ c / d
+    end
+
+    for k in 1:3
+        @test p.self_cure[1, k] +
+            p.tb_mortality[1, k] ≈ 2.0
+    end
+
+    # Detection hazard scaling is independent of
+    # presentation-specific untreated durations.
+    @test p.detection_multiplier[16] ≈ 1 / 3
+
     @test p isa TB.DoddExtendedTBParameters
     @test !hasproperty(p, :base)
 
@@ -58,14 +79,17 @@ const TB = TBKiribatiJulia
     @test size(p.self_cure) == (n, 3)
     @test size(p.tb_mortality) == (n, 3)
 
-    for a in 16:n
-        for (k, c) in enumerate((0.70, 0.20, 0.20))
-            @test p.self_cure[a, k] ≈ (1 - c) / 3
-            @test p.tb_mortality[a, k] ≈ c / 3
+    durations = (1.6, 5.35, 3.0)
+    cfrs = (0.7, 0.2, 0.2)
 
-            @test p.self_cure[a, k] +
-                p.tb_mortality[a, k] ≈ 1 / 3
-        end
+    for a in 16:n, k in 1:3
+        d = durations[k]
+        c = cfrs[k]
+
+        @test p.self_cure[a, k] ≈ (1 - c) / d
+        @test p.tb_mortality[a, k] ≈ c / d
+        @test p.self_cure[a, k] +
+            p.tb_mortality[a, k] ≈ 1 / d
     end
 
     @test p.relative_infectiousness ==
@@ -90,7 +114,7 @@ const TB = TBKiribatiJulia
         u[b+12] = 1.0
     end
 
-    du = similar(u)
+    du = fill(NaN, length(u))
 
     ctx = TB.SimulationContext(
         model, p, nothing,
@@ -98,6 +122,17 @@ const TB = TBKiribatiJulia
     )
 
     TB.tb_rhs!(du, u, ctx, 2023.0)
+
+    bad = findall(isnan, du)
+
+    println("\nUnassigned derivatives:")
+
+    for i in bad
+        age = div(i - 1, stride) + 1
+        state = mod(i - 1, stride) + 1
+
+        println("Age index: $age, state index: $state")
+    end
 
     @test all(isfinite, du)
 
