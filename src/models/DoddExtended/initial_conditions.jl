@@ -37,8 +37,10 @@ function initial_state(
     ν = sum(weights .* params.nu)
     ω = sum(weights .* params.omega)
 
-    duration = one(params.beta) ./ (
-        params.self_cure .+ params.tb_mortality
+    duration = one(params.beta) ./
+        (
+        @view(params.self_cure[:, 1]) .+
+            @view(params.tb_mortality[:, 1])
     )
 
     mean_duration = sum(weights .* duration)

@@ -155,8 +155,8 @@ function tb_rhs!(
             δ = base_detection *
                 p.relative_detection[k]
 
-            γ = p.self_cure[a]
-            μ = p.tb_mortality[a]
+            γ = p.self_cure[a, k]
+            μ = p.tb_mortality[a, k]
 
             detection_0 = δ * active_0
             detection_1 = δ * active_1

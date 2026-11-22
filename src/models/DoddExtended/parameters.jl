@@ -54,8 +54,8 @@ struct DoddExtendedTBParameters{T<:Real}
     nu::Vector{T}
     omega::Vector{T}
 
-    self_cure::Vector{T}
-    tb_mortality::Vector{T}
+    self_cure::Matrix{T}
+    tb_mortality::Matrix{T}
     detection_multiplier::Vector{T}
 
     treatment_rate::T
@@ -78,11 +78,13 @@ function priors(model::DoddExtendedTBModel)
         nu=LogNormal(-6.89, 0.58),
         omega=LogNormal(-3.95, 0.27),
         detection_logitK=Normal(0.0, 0.3),
-        detection_trend=Gamma(0.5, 0.04),
+        detection_trend=Gamma(1., 0.02),
         detection_or_0_4=LogNormal(-0.100, 0.626),
         detection_or_5_14=LogNormal(-0.567, 0.458),
         duration=LogNormal(1.1, 0.2),
-        untreated_cfr=Beta(25.48, 33.78),
+        untreated_cfr_sp=Beta(14, 6),
+        untreated_cfr_sn=Beta(4, 16),
+        untreated_cfr_ep=Beta(4, 16),
         treatment_cfr=Beta(2.71, 87.55),
     )
 
@@ -148,7 +150,11 @@ function make_parameters(
         for age in 0:(nages-1)
     ]
 
-    fatality = x(:untreated_cfr)
+    fatality = T[
+        x(:untreated_cfr_sp),
+        x(:untreated_cfr_sn),
+        x(:untreated_cfr_ep),
+    ]
 
     relative_detection_age = T[
         age < 5 ? x(:detection_or_0_4) :
@@ -181,8 +187,10 @@ function make_parameters(
         (Λ0, β, ψ, κ, x(:treatment_cfr))) ||
         throw(ArgumentError("Invalid nonnegative parameter"))
 
-    0 <= fatality <= 1 ||
-        throw(ArgumentError("Invalid untreated CFR"))
+    all(c -> isfinite(c) && 0 <= c <= 1, fatality) ||
+        throw(ArgumentError(
+            "Untreated CFRs must be finite and between 0 and 1"
+        ))
 
     0 <= x(:treatment_cfr) <= 1 ||
         throw(ArgumentError("Invalid treatment CFR"))
@@ -203,8 +211,11 @@ function make_parameters(
     all(v -> isfinite(v) && v >= 0, relative_detection_age) ||
         throw(ArgumentError("Invalid detection multipliers"))
 
-    γ = (one(T) - fatality) ./ duration
-    μ = fatality ./ duration
+    γ = (one(T) .- reshape(fatality, 1, 3)) ./
+        reshape(duration, :, 1)
+
+    μ = reshape(fatality, 1, 3) ./
+        reshape(duration, :, 1)
     detection_multiplier = relative_detection_age ./ duration
 
     return DoddExtendedTBParameters(
