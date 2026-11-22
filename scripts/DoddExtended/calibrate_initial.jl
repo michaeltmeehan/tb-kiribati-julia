@@ -70,7 +70,7 @@ deaths = TreatmentDeathObservation(
 observation_model = AnnualRandomEffectNB2Observation(
     truncated(Normal(0.0, 0.3), 0.0, Inf),
     truncated(Normal(0.0, 0.3), 0.0, Inf);
-    quadrature_order=20,
+    quadrature_order=100,
 )
 
 problem = CalibrationProblem(
@@ -95,17 +95,37 @@ free_names = (
     :psi,
     :Lambda0,
     :epsilon,
+    :nu,
     :omega,
     :detection_logitK,
-    :detection_trend,
     :extrapulmonary_detection,
     :sigma_obs,
     :tau_year,
 )
 
+# Build a complete parameter vector from the new priors.
 initial = map(median, problem.prior)
 
-# Fix all parameters not selected for estimation.
+# Explicit starting values informed by the previous
+# F_nu_only calibration.
+#
+# These are starting points, not fixed estimates.
+initial = merge(
+    initial,
+    (
+        beta=10.83,
+        psi=0.1442,
+        epsilon=0.04675,
+        nu=0.01454,
+        omega=0.004337,
+        detection_logitK=log(0.409575 / (1 - 0.409575)),
+        extrapulmonary_detection=0.72805,
+        sigma_obs=0.31056,
+        tau_year=0.18286,
+    ),
+)
+
+# Fix parameters not selected for estimation.
 fixed_names = Tuple(
     k for k in keys(problem.prior)
           if !(k in free_names)
@@ -115,20 +135,33 @@ fixed = NamedTuple{fixed_names}(
     Tuple(getproperty(initial, k) for k in fixed_names)
 )
 
-# Override selected fixed parameters.
+# Apply explicit fixed assumptions.
 fixed = merge(
     fixed,
     (
-        smear_negative_infectiousness=0.35,
-        smear_negative_detection=1.0,
+        kappa=1.85893,
         duration=3.0,
         treatment_cfr=304 / 4928,
+        detection_trend=0.0,
+        untreated_cfr_sp=0.70,
+        untreated_cfr_sn=0.20,
+        untreated_cfr_ep=0.20,
+        smear_negative_infectiousness=0.35,
+        smear_negative_detection=1.0,
     ),
 )
 
 @assert all(k -> !haskey(fixed, k), free_names)
+@assert all(k -> haskey(problem.prior, k), keys(fixed))
 
 initial = merge(initial, fixed)
+
+println("\nInitial CFR parameters:")
+println((
+    sp=initial.untreated_cfr_sp,
+    sn=initial.untreated_cfr_sn,
+    ep=initial.untreated_cfr_ep,
+))
 
 # --------------------------------------------------
 # Likelihood decomposition
@@ -179,7 +212,7 @@ fit = fit_map(
     initial=initial,
     optimizer=:nelder_mead,
     nstarts=1,
-    iterations=1500,
+    iterations=3000,
     rng=MersenneTwister(42),
 )
 
@@ -197,10 +230,14 @@ parameters = DataFrame(
     parameter=String.(collect(keys(problem.prior))),
     initial=Float64.(collect(values(initial))),
     fitted=Float64.(collect(values(fit.parameters))),
+    free=[k in free_names for k in keys(problem.prior)],
 )
 
-parameters.relative_change =
-    parameters.fitted ./ parameters.initial .- 1
+parameters.relative_change = [
+    iszero(r.initial) ? missing :
+    r.fitted / r.initial - 1
+    for r in eachrow(parameters)
+]
 
 display(parameters)
 
@@ -241,10 +278,10 @@ println("Optimiser iterations: ",
 # Save results
 # --------------------------------------------------
 
-results_dir = joinpath(
+results_dir = normpath(joinpath(
     @__DIR__, "..", "..",
-    "results", "DoddExtended", "initial_calibration",
-)
+    "results", "DoddExtended", "current_calibration",
+))
 
 mkpath(results_dir)
 

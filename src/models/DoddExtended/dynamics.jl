@@ -166,6 +166,18 @@ function tb_rhs!(
 
             deaths = μ * (active_0 + active_1)
 
+            # Presentation-specific incidence
+            du[base+DE.CumIncidenceSP+k-1] =
+                p.presentation[a, k] * (onset_0 + onset_1)
+
+            # Presentation-specific untreated mortality
+            du[base+DE.CumUntreatedDeathsSP+k-1] =
+                deaths
+
+            # Presentation-specific self-cure
+            du[base+DE.CumSelfCureSP+k-1] =
+                cure_0 + cure_1
+
             self_cure_0 += cure_0
             self_cure_1 += cure_1
 

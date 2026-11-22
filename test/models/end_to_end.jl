@@ -96,8 +96,13 @@ function draw(beta; extended=false)
     )
 
     return extended ? merge(
-        base,
+        Base.structdiff(base, (; untreated_cfr=base.untreated_cfr)),
         TB.extended_fixed_parameters(),
+        (
+            untreated_cfr_sp=0.70,
+            untreated_cfr_sn=0.20,
+            untreated_cfr_ep=0.20,
+        ),
     ) : base
 end
 

@@ -24,6 +24,15 @@ default_output_variables(::DoddExtendedTBModel) = (
     :recurrent_smear_positive,
     :recurrent_smear_negative,
     :recurrent_extrapulmonary,
+    :incidence_sp,
+    :incidence_sn,
+    :incidence_ep,
+    :untreated_mortality_sp,
+    :untreated_mortality_sn,
+    :untreated_mortality_ep,
+    :self_cure_sp,
+    :self_cure_sn,
+    :self_cure_ep,
 )
 
 # Directly observed event counters.
@@ -43,6 +52,15 @@ const DODD_EXTENDED_COUNTERS = (
     recurrent_smear_positive=DE.CumRecurrentSP,
     recurrent_smear_negative=DE.CumRecurrentSN,
     recurrent_extrapulmonary=DE.CumRecurrentEP,
+    incidence_sp=DE.CumIncidenceSP,
+    incidence_sn=DE.CumIncidenceSN,
+    incidence_ep=DE.CumIncidenceEP,
+    untreated_mortality_sp=DE.CumUntreatedDeathsSP,
+    untreated_mortality_sn=DE.CumUntreatedDeathsSN,
+    untreated_mortality_ep=DE.CumUntreatedDeathsEP,
+    self_cure_sp=DE.CumSelfCureSP,
+    self_cure_sn=DE.CumSelfCureSN,
+    self_cure_ep=DE.CumSelfCureEP,
 )
 
 function model_output(
@@ -245,4 +263,31 @@ function extended_combined_output(
     ::Val{:treatment_prevalence},
 )
     return stock_output(ex, (DE.T,))
+end
+
+# Total living population, including treatment and recovery.
+function extended_combined_output(
+    model::DoddExtendedTBModel,
+    ex::OutputExtraction,
+    ::Val{:population},
+)
+    return stock_output(ex, DE.S:DE.R)
+end
+
+# Early latent infection, both treatment-history classes.
+function extended_combined_output(
+    model::DoddExtendedTBModel,
+    ex::OutputExtraction,
+    ::Val{:early_latent_prevalence},
+)
+    return stock_output(ex, (DE.E0, DE.E1))
+end
+
+# Late latent infection, both treatment-history classes.
+function extended_combined_output(
+    model::DoddExtendedTBModel,
+    ex::OutputExtraction,
+    ::Val{:late_latent_prevalence},
+)
+    return stock_output(ex, (DE.L0, DE.L1))
 end

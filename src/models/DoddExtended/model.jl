@@ -34,6 +34,21 @@ const CumRecurrentSP = 27
 const CumRecurrentSN = 28
 const CumRecurrentEP = 29
 
+# Incidence by disease presentation
+const CumIncidenceSP = 30
+const CumIncidenceSN = 31
+const CumIncidenceEP = 32
+
+# Untreated TB deaths by presentation
+const CumUntreatedDeathsSP = 33
+const CumUntreatedDeathsSN = 34
+const CumUntreatedDeathsEP = 35
+
+# Self-cure by presentation
+const CumSelfCureSP = 36
+const CumSelfCureSN = 37
+const CumSelfCureEP = 38
+
 end
 
 const DE = DoddExtendedStates
@@ -94,7 +109,7 @@ function DoddExtendedTBModel(
     # -------------------------------------------------------
 
     return DoddExtendedTBModel(
-        StateLayout(13, 16, nages),
+        StateLayout(13, 35, nages),
         contact_matrix,
         infectiousness,
         P,

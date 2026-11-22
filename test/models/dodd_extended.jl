@@ -33,7 +33,9 @@ const TB = TBKiribatiJulia
         nu=0.02,
         omega=0.05,
         duration=3.0,
-        untreated_cfr=0.3,
+        untreated_cfr_sp=0.70,
+        untreated_cfr_sn=0.20,
+        untreated_cfr_ep=0.20,
         treatment_cfr=0.05,
         detection_logitK=0.0,
         detection_trend=0.01,
@@ -53,8 +55,18 @@ const TB = TBKiribatiJulia
     @test p.psi == 0.2
     @test p.epsilon[1] == 0.2
     @test p.epsilon[16] == 0.1
-    @test p.self_cure[16] ≈ 0.7 / 3
-    @test p.tb_mortality[16] ≈ 0.3 / 3
+    @test size(p.self_cure) == (n, 3)
+    @test size(p.tb_mortality) == (n, 3)
+
+    for a in 16:n
+        for (k, c) in enumerate((0.70, 0.20, 0.20))
+            @test p.self_cure[a, k] ≈ (1 - c) / 3
+            @test p.tb_mortality[a, k] ≈ c / 3
+
+            @test p.self_cure[a, k] +
+                p.tb_mortality[a, k] ≈ 1 / 3
+        end
+    end
 
     @test p.relative_infectiousness ==
         (1.0, 0.35, 0.0)

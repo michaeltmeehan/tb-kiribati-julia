@@ -10,12 +10,13 @@ function diagnose_dodd_calibration(fit; nsim=3000)
     rng = MersenneTwister(2026)
 
     root = normpath(joinpath(@__DIR__, "..", ".."))
-    dir = joinpath(root, "results", "DoddExtended", "initial_calibration")
+    dir = joinpath(
+        root, "results", "DoddExtended", "current_calibration"
+    )
     mkpath(dir)
 
     # One model simulation, covering the full calibration period.
-    years = collect(minimum(o.year for o in problem.observations):
-    (problem.end_year-1))
+    years = collect(minimum(o.year for o in problem.observations):(problem.end_year-1))
 
     out = predict(
         problem, theta;
@@ -293,6 +294,62 @@ function diagnose_dodd_calibration(fit; nsim=3000)
     axislegend(ax2)
 
     save(joinpath(dir, "04_burden_vs_who.png"), fig)
+
+    # --------------------------------------------------
+    # 5. WHO estimated case detection rate
+    # --------------------------------------------------
+
+    model_df.cdr = 100 .* (
+        model_df.notifications ./ model_df.incidence
+    )
+
+    fig = Figure(size=(1100, 500))
+
+    ax = Axis(
+        fig[1, 1],
+        xlabel="Year",
+        ylabel="Case detection rate (%)",
+        title="Model versus WHO case detection estimates",
+    )
+
+    band!(
+        ax,
+        who.year,
+        who.c_cdr_lo,
+        who.c_cdr_hi;
+        color=(:gray, 0.2),
+        label="WHO uncertainty interval",
+    )
+
+    lines!(
+        ax,
+        who.year,
+        who.c_cdr;
+        color=:black,
+        linewidth=2,
+        label="WHO estimate",
+    )
+
+    lines!(
+        ax,
+        model_df.year,
+        model_df.cdr;
+        color=:steelblue,
+        linewidth=2,
+        label="Model notifications/incidence",
+    )
+
+    axislegend(ax, position=:lt)
+
+    save(
+        joinpath(dir, "05_detection_vs_who.png"),
+        fig,
+    )
+
+    CSV.write(
+        joinpath(dir, "model_annual_outputs.csv"),
+        model_df,
+    )
 
     # --------------------------------------------------
     # Summary
