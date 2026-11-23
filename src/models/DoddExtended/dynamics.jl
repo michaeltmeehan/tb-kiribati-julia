@@ -107,10 +107,10 @@ function tb_rhs!(
 
         # Latent TB transitions.
         early_to_late_0 =
-            p.kappa * early_latent_0
+            p.kappa[a] * early_latent_0
 
         early_to_late_1 =
-            p.kappa * early_latent_1
+            p.kappa[a] * early_latent_1
 
         fast_progression_0 =
             p.epsilon[a] * early_latent_0
@@ -125,14 +125,6 @@ function tb_rhs!(
             p.nu[a] * late_latent_1
 
         relapse = p.omega[a] * recovered
-
-        onset_0 =
-            fast_progression_0 + slow_progression_0
-
-        onset_1 =
-            fast_progression_1 +
-                slow_progression_1 +
-                relapse
 
         # Active disease transitions.
         self_cure_0 = 0.0
@@ -166,9 +158,19 @@ function tb_rhs!(
 
             deaths = μ * (active_0 + active_1)
 
-            # Presentation-specific incidence
+            # Pathway-specific disease onset.
+            incidence_0 =
+                p.presentation_fast[a, k] * fast_progression_0 +
+                    p.presentation_slow[a, k] * slow_progression_0
+
+            incidence_1 =
+                p.presentation_fast[a, k] * fast_progression_1 +
+                    p.presentation_slow[a, k] * slow_progression_1 +
+                    p.presentation_relapse[a, k] * relapse
+
+            # Presentation-specific incidence.
             du[base+DE.CumIncidenceSP+k-1] =
-                p.presentation[a, k] * (onset_0 + onset_1)
+                incidence_0 + incidence_1
 
             # Presentation-specific untreated mortality
             du[base+DE.CumUntreatedDeathsSP+k-1] =
@@ -186,15 +188,13 @@ function tb_rhs!(
             treatment_initiation +=
                 detection_0 + detection_1
 
-            presentation = p.presentation[a, k]
-
             du[base+i0] =
-                presentation * onset_0 -
+                incidence_0 -
                     detection_0 - cure_0 -
                     μ * active_0
 
             du[base+i1] =
-                presentation * onset_1 -
+                incidence_1 -
                     detection_1 - cure_1 -
                     μ * active_1
 

@@ -1,4 +1,79 @@
 
+function initial_cohort_generator(
+    params::DoddExtendedTBParameters,
+    a::Int,
+    year::Real,
+)
+    T = typeof(params.beta)
+    Q = zeros(T, 9, 9)
+
+    # Auxiliary state indices
+    S, E, L = 1, 2, 3
+    ISP, ISN, IEP = 4, 5, 6
+    TR, R, D = 7, 8, 9
+
+    # Column-oriented transition generator.
+    function transition!(from, to, rate)
+        Q[to, from] += rate
+        Q[from, from] -= rate
+    end
+
+    # Primary infection and progression.
+    transition!(S, E, params.Lambda0)
+    transition!(E, L, params.kappa[a])
+
+    for k in 1:3
+        I = ISP + k - 1
+        transition!(
+            E, I,
+            params.epsilon[a] * params.presentation_fast[a, k]
+        )
+
+        transition!(
+            L, I,
+            params.nu[a] * params.presentation_slow[a, k]
+        )
+    end
+
+    # Detection probability translated to the
+    # reference detection-hazard scale.
+    pd = detection_probability(params.detection, year)
+    odds = pd / (one(T) - pd)
+
+    for k in 1:3
+        I = ISP + k - 1
+
+        δ = odds *
+            params.detection_multiplier[a] *
+            params.relative_detection[k]
+
+        transition!(I, TR, δ)
+
+        transition!(
+            I, R, params.self_cure[a, k]
+        )
+
+        transition!(
+            I, D, params.tb_mortality[a, k]
+        )
+    end
+
+    # Treatment completion and death.
+    transition!(
+        TR, R,
+        params.treatment_rate *
+            (one(T) - params.treatment_cfr)
+    )
+
+    transition!(
+        TR, D,
+        params.treatment_rate *
+            params.treatment_cfr
+    )
+
+    return Q
+end
+
 """
 Construct the DoddExtended initial state directly.
 
@@ -8,6 +83,7 @@ previously used through the Dodd reference model.
 All initial active TB is treatment-history 0.
 Recovered individuals occupy the common R compartment.
 """
+
 function initial_state(
     model::DoddExtendedTBModel,
     params::DoddExtendedTBParameters,
@@ -26,40 +102,7 @@ function initial_state(
         ))
 
     all(v -> isfinite(v) && v >= 0, population) ||
-        throw(ArgumentError("Invalid initial population"))
-
-    total = sum(population)
-    total > 0 ||
-        throw(ArgumentError("Population must be positive"))
-
-    weights = population ./ total
-
-    ν = sum(weights .* params.nu)
-    ω = sum(weights .* params.omega)
-
-    duration = one(params.beta) ./
-        (params.self_cure .+ params.tb_mortality)
-
-    # Population- and presentation-weighted untreated duration.
-    mean_duration = sum(
-        weights .* vec(sum(
-            params.presentation .* duration;
-            dims=2,
-        ))
-    )
-
-    Λ0 = params.Lambda0
-    detection = detection_probability(
-        params.detection, year
-    )
-
-    f0 = (ω + ν + params.psi * Λ0) / params.kappa
-    d0 = 2 * ν * mean_duration * (1 - detection)
-
-    f0 + 4 * d0 / 3 <= 1 ||
-        throw(ArgumentError(
-            "Initialisation produces negative latent population"
-        ))
+        throw(ArgumentError("Invalid population"))
 
     T = promote_type(
         eltype(population),
@@ -68,31 +111,49 @@ function initial_state(
 
     u0 = zeros(T, stride * nages)
 
-    @inbounds for a in 1:nages
-        age = a - 1
-        N = population[a]
-        base = (a - 1) * stride
+    # Birth cohort initially entirely susceptible.
+    x = zeros(T, 9)
+    x[1] = one(T)
 
-        fL = -expm1(-age * Λ0)
+    Qprevious = nothing
 
-        S0 = N * (1 - fL)
-        E0 = N * fL * f0 / 2
-        L0 = N * fL * (1 - f0 - 4 * d0 / 3)
-        I0 = N * fL * d0
-        T0 = N * fL * d0 / 3
-        R0 = N * fL * f0 / 2
+    for a in 1:nages
+        Q = initial_cohort_generator(
+            params, a, year
+        )
 
-        u0[base+DE.S] = S0
-        u0[base+DE.E0] = E0
-        u0[base+DE.L0] = L0
-
-        for k in 1:3
-            u0[base+DE.I0SP+k-1] =
-                params.presentation[a, k] * I0
+        # Approximate age-a population at midpoint
+        # of the corresponding one-year age interval.
+        if a == 1
+            x = exp(Q * T(0.5)) * x
+        else
+            x = exp(Qprevious * T(0.5)) * x
+            x = exp(Q * T(0.5)) * x
         end
 
-        u0[base+DE.T] = T0
-        u0[base+DE.R] = R0
+        Qprevious = Q
+
+        # Condition on not having died from TB.
+        survival = sum(@view x[1:8])
+
+        survival > 0 ||
+            throw(ArgumentError(
+                "No surviving cohort at age $(a-1)"
+            ))
+
+        z = population[a] / survival
+        base = (a - 1) * stride
+
+        u0[base+DE.S] = z * x[1]
+        u0[base+DE.E0] = z * x[2]
+        u0[base+DE.L0] = z * x[3]
+
+        u0[base+DE.I0SP] = z * x[4]
+        u0[base+DE.I0SN] = z * x[5]
+        u0[base+DE.I0EP] = z * x[6]
+
+        u0[base+DE.T] = z * x[7]
+        u0[base+DE.R] = z * x[8]
     end
 
     return u0
