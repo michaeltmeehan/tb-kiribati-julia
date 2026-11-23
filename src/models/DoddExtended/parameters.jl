@@ -94,6 +94,11 @@ function priors(model::DoddExtendedTBModel)
         mortality_sn=LogNormal(log(0.025), 0.25),
         self_cure_sn=LogNormal(log(0.130), 0.30),
 
+        # Childhood mortality multipliers relative to
+        # presentation-specific adult mortality hazards.
+        child_mortality_0_4=LogNormal(log(1.0), 0.8),
+        child_mortality_5_14=LogNormal(log(0.3), 0.8),
+
         # Extrapulmonary TB: retain existing assumptions.
         duration_ep=LogNormal(log(3.0), 0.40),
         untreated_cfr_ep=Beta(4, 16),
@@ -239,28 +244,36 @@ function make_parameters(
         x(:untreated_cfr_ep)/x(:duration_ep),
     ]
 
-    # Preserve the previous childhood assumption for now:
-    # total untreated exit rate = 2/year.
+    # Presentation-specific natural-history hazards.
     #
-    # Use the corresponding adult presentation-specific
-    # fatality fraction to allocate childhood exits
-    # between self-cure and TB mortality.
+    # Adult hazards provide the reference values.
+    # Mortality is modified by age, while self-cure
+    # retains the adult reference hazard.
+
     γ = Matrix{T}(undef, nages, 3)
     μ = Matrix{T}(undef, nages, 3)
 
-    for a in 1:nages, k in 1:3
-        if a <= 15
-            total_adult = adult_gamma[k] + adult_mu[k]
-            fatality = adult_mu[k] / total_adult
+    m_0_4 = x(:child_mortality_0_4)
+    m_5_14 = x(:child_mortality_5_14)
 
-            γ[a, k] = T(2) * (one(T) - fatality)
-            μ[a, k] = T(2) * fatality
-        else
+    all(v -> isfinite(v) && v > 0, (m_0_4, m_5_14)) ||
+        throw(ArgumentError(
+            "Childhood mortality multipliers must be positive"
+        ))
+
+    for a in 1:nages
+        age = a - 1
+
+        mortality_multiplier =
+            age < 5 ? m_0_4 :
+            age < 15 ? m_5_14 :
+            one(T)
+
+        for k in 1:3
             γ[a, k] = adult_gamma[k]
-            μ[a, k] = adult_mu[k]
+            μ[a, k] = mortality_multiplier * adult_mu[k]
         end
     end
-
 
     relative_detection_age = T[
         age < 5 ? x(:detection_or_0_4) :

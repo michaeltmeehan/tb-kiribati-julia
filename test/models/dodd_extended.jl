@@ -53,6 +53,8 @@ TB.get_population(
         self_cure_sp=0.231,
         mortality_sn=0.025,
         self_cure_sn=0.130,
+        child_mortality_0_4=1.0,
+        child_mortality_5_14=0.3,
         untreated_cfr_ep=0.20,
         treatment_cfr=0.05,
         detection_logitK=0.0,
@@ -85,11 +87,6 @@ TB.get_population(
             ))
             @test all((0 .<= M) .& (M .<= 1))
         end
-    end
-
-    for k in 1:3
-        @test p.self_cure[1, k] +
-            p.tb_mortality[1, k] ≈ 2.0
     end
 
     # Detection hazard scaling is independent of
@@ -135,12 +132,6 @@ TB.get_population(
                 (expected_gamma[k] + expected_mu[k])
         end
 
-        # Existing childhood duration assumption.
-        for a in 1:15, k in 1:3
-            @test p.self_cure[a, k] +
-                p.tb_mortality[a, k] ≈ 2.0
-        end
-
         # Check that the new prior fields exist.
         prior = TB.priors(model)
 
@@ -155,6 +146,33 @@ TB.get_population(
         @test :duration_sn ∉ keys(prior)
         @test :untreated_cfr_sp ∉ keys(prior)
         @test :untreated_cfr_sn ∉ keys(prior)
+
+        @testset "Age-specific childhood natural history" begin
+            adult_gamma = [0.231, 0.130, 0.8 / 3.0]
+            adult_mu = [0.389, 0.025, 0.2 / 3.0]
+
+            for (age, multiplier) in (
+                (0, 1.0),
+                (4, 1.0),
+                (5, 0.3),
+                (14, 0.3),
+                (15, 1.0),
+                (19, 1.0),
+            )
+                a = age + 1
+
+                for k in 1:3
+                    @test p.self_cure[a, k] ≈ adult_gamma[k]
+
+                    @test p.tb_mortality[a, k] ≈
+                        multiplier * adult_mu[k]
+                end
+            end
+
+            @test :child_mortality_0_4 in keys(TB.priors(model))
+            @test :child_mortality_5_14 in keys(TB.priors(model))
+        end
+
     end
 
     @test p.relative_infectiousness ==
@@ -458,6 +476,34 @@ TB.get_population(
         @test all(isapprox.(
             vec(sum(Q_model; dims=2)), 1.0
         ))
+    end
+
+    @testset "Childhood untreated CFR diagnostics" begin
+        targets = (
+            (0, 0.436),
+            (5, 0.149),
+        )
+
+        for (age, literature_cfr) in targets
+            a = age + 1
+
+            # Presentation-specific untreated fatality.
+            cfr = p.tb_mortality[a, :] ./
+                (p.tb_mortality[a, :] .+
+                p.self_cure[a, :])
+
+            # Aggregate using the assumed disease-onset
+            # distribution, not notification proportions.
+            implied = sum(p.presentation_fast[a, :] .* cfr)
+
+            println(
+                "Age group starting at $age: ",
+                "model = ", round(implied; digits=3),
+                ", literature = ", literature_cfr
+            )
+
+            @test 0 <= implied <= 1
+        end
     end
 
 end
