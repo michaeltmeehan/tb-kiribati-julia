@@ -92,7 +92,13 @@ include(joinpath(
     )
 
     @test state_layout(model).nages == 96
-    @test all(isfinite, params.presentation)
+    for P in (
+        params.presentation_fast,
+        params.presentation_slow,
+        params.presentation_relapse,
+    )
+        @test all(isfinite, P)
+    end
 
     # One simulation, all required outputs
     output = predict(problem, theta)

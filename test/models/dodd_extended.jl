@@ -2,6 +2,7 @@
 using Test
 using LinearAlgebra
 using TBKiribatiJulia
+using ForwardDiff
 
 const TB = TBKiribatiJulia
 
@@ -504,6 +505,76 @@ TB.get_population(
 
             @test 0 <= implied <= 1
         end
+    end
+
+    @testset "Initialisation transition consistency" begin
+        a = 16
+        Q = TB.initial_cohort_generator(p, a, 2023.0)
+
+        # The generator uses:
+        # S=1, E=2, L=3, SP=4, SN=5, EP=6,
+        # treatment=7, recovered=8, death=9.
+
+        for k in 1:3
+            I = 3 + k
+
+            # Untreated self-cure returns to latent infection.
+            @test Q[3, I] ≈ p.self_cure[a, k]
+            @test Q[8, I] == 0
+
+            # Diagnosis leads to treatment.
+            @test Q[7, I] > 0
+
+            # Untreated TB mortality.
+            @test Q[9, I] ≈ p.tb_mortality[a, k]
+        end
+
+        # Columns sum to zero, including the absorbing
+        # death state.
+        @test all(isapprox.(
+            vec(sum(Q; dims=1)), 0.0;
+            atol=1e-12,
+        ))
+
+        # All off-diagonal transitions are nonnegative.
+        @test all(
+            Q[i, j] >= 0
+            for i in 1:9, j in 1:9 if i != j
+        )
+    end
+
+    @testset "AD-compatible cohort propagation" begin
+        using_dummy = nothing  # No additional fixture required
+
+        Q = TB.initial_cohort_generator(p, 16, 2023.0)
+
+        x = zeros(9)
+        x[1] = 1.0
+
+        # Compare with the standard matrix exponential.
+        expected = exp(Q * 0.5) * x
+
+        observed = TB.propagate_initial_cohort(
+            x, Q, 0.5
+        )
+
+        @test observed ≈ expected atol=1e-11 rtol=1e-11
+
+        # Check that ForwardDiff propagates derivatives.
+        f(s) = TB.propagate_initial_cohort(
+            x, s .* Q, 0.5
+        )[1]
+
+        derivative = ForwardDiff.derivative(f, 1.0)
+
+        @test isfinite(derivative)
+
+        # The susceptible probability follows exp(-lambda*t)
+        # in this simplified initial cohort generator.
+        expected_derivative =
+            -0.5 * p.Lambda0 * exp(-0.5 * p.Lambda0)
+
+        @test derivative ≈ expected_derivative rtol=1e-8
     end
 
 end

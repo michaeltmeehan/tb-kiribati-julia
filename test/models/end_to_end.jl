@@ -95,24 +95,41 @@ function draw(beta; extended=false)
         detection_or_5_14=1.0,
     )
 
-    return extended ? merge(
-        Base.structdiff(
-            base,
-            (
-                duration=base.duration,
-                untreated_cfr=base.untreated_cfr,
-            ),
-        ),
+    if !extended
+        return base
+    end
+
+    # Remove parameters belonging to the original Dodd
+    # natural-history parameterisation.
+    old_fields = (
+        kappa=base.kappa,
+        epsilon=base.epsilon,
+        epsilon_child=base.epsilon_child,
+        duration=base.duration,
+        untreated_cfr=base.untreated_cfr,
+    )
+
+    return merge(
+        Base.structdiff(base, old_fields),
         TB.extended_fixed_parameters(),
         (
-            duration_sp=1.6,
-            duration_sn=5.35,
+            early_duration=2.0,
+            fast_risk_0=0.45,
+            fast_risk_1=0.18,
+            fast_risk_2_4=0.055,
+            fast_risk_5_9=0.02,
+            fast_risk_10_14=0.10,
+            fast_risk_15_plus=0.05,
+            mortality_sp=0.389,
+            self_cure_sp=0.231,
+            mortality_sn=0.025,
+            self_cure_sn=0.130,
             duration_ep=3.0,
-            untreated_cfr_sp=0.7,
-            untreated_cfr_sn=0.2,
             untreated_cfr_ep=0.2,
+            child_mortality_0_4=1.0,
+            child_mortality_5_14=0.3,
         ),
-    ) : base
+    )
 end
 
 function initialise(model, demography, beta; extended=false)
@@ -347,4 +364,5 @@ end # module
             )
         end
     end
+
 end

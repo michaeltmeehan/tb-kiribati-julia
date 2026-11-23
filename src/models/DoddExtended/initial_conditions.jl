@@ -1,3 +1,4 @@
+import ForwardDiff
 
 function initial_cohort_generator(
     params::DoddExtendedTBParameters,
@@ -50,7 +51,7 @@ function initial_cohort_generator(
         transition!(I, TR, δ)
 
         transition!(
-            I, R, params.self_cure[a, k]
+            I, L, params.self_cure[a, k]
         )
 
         transition!(
@@ -72,6 +73,84 @@ function initial_cohort_generator(
     )
 
     return Q
+end
+
+"""
+Propagate a cohort through a constant CTMC generator.
+
+Uses uniformisation to evaluate exp(Q * duration) * x
+without requiring a matrix exponential of Dual numbers.
+
+Q uses column-oriented transition rates.
+"""
+function propagate_initial_cohort(
+    x::AbstractVector,
+    Q::AbstractMatrix,
+    duration::Real;
+    tol::Real=1e-13,
+)
+    n = length(x)
+
+    size(Q) == (n, n) ||
+        throw(DimensionMismatch("Invalid generator dimensions"))
+
+    duration >= 0 ||
+        throw(ArgumentError("Negative propagation duration"))
+
+    # Use primal values only to select the numerical
+    # uniformisation rate and number of substeps.
+    rate = maximum(
+        -ForwardDiff.value(Q[i, i]) for i in 1:n
+    )
+
+    rate >= 0 ||
+        throw(ArgumentError("Invalid generator"))
+
+    if rate == 0 || duration == 0
+        return copy(x)
+    end
+
+    # Keep the Poisson mean modest for numerical stability.
+    nsteps = max(1, ceil(Int, rate * duration / 4))
+    h = duration / nsteps
+    z = rate * h
+
+    T = promote_type(eltype(x), eltype(Q))
+    P = Matrix{T}(Q ./ rate)
+
+    for i in 1:n
+        P[i, i] += one(T)
+    end
+
+    result = T.(x)
+
+    for _ in 1:nsteps
+        term = copy(result)
+        weight = exp(-z)
+
+        next = weight .* term
+        cumulative = weight
+
+        for k in 1:200
+            term = P * term
+            weight *= z / k
+
+            next .+= weight .* term
+            cumulative += weight
+
+            if 1 - cumulative <= tol
+                break
+            end
+
+            k == 200 && throw(ErrorException(
+                "Uniformisation series did not converge"
+            ))
+        end
+
+        result = next
+    end
+
+    return result
 end
 
 """
@@ -125,10 +204,16 @@ function initial_state(
         # Approximate age-a population at midpoint
         # of the corresponding one-year age interval.
         if a == 1
-            x = exp(Q * T(0.5)) * x
+            x = propagate_initial_cohort(
+                x, Q, 0.5
+            )
         else
-            x = exp(Qprevious * T(0.5)) * x
-            x = exp(Q * T(0.5)) * x
+            x = propagate_initial_cohort(
+                x, Qprevious, 0.5
+            )
+            x = propagate_initial_cohort(
+                x, Q, 0.5
+            )
         end
 
         Qprevious = Q
