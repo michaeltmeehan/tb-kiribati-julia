@@ -60,6 +60,7 @@ TB.get_population(
         treatment_cfr=0.05,
         detection_logitK=0.0,
         detection_trend=0.01,
+        r_SP=1.0,
         detection_or_0_4=1.2,
         detection_or_5_14=1.1,
         smear_negative_infectiousness=0.35,
@@ -603,5 +604,28 @@ TB.get_population(
             Q, reshape([0.0, 0.5, 0.5], 1, 3)
         )
     end
+    @testset "SP detection multiplier" begin
+        @test :r_SP in keys(TB.priors(model))
 
+        # Existing parameter tuples remain compatible.
+        p_base = TB.make_parameters(model, draw)
+
+        # Increasing SP detection leaves SN and EP unchanged.
+        p_sp = TB.make_parameters(
+            model,
+            merge(draw, (r_SP=3.0,))
+        )
+
+        @test p_sp.relative_detection[1] ≈ 3.0
+        @test p_sp.relative_detection[2:3] ==
+            p_base.relative_detection[2:3]
+
+        @test p_sp.detection_multiplier ==
+            p_base.detection_multiplier
+
+        @test_throws ArgumentError TB.make_parameters(
+            model,
+            merge(draw, (r_SP=0.0,))
+        )
+    end
 end

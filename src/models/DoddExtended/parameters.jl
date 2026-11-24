@@ -1,5 +1,5 @@
 
-using Distributions: Beta, Gamma, LogNormal, Normal
+using Distributions: Beta, LogNormal, Normal
 
 struct DoddExtendedDetection{T<:Real}
     K::T
@@ -11,7 +11,7 @@ end
 function DoddExtendedDetection(;
     K::Real,
     trend::Real,
-    reference_year::Real=1970.0,
+    reference_year::Real=2019.0,
     maximum::Real=0.9,
 )
     0 < K < 1 ||
@@ -69,13 +69,16 @@ struct DoddExtendedTBParameters{T<:Real}
     relative_detection::NTuple{3,T}
 end
 
+
 function priors(model::DoddExtendedTBModel)
-    base = (
+    p = (
+        # Transmission and reinfection
         beta=LogNormal(log(10), 0.5),
+        Lambda0=LogNormal(log(0.005), 0.7),
         psi=Beta(20.7, 77.9),
-        Lambda0=LogNormal(log(5e-3), 0.7),
-        # Mean residence time in early infection (years).
-        # Provisional prior: median 6 months.
+        smear_negative_infectiousness=LogNormal(log(0.35), 0.4),
+
+        # Progression and recurrence
         early_duration=LogNormal(log(0.5), 0.35),
         fast_risk_0=Beta(9, 11),
         fast_risk_1=Beta(3.6, 16.4),
@@ -85,46 +88,38 @@ function priors(model::DoddExtendedTBModel)
         fast_risk_15_plus=Beta(1, 19),
         nu=LogNormal(log(0.003), 1.0),
         omega=LogNormal(log(0.005), 0.5),
+
+        # Detection
         detection_logitK=Normal(-0.4, 0.8),
         detection_trend=Normal(0.0, 0.03),
+        r_SP=LogNormal(log(2.5), 0.5),
+        smear_negative_detection=LogNormal(0.0, 0.5),
+        extrapulmonary_detection=LogNormal(0.0, 0.5),
         detection_or_0_4=LogNormal(-0.100, 0.626),
         detection_or_5_14=LogNormal(-0.567, 0.458),
 
-        # Adult pulmonary TB natural-history hazards (year^-1).
+        # Adult pulmonary natural history
         mortality_sp=LogNormal(log(0.389), 0.12),
         self_cure_sp=LogNormal(log(0.231), 0.18),
         mortality_sn=LogNormal(log(0.025), 0.25),
         self_cure_sn=LogNormal(log(0.130), 0.30),
 
-        # Childhood mortality multipliers relative to
-        # presentation-specific adult mortality hazards.
+        # Childhood mortality relative to adult hazards
         child_mortality_0_4=LogNormal(log(1.0), 0.8),
         child_mortality_5_14=LogNormal(log(0.3), 0.8),
 
-        # Extrapulmonary TB: retain existing assumptions.
+        # Extrapulmonary natural history
         duration_ep=LogNormal(log(3.0), 0.40),
         untreated_cfr_ep=Beta(4, 16),
+
+        # Treatment
         treatment_cfr=Beta(2.71, 87.55),
     )
 
-    if !model.reinfection
-        keys_without_psi = Tuple(
-            key for key in keys(base) if key != :psi
-        )
-        base = NamedTuple{keys_without_psi}(
-            Tuple(getproperty(base, k) for k in keys_without_psi)
-        )
-    end
-
-    return merge(base, (
-        smear_negative_infectiousness=
-        LogNormal(log(0.35), 0.4),
-        smear_negative_detection=
-        LogNormal(0.0, 0.5),
-        extrapulmonary_detection=
-        LogNormal(0.0, 0.5),
-    ))
+    return model.reinfection ?
+           p : Base.structdiff(p, (psi=nothing,))
 end
+
 
 extended_fixed_parameters() = (
     smear_negative_infectiousness=0.35,
@@ -301,6 +296,9 @@ function make_parameters(
     )
 
     q_negative = x(:smear_negative_infectiousness)
+
+    r_SP = x(:r_SP)
+
     d_negative = x(:smear_negative_detection)
     d_extra = x(:extrapulmonary_detection)
 
@@ -320,7 +318,7 @@ function make_parameters(
         ))
 
     all(v -> isfinite(v) && v > 0,
-        (q_negative, d_negative, d_extra)) ||
+        (q_negative, r_SP, d_negative, d_extra)) ||
         throw(ArgumentError(
             "Invalid presentation-specific multipliers"
         ))
@@ -402,7 +400,7 @@ function make_parameters(
         presentation_slow,
         presentation_relapse,
         (one(T), q_negative, zero(T)),
-        (one(T), d_negative, d_extra),
+        (r_SP, d_negative, d_extra),
     )
 end
 
