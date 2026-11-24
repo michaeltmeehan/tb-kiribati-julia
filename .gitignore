@@ -19,3 +19,4 @@ Thumbs.db
 # Temporary files
 *.tmp
 *.log
+results/DoddExtended/natural_history_priors/draws.csv

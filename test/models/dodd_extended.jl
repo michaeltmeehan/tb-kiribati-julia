@@ -577,4 +577,31 @@ TB.get_population(
         @test derivative ≈ expected_derivative rtol=1e-8
     end
 
+    @testset "Notification-to-onset transformation" begin
+        Q = reshape([0.5, 0.3, 0.2], 1, 3)
+        A = reshape([0.4, 0.8, 0.6], 1, 3)
+
+        P = TB.inferred_onset_presentation(Q, A)
+
+        expected = [1.25, 0.375, 1/3]
+        expected ./= sum(expected)
+        @test vec(P) ≈ expected
+
+        # Forward transformation recovers notifications.
+        Q_recovered = TB.expected_notification_presentation(
+            P, A
+        )
+
+        @test Q_recovered ≈ Q
+
+        # Equal ascertainment produces no correction.
+        @test TB.inferred_onset_presentation(
+            Q, fill(0.5, 1, 3)
+        ) ≈ Q
+
+        @test_throws ArgumentError TB.inferred_onset_presentation(
+            Q, reshape([0.0, 0.5, 0.5], 1, 3)
+        )
+    end
+
 end

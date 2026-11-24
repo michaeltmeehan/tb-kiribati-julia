@@ -74,7 +74,9 @@ function priors(model::DoddExtendedTBModel)
         beta=LogNormal(log(10), 0.75),
         psi=Beta(20.7, 77.9),
         Lambda0=LogNormal(log(3e-2), 0.75),
-        early_duration=LogNormal(log(2.0), 0.25),
+        # Mean residence time in early infection (years).
+        # Provisional prior: median 6 months.
+        early_duration=LogNormal(log(0.5), 0.35),
         fast_risk_0=Beta(9, 11),
         fast_risk_1=Beta(3.6, 16.4),
         fast_risk_2_4=Beta(1.1, 18.9),
@@ -83,8 +85,8 @@ function priors(model::DoddExtendedTBModel)
         fast_risk_15_plus=Beta(1, 19),
         nu=LogNormal(-6.89, 0.58),
         omega=LogNormal(-3.95, 0.27),
-        detection_logitK=Normal(0.0, 0.3),
-        detection_trend=Gamma(1., 0.02),
+        detection_logitK=Normal(0.0, 1.5),
+        detection_trend=Normal(0.0, 0.03),
         detection_or_0_4=LogNormal(-0.100, 0.626),
         detection_or_5_14=LogNormal(-0.567, 0.458),
 
@@ -294,7 +296,7 @@ function make_parameters(
     detection = DoddExtendedDetection(
         K=K,
         trend=x(:detection_trend),
-        reference_year=T(1970),
+        reference_year=T(2019),
         maximum=T(0.9),
     )
 
@@ -483,4 +485,56 @@ function expected_notification_presentation(
     end
 
     return Q
+end
+
+"""
+Infer disease-onset presentation proportions from
+notification proportions and ascertainment probabilities.
+
+Uses the stationary competing-risk approximation.
+This is a diagnostic transformation, not a calibration.
+"""
+function inferred_onset_presentation(
+    Q::AbstractMatrix,
+    ascertainment::AbstractMatrix,
+)
+    size(Q) == size(ascertainment) ||
+        throw(DimensionMismatch(
+            "Notification and ascertainment dimensions differ"
+        ))
+
+    size(Q, 2) == 3 ||
+        throw(DimensionMismatch(
+            "Expected SP, SN and EP columns"
+        ))
+
+    all(x -> isfinite(x) && x >= 0, Q) ||
+        throw(ArgumentError(
+            "Invalid notification probabilities"
+        ))
+
+    all(x -> isfinite(x) && 0 < x <= 1, ascertainment) ||
+        throw(ArgumentError(
+            "Ascertainment must lie in (0, 1]"
+        ))
+
+    all(isapprox.(vec(sum(Q; dims=2)), 1.0; atol=1e-8)) ||
+        throw(ArgumentError(
+            "Notification probabilities must sum to one"
+        ))
+
+    P = Q ./ ascertainment
+
+    for a in axes(P, 1)
+        total = sum(@view P[a, :])
+
+        total > 0 ||
+            throw(ArgumentError(
+                "Zero onset probability at age index $a"
+            ))
+
+        P[a, :] ./= total
+    end
+
+    return P
 end

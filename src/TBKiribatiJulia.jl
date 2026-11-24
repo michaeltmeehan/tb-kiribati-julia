@@ -27,6 +27,7 @@ include("demography/equilibrium.jl")
 include("demography/projected.jl")
 include("demography/cohort.jl")
 include("demography/operators.jl")
+include("demography/growth_only.jl")
 
 # ============================================================
 # Shared numerical infrastructure and mixing
@@ -90,6 +91,13 @@ include("outputs/summary.jl")
 include("simulation/ensemble.jl")
 
 # ============================================================
+# Projections
+# ============================================================
+
+include("projections/simulation.jl")
+include("projections/summaries.jl")
+
+# ============================================================
 # Inference
 # ============================================================
 
@@ -125,6 +133,7 @@ include("visualisation/sensitivity.jl")
 include("visualisation/calibration.jl")
 include("visualisation/annual_effects.jl")
 include("visualisation/profiles.jl")
+include("visualisation/projections.jl")
 
 # ============================================================
 # Exports
@@ -169,6 +178,7 @@ export DemographicData,
     EquilibriumDemography,
     ProjectedDemography,
     CohortDemography,
+    GrowthOnlyDemography,
     apply_demography!,
     target_population
 
@@ -184,6 +194,9 @@ export simulate, simulate_from_draw
 export PreparedSimulation, prepare_simulation
 export equilibrate, equilibrium_parameter_check
 export simulate_ensemble, summarise_ensemble
+
+# Projections
+export project_scenarios, summarise_projections, compare_projections
 
 # Outputs
 export annual_events, annual_windows
@@ -242,5 +255,10 @@ export plot_calibration_national,
 
 export plot_annual_effects
 export plot_profile_likelihood
+
+export plot_projections,
+    plot_projections!,
+    plot_projection_effects,
+    plot_projection_effects!
 
 end # module TBKiribatiJulia

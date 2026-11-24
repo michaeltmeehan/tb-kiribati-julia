@@ -2,6 +2,7 @@
 using OrdinaryDiffEq
 using DiffEqCallbacks: PresetTimeCallback
 using SciMLBase: ODEProblem, solve, remake, u_modified!
+using ADTypes
 
 # ------------------------------------------------------------
 # Numerical type inference
@@ -80,7 +81,7 @@ function prepare_simulation(
     demography::AbstractDemography;
     start_year::Real,
     end_year::Real,
-    solver=Tsit5(),
+    solver=AutoTsit5(Rosenbrock23(autodiff=ADTypes.AutoFiniteDiff())),
     abstol::Real=1e-8,
     reltol::Real=1e-6,
     saveat=nothing,
