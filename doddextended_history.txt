@@ -1,0 +1,858 @@
+﻿commit d904e177e0bb35c7bc4083869e601ab9f29ddd95
+Author: michaeltmeehan <michael.meehan1@jcu.edu.au>
+Date:   Tue Nov 24 16:18:47 2026 +1000
+
+    Update natural history progression model and analyses
+
+diff --git a/src/models/DoddExtended/parameters.jl b/src/models/DoddExtended/parameters.jl
+index f6e3d16..55bbb84 100644
+--- a/src/models/DoddExtended/parameters.jl
++++ b/src/models/DoddExtended/parameters.jl
+@@ -74,7 +74,9 @@ function priors(model::DoddExtendedTBModel)
+         beta=LogNormal(log(10), 0.75),
+         psi=Beta(20.7, 77.9),
+         Lambda0=LogNormal(log(3e-2), 0.75),
+-        early_duration=LogNormal(log(2.0), 0.25),
++        # Mean residence time in early infection (years).
++        # Provisional prior: median 6 months.
++        early_duration=LogNormal(log(0.5), 0.35),
+         fast_risk_0=Beta(9, 11),
+         fast_risk_1=Beta(3.6, 16.4),
+         fast_risk_2_4=Beta(1.1, 18.9),
+@@ -83,8 +85,8 @@ function priors(model::DoddExtendedTBModel)
+         fast_risk_15_plus=Beta(1, 19),
+         nu=LogNormal(-6.89, 0.58),
+         omega=LogNormal(-3.95, 0.27),
+-        detection_logitK=Normal(0.0, 0.3),
+-        detection_trend=Gamma(1., 0.02),
++        detection_logitK=Normal(0.0, 1.5),
++        detection_trend=Normal(0.0, 0.03),
+         detection_or_0_4=LogNormal(-0.100, 0.626),
+         detection_or_5_14=LogNormal(-0.567, 0.458),
+ 
+@@ -294,7 +296,7 @@ function make_parameters(
+     detection = DoddExtendedDetection(
+         K=K,
+         trend=x(:detection_trend),
+-        reference_year=T(1970),
++        reference_year=T(2019),
+         maximum=T(0.9),
+     )
+ 
+@@ -484,3 +486,55 @@ function expected_notification_presentation(
+ 
+     return Q
+ end
++
++"""
++Infer disease-onset presentation proportions from
++notification proportions and ascertainment probabilities.
++
++Uses the stationary competing-risk approximation.
++This is a diagnostic transformation, not a calibration.
++"""
++function inferred_onset_presentation(
++    Q::AbstractMatrix,
++    ascertainment::AbstractMatrix,
++)
++    size(Q) == size(ascertainment) ||
++        throw(DimensionMismatch(
++            "Notification and ascertainment dimensions differ"
++        ))
++
++    size(Q, 2) == 3 ||
++        throw(DimensionMismatch(
++            "Expected SP, SN and EP columns"
++        ))
++
++    all(x -> isfinite(x) && x >= 0, Q) ||
++        throw(ArgumentError(
++            "Invalid notification probabilities"
++        ))
++
++    all(x -> isfinite(x) && 0 < x <= 1, ascertainment) ||
++        throw(ArgumentError(
++            "Ascertainment must lie in (0, 1]"
++        ))
++
++    all(isapprox.(vec(sum(Q; dims=2)), 1.0; atol=1e-8)) ||
++        throw(ArgumentError(
++            "Notification probabilities must sum to one"
++        ))
++
++    P = Q ./ ascertainment
++
++    for a in axes(P, 1)
++        total = sum(@view P[a, :])
++
++        total > 0 ||
++            throw(ArgumentError(
++                "Zero onset probability at age index $a"
++            ))
++
++        P[a, :] ./= total
++    end
++
++    return P
++end
+
+commit 238b365a8bce12a8654f31cf2b737f228275f0d8
+Author: michaeltmeehan <michael.meehan1@jcu.edu.au>
+Date:   Mon Nov 23 12:09:04 2026 +1000
+
+    Updated child natural history parameters
+
+diff --git a/src/models/DoddExtended/parameters.jl b/src/models/DoddExtended/parameters.jl
+index f2b8e55..f6e3d16 100644
+--- a/src/models/DoddExtended/parameters.jl
++++ b/src/models/DoddExtended/parameters.jl
+@@ -94,6 +94,11 @@ function priors(model::DoddExtendedTBModel)
+         mortality_sn=LogNormal(log(0.025), 0.25),
+         self_cure_sn=LogNormal(log(0.130), 0.30),
+ 
++        # Childhood mortality multipliers relative to
++        # presentation-specific adult mortality hazards.
++        child_mortality_0_4=LogNormal(log(1.0), 0.8),
++        child_mortality_5_14=LogNormal(log(0.3), 0.8),
++
+         # Extrapulmonary TB: retain existing assumptions.
+         duration_ep=LogNormal(log(3.0), 0.40),
+         untreated_cfr_ep=Beta(4, 16),
+@@ -239,29 +244,37 @@ function make_parameters(
+         x(:untreated_cfr_ep)/x(:duration_ep),
+     ]
+ 
+-    # Preserve the previous childhood assumption for now:
+-    # total untreated exit rate = 2/year.
++    # Presentation-specific natural-history hazards.
+     #
+-    # Use the corresponding adult presentation-specific
+-    # fatality fraction to allocate childhood exits
+-    # between self-cure and TB mortality.
++    # Adult hazards provide the reference values.
++    # Mortality is modified by age, while self-cure
++    # retains the adult reference hazard.
++
+     ╬│ = Matrix{T}(undef, nages, 3)
+     ╬╝ = Matrix{T}(undef, nages, 3)
+ 
+-    for a in 1:nages, k in 1:3
+-        if a <= 15
+-            total_adult = adult_gamma[k] + adult_mu[k]
+-            fatality = adult_mu[k] / total_adult
++    m_0_4 = x(:child_mortality_0_4)
++    m_5_14 = x(:child_mortality_5_14)
+ 
+-            ╬│[a, k] = T(2) * (one(T) - fatality)
+-            ╬╝[a, k] = T(2) * fatality
+-        else
++    all(v -> isfinite(v) && v > 0, (m_0_4, m_5_14)) ||
++        throw(ArgumentError(
++            "Childhood mortality multipliers must be positive"
++        ))
++
++    for a in 1:nages
++        age = a - 1
++
++        mortality_multiplier =
++            age < 5 ? m_0_4 :
++            age < 15 ? m_5_14 :
++            one(T)
++
++        for k in 1:3
+             ╬│[a, k] = adult_gamma[k]
+-            ╬╝[a, k] = adult_mu[k]
++            ╬╝[a, k] = mortality_multiplier * adult_mu[k]
+         end
+     end
+ 
+-
+     relative_detection_age = T[
+         age < 5 ? x(:detection_or_0_4) :
+         age < 15 ? x(:detection_or_5_14) :
+
+commit 20615304a44509f28dc1350225283c09f0711f78
+Author: michaeltmeehan <michael.meehan1@jcu.edu.au>
+Date:   Mon Nov 23 12:04:04 2026 +1000
+
+    Added age-specific progression probabilities
+
+diff --git a/src/models/DoddExtended/dynamics.jl b/src/models/DoddExtended/dynamics.jl
+index 4da561a..7c71e08 100644
+--- a/src/models/DoddExtended/dynamics.jl
++++ b/src/models/DoddExtended/dynamics.jl
+@@ -107,10 +107,10 @@ function tb_rhs!(
+ 
+         # Latent TB transitions.
+         early_to_late_0 =
+-            p.kappa * early_latent_0
++            p.kappa[a] * early_latent_0
+ 
+         early_to_late_1 =
+-            p.kappa * early_latent_1
++            p.kappa[a] * early_latent_1
+ 
+         fast_progression_0 =
+             p.epsilon[a] * early_latent_0
+@@ -126,14 +126,6 @@ function tb_rhs!(
+ 
+         relapse = p.omega[a] * recovered
+ 
+-        onset_0 =
+-            fast_progression_0 + slow_progression_0
+-
+-        onset_1 =
+-            fast_progression_1 +
+-                slow_progression_1 +
+-                relapse
+-
+         # Active disease transitions.
+         self_cure_0 = 0.0
+         self_cure_1 = 0.0
+@@ -166,9 +158,19 @@ function tb_rhs!(
+ 
+             deaths = ╬╝ * (active_0 + active_1)
+ 
+-            # Presentation-specific incidence
++            # Pathway-specific disease onset.
++            incidence_0 =
++                p.presentation_fast[a, k] * fast_progression_0 +
++                    p.presentation_slow[a, k] * slow_progression_0
++
++            incidence_1 =
++                p.presentation_fast[a, k] * fast_progression_1 +
++                    p.presentation_slow[a, k] * slow_progression_1 +
++                    p.presentation_relapse[a, k] * relapse
++
++            # Presentation-specific incidence.
+             du[base+DE.CumIncidenceSP+k-1] =
+-                p.presentation[a, k] * (onset_0 + onset_1)
++                incidence_0 + incidence_1
+ 
+             # Presentation-specific untreated mortality
+             du[base+DE.CumUntreatedDeathsSP+k-1] =
+@@ -186,15 +188,13 @@ function tb_rhs!(
+             treatment_initiation +=
+                 detection_0 + detection_1
+ 
+-            presentation = p.presentation[a, k]
+-
+             du[base+i0] =
+-                presentation * onset_0 -
++                incidence_0 -
+                     detection_0 - cure_0 -
+                     ╬╝ * active_0
+ 
+             du[base+i1] =
+-                presentation * onset_1 -
++                incidence_1 -
+                     detection_1 - cure_1 -
+                     ╬╝ * active_1
+ 
+diff --git a/src/models/DoddExtended/parameters.jl b/src/models/DoddExtended/parameters.jl
+index 2cc9f1b..f2b8e55 100644
+--- a/src/models/DoddExtended/parameters.jl
++++ b/src/models/DoddExtended/parameters.jl
+@@ -48,7 +48,7 @@ struct DoddExtendedTBParameters{T<:Real}
+     Lambda0::T
+     beta::T
+     psi::T
+-    kappa::T
++    kappa::Vector{T}
+ 
+     epsilon::Vector{T}
+     nu::Vector{T}
+@@ -62,7 +62,9 @@ struct DoddExtendedTBParameters{T<:Real}
+     treatment_cfr::T
+     detection::DoddExtendedDetection{T}
+ 
+-    presentation::Matrix{T}
++    presentation_fast::Matrix{T}
++    presentation_slow::Matrix{T}
++    presentation_relapse::Matrix{T}
+     relative_infectiousness::NTuple{3,T}
+     relative_detection::NTuple{3,T}
+ end
+@@ -72,20 +74,28 @@ function priors(model::DoddExtendedTBModel)
+         beta=LogNormal(log(10), 0.75),
+         psi=Beta(20.7, 77.9),
+         Lambda0=LogNormal(log(3e-2), 0.75),
+-        kappa=LogNormal(0.62, 0.068),
+-        epsilon=LogNormal(-2.837, 0.32),
+-        epsilon_child=Beta(5.153, 21.967),
++        early_duration=LogNormal(log(2.0), 0.25),
++        fast_risk_0=Beta(9, 11),
++        fast_risk_1=Beta(3.6, 16.4),
++        fast_risk_2_4=Beta(1.1, 18.9),
++        fast_risk_5_9=Beta(0.4, 19.6),
++        fast_risk_10_14=Beta(2, 18),
++        fast_risk_15_plus=Beta(1, 19),
+         nu=LogNormal(-6.89, 0.58),
+         omega=LogNormal(-3.95, 0.27),
+         detection_logitK=Normal(0.0, 0.3),
+         detection_trend=Gamma(1., 0.02),
+         detection_or_0_4=LogNormal(-0.100, 0.626),
+         detection_or_5_14=LogNormal(-0.567, 0.458),
+-        duration_sp=LogNormal(log(1.6), 0.20),
+-        duration_sn=LogNormal(log(5.35), 0.30),
++
++        # Adult pulmonary TB natural-history hazards (year^-1).
++        mortality_sp=LogNormal(log(0.389), 0.12),
++        self_cure_sp=LogNormal(log(0.231), 0.18),
++        mortality_sn=LogNormal(log(0.025), 0.25),
++        self_cure_sn=LogNormal(log(0.130), 0.30),
++
++        # Extrapulmonary TB: retain existing assumptions.
+         duration_ep=LogNormal(log(3.0), 0.40),
+-        untreated_cfr_sp=Beta(14, 6),
+-        untreated_cfr_sn=Beta(4, 16),
+         untreated_cfr_ep=Beta(4, 16),
+         treatment_cfr=Beta(2.71, 87.55),
+     )
+@@ -115,9 +125,66 @@ extended_fixed_parameters() = (
+     extrapulmonary_detection=1.0,
+ )
+ 
++function fast_progression_hazards(
++    risk::AbstractVector{T},
++    duration::Real,
++) where {T<:Real}
++    duration > 0 ||
++        throw(ArgumentError("duration must be positive"))
++
++    all(p -> 0 <= p < 1, risk) ||
++        throw(ArgumentError("risks must be in [0, 1)"))
++
++    epsilon = risk ./ duration
++    kappa = (one(T) .- risk) ./ duration
++
++    return epsilon, kappa
++end
++
++function expand_fast_progression_risks(r, nages)
++    length(r) == 6 ||
++        throw(ArgumentError("Expected six age-band risks"))
++
++    return [
++        age == 0 ? r[1] :
++        age == 1 ? r[2] :
++        age < 5 ? r[3] :
++        age < 10 ? r[4] :
++        age < 15 ? r[5] :
++        r[6]
++        for age in 0:(nages-1)
++    ]
++end
++
++function adjust_ep_presentation(
++    P::AbstractMatrix,
++    odds_ratio::Real;
++    max_age::Int=4,
++)
++    isfinite(odds_ratio) && odds_ratio > 0 ||
++        throw(ArgumentError(
++            "EP odds ratio must be finite and positive"
++        ))
++
++    size(P, 2) == 3 ||
++        throw(DimensionMismatch(
++            "Expected SP, SN and EP columns"
++        ))
++
++    Q = copy(P)
++
++    for a in 1:min(size(Q, 1), max_age+1)
++        Q[a, 3] *= odds_ratio
++        Q[a, :] ./= sum(@view Q[a, :])
++    end
++
++    return Q
++end
++
+ function make_parameters(
+     model::DoddExtendedTBModel,
+-    draw::NamedTuple,
++    draw::NamedTuple;
++    fast_ep_odds_under5::Real=1.0,
+ )
+     nages = state_layout(model).nages
+ 
+@@ -137,36 +204,63 @@ function make_parameters(
+     ╬¢0 = x(:Lambda0)
+     ╬▓ = x(:beta)
+     ╧ê = model.reinfection ? x(:psi) : zero(T)
+-    ╬║ = x(:kappa)
+ 
+-    ╬╡ = T[
+-        age < 5 ? x(:epsilon_child) : x(:epsilon)
+-        for age in 0:(nages-1)
++    risk_bands = T[
++        x(:fast_risk_0),
++        x(:fast_risk_1),
++        x(:fast_risk_2_4),
++        x(:fast_risk_5_9),
++        x(:fast_risk_10_14),
++        x(:fast_risk_15_plus),
+     ]
+ 
++    risk = expand_fast_progression_risks(
++        risk_bands, nages
++    )
++
++    ╬╡, ╬║ = fast_progression_hazards(
++        risk, x(:early_duration)
++    )
++
+     ╬╜ = fill(x(:nu), nages)
+     ╧ë = fill(x(:omega), nages)
+ 
+-    adult_duration = T[
+-        x(:duration_sp),
+-        x(:duration_sn),
+-        x(:duration_ep),
++
++    # Adult pulmonary natural-history hazards.
++    adult_gamma = T[
++        x(:self_cure_sp),
++        x(:self_cure_sn),
++        (one(T)-x(:untreated_cfr_ep))/x(:duration_ep),
+     ]
+ 
+-    # Preserve the existing 0.5-year childhood assumption.
+-    # Presentation-specific durations apply from age 15 onward.
+-    duration = Matrix{T}(undef, nages, 3)
++    adult_mu = T[
++        x(:mortality_sp),
++        x(:mortality_sn),
++        x(:untreated_cfr_ep)/x(:duration_ep),
++    ]
++
++    # Preserve the previous childhood assumption for now:
++    # total untreated exit rate = 2/year.
++    #
++    # Use the corresponding adult presentation-specific
++    # fatality fraction to allocate childhood exits
++    # between self-cure and TB mortality.
++    ╬│ = Matrix{T}(undef, nages, 3)
++    ╬╝ = Matrix{T}(undef, nages, 3)
+ 
+     for a in 1:nages, k in 1:3
+-        duration[a, k] =
+-            a <= 15 ? T(0.5) : adult_duration[k]
++        if a <= 15
++            total_adult = adult_gamma[k] + adult_mu[k]
++            fatality = adult_mu[k] / total_adult
++
++            ╬│[a, k] = T(2) * (one(T) - fatality)
++            ╬╝[a, k] = T(2) * fatality
++        else
++            ╬│[a, k] = adult_gamma[k]
++            ╬╝[a, k] = adult_mu[k]
++        end
+     end
+ 
+-    fatality = T[
+-        x(:untreated_cfr_sp),
+-        x(:untreated_cfr_sn),
+-        x(:untreated_cfr_ep),
+-    ]
+ 
+     relative_detection_age = T[
+         age < 5 ? x(:detection_or_0_4) :
+@@ -196,24 +290,32 @@ function make_parameters(
+     d_extra = x(:extrapulmonary_detection)
+ 
+     all(v -> isfinite(v) && v >= 0,
+-        (╬¢0, ╬▓, ╧ê, ╬║, x(:treatment_cfr))) ||
++        (╬¢0, ╬▓, ╧ê, x(:treatment_cfr))) ||
+         throw(ArgumentError("Invalid nonnegative parameter"))
+ 
+-    all(c -> isfinite(c) && 0 <= c <= 1, fatality) ||
++    all(v -> isfinite(v) && v >= 0, ╬║) ||
+         throw(ArgumentError(
+-            "Untreated CFRs must be finite and between 0 and 1"
++            "Invalid stabilisation hazards"
+         ))
+ 
+-    0 <= x(:treatment_cfr) <= 1 ||
+-        throw(ArgumentError("Invalid treatment CFR"))
++    all(v -> isfinite(v) && v > 0,
++        (adult_gamma..., adult_mu...)) ||
++        throw(ArgumentError(
++            "Natural-history hazards must be finite and positive"
++        ))
+ 
+     all(v -> isfinite(v) && v > 0,
+-        (adult_duration...,
+-            q_negative, d_negative, d_extra)) ||
++        (q_negative, d_negative, d_extra)) ||
+         throw(ArgumentError(
+-            "Invalid untreated duration or presentation parameter"
++            "Invalid presentation-specific multipliers"
+         ))
+ 
++    0 <= x(:untreated_cfr_ep) <= 1 ||
++        throw(ArgumentError("Invalid EP untreated CFR"))
++
++    0 <= x(:treatment_cfr) <= 1 ||
++        throw(ArgumentError("Invalid treatment CFR"))
++
+     all(v -> isfinite(v) && v >= 0, ╬╡) ||
+         throw(ArgumentError("Invalid fast progression"))
+ 
+@@ -226,9 +328,6 @@ function make_parameters(
+     all(v -> isfinite(v) && v >= 0, relative_detection_age) ||
+         throw(ArgumentError("Invalid detection multipliers"))
+ 
+-    ╬│ = (one(T) .- reshape(fatality, 1, 3)) ./ duration
+-    ╬╝ = reshape(fatality, 1, 3) ./ duration
+-
+     # Detection hazards are not determined by the
+     # presentation-specific natural-history durations.
+     #
+@@ -242,13 +341,133 @@ function make_parameters(
+     detection_multiplier =
+         relative_detection_age ./ detection_reference_duration
+ 
++    # Baseline age-specific presentation probabilities.
++    baseline = T.(model.presentation)
++
++    # Optional sensitivity modifier for EP disease
++    # following fast progression at ages 0ΓÇô4.
++    presentation_fast = adjust_ep_presentation(
++        baseline,
++        T(fast_ep_odds_under5);
++        max_age=4,
++    )
++
++    presentation_slow = copy(baseline)
++    presentation_relapse = copy(baseline)
++
++    # Validate presentation distributions.
++    for P in (
++        presentation_fast,
++        presentation_slow,
++        presentation_relapse,
++    )
++        size(P) == (nages, 3) ||
++            throw(DimensionMismatch(
++                "Invalid presentation matrix dimensions"
++            ))
++
++        all(v -> isfinite(v) && 0 <= v <= 1, P) ||
++            throw(ArgumentError(
++                "Invalid presentation probabilities"
++            ))
++
++        all(isapprox.(vec(sum(P; dims=2)), one(T);
++            atol=1e-10)) ||
++            throw(ArgumentError(
++                "Presentation probabilities must sum to one"
++            ))
++    end
++
+     return DoddExtendedTBParameters(
+         ╬¢0, ╬▓, ╧ê, ╬║,
+         ╬╡, ╬╜, ╧ë,
+         ╬│, ╬╝, detection_multiplier,
+         T(2), x(:treatment_cfr), detection,
+-        T.(model.presentation),
++        presentation_fast,
++        presentation_slow,
++        presentation_relapse,
+         (one(T), q_negative, zero(T)),
+         (one(T), d_negative, d_extra),
+     )
+ end
++
++"""
++Probability of diagnosis before self-cure or TB death,
++conditional on active disease presentation and age.
++
++Assumes constant competing hazards and no ageing
++during the disease episode.
++"""
++function presentation_ascertainment(
++    p::DoddExtendedTBParameters,
++    year::Real,
++)
++    nages = length(p.nu)
++    T = typeof(p.beta)
++    A = Matrix{T}(undef, nages, 3)
++
++    probability = detection_probability(p.detection, year)
++    odds = probability / (one(T) - probability)
++
++    for a in 1:nages, k in 1:3
++        ╬┤ = odds *
++            p.detection_multiplier[a] *
++            p.relative_detection[k]
++
++        ╬│ = p.self_cure[a, k]
++        ╬╝ = p.tb_mortality[a, k]
++
++        total = ╬┤ + ╬│ + ╬╝
++
++        total > 0 ||
++            throw(ArgumentError(
++                "Invalid competing hazards"
++            ))
++
++        A[a, k] = ╬┤ / total
++    end
++
++    return A
++end
++
++
++"""
++Expected notification proportions given the
++underlying disease-onset presentation distribution.
++"""
++function expected_notification_presentation(
++    P::AbstractMatrix,
++    ascertainment::AbstractMatrix,
++)
++    size(P) == size(ascertainment) ||
++        throw(DimensionMismatch(
++            "Presentation and ascertainment dimensions differ"
++        ))
++
++    size(P, 2) == 3 ||
++        throw(DimensionMismatch(
++            "Expected three disease presentations"
++        ))
++
++    all(isfinite, P) && all(x -> x >= 0, P) ||
++        throw(ArgumentError("Invalid presentation probabilities"))
++
++    all(isfinite, ascertainment) &&
++        all(x -> 0 <= x <= 1, ascertainment) ||
++        throw(ArgumentError("Invalid ascertainment probabilities"))
++
++    Q = P .* ascertainment
++
++    for a in axes(Q, 1)
++        total = sum(@view Q[a, :])
++
++        total > 0 ||
++            throw(ArgumentError(
++                "Zero expected notifications at age index $a"
++            ))
++
++        Q[a, :] ./= total
++    end
++
++    return Q
++end
+
+commit d3a105b18fbf7d17d2a6b7ef1152eba58511fef0
+Author: michaeltmeehan <michael.meehan1@jcu.edu.au>
+Date:   Mon Nov 23 08:43:17 2026 +1000
+
+    Added site-specific infection duration
+
+diff --git a/src/models/DoddExtended/parameters.jl b/src/models/DoddExtended/parameters.jl
+index bea27e7..2cc9f1b 100644
+--- a/src/models/DoddExtended/parameters.jl
++++ b/src/models/DoddExtended/parameters.jl
+@@ -81,7 +81,9 @@ function priors(model::DoddExtendedTBModel)
+         detection_trend=Gamma(1., 0.02),
+         detection_or_0_4=LogNormal(-0.100, 0.626),
+         detection_or_5_14=LogNormal(-0.567, 0.458),
+-        duration=LogNormal(1.1, 0.2),
++        duration_sp=LogNormal(log(1.6), 0.20),
++        duration_sn=LogNormal(log(5.35), 0.30),
++        duration_ep=LogNormal(log(3.0), 0.40),
+         untreated_cfr_sp=Beta(14, 6),
+         untreated_cfr_sn=Beta(4, 16),
+         untreated_cfr_ep=Beta(4, 16),
+@@ -145,11 +147,21 @@ function make_parameters(
+     ╬╜ = fill(x(:nu), nages)
+     ╧ë = fill(x(:omega), nages)
+ 
+-    duration = T[
+-        age < 15 ? T(0.5) : x(:duration)
+-        for age in 0:(nages-1)
++    adult_duration = T[
++        x(:duration_sp),
++        x(:duration_sn),
++        x(:duration_ep),
+     ]
+ 
++    # Preserve the existing 0.5-year childhood assumption.
++    # Presentation-specific durations apply from age 15 onward.
++    duration = Matrix{T}(undef, nages, 3)
++
++    for a in 1:nages, k in 1:3
++        duration[a, k] =
++            a <= 15 ? T(0.5) : adult_duration[k]
++    end
++
+     fatality = T[
+         x(:untreated_cfr_sp),
+         x(:untreated_cfr_sn),
+@@ -196,8 +208,11 @@ function make_parameters(
+         throw(ArgumentError("Invalid treatment CFR"))
+ 
+     all(v -> isfinite(v) && v > 0,
+-        (x(:duration), q_negative, d_negative, d_extra)) ||
+-        throw(ArgumentError("Invalid duration or presentation rate"))
++        (adult_duration...,
++            q_negative, d_negative, d_extra)) ||
++        throw(ArgumentError(
++            "Invalid untreated duration or presentation parameter"
++        ))
+ 
+     all(v -> isfinite(v) && v >= 0, ╬╡) ||
+         throw(ArgumentError("Invalid fast progression"))
+@@ -211,12 +226,21 @@ function make_parameters(
+     all(v -> isfinite(v) && v >= 0, relative_detection_age) ||
+         throw(ArgumentError("Invalid detection multipliers"))
+ 
+-    ╬│ = (one(T) .- reshape(fatality, 1, 3)) ./
+-        reshape(duration, :, 1)
++    ╬│ = (one(T) .- reshape(fatality, 1, 3)) ./ duration
++    ╬╝ = reshape(fatality, 1, 3) ./ duration
++
++    # Detection hazards are not determined by the
++    # presentation-specific natural-history durations.
++    #
++    # Preserve the original reference scale:
++    # 0.5 years for children, 3 years for adults.
++    detection_reference_duration = T[
++        age < 15 ? T(0.5) : T(3.0)
++        for age in 0:(nages-1)
++    ]
+ 
+-    ╬╝ = reshape(fatality, 1, 3) ./
+-        reshape(duration, :, 1)
+-    detection_multiplier = relative_detection_age ./ duration
++    detection_multiplier =
++        relative_detection_age ./ detection_reference_duration
+ 
+     return DoddExtendedTBParameters(
+         ╬¢0, ╬▓, ╧ê, ╬║,
+
+commit 1f999aaac80c4a87c669519e085ff413501fb5b0
+Author: michaeltmeehan <michael.meehan1@jcu.edu.au>
+Date:   Sun Nov 22 22:15:41 2026 +1000
+
+    Added further calibration diagnostics
+
+diff --git a/src/models/DoddExtended/dynamics.jl b/src/models/DoddExtended/dynamics.jl
+index dfc87ae..4da561a 100644
+--- a/src/models/DoddExtended/dynamics.jl
++++ b/src/models/DoddExtended/dynamics.jl
+@@ -166,6 +166,18 @@ function tb_rhs!(
+ 
+             deaths = ╬╝ * (active_0 + active_1)
+ 
++            # Presentation-specific incidence
++            du[base+DE.CumIncidenceSP+k-1] =
++                p.presentation[a, k] * (onset_0 + onset_1)
++
++            # Presentation-specific untreated mortality
++            du[base+DE.CumUntreatedDeathsSP+k-1] =
++                deaths
++
++            # Presentation-specific self-cure
++            du[base+DE.CumSelfCureSP+k-1] =
++                cure_0 + cure_1
++
+             self_cure_0 += cure_0
+             self_cure_1 += cure_1
+ 
+
+commit a1dc167fde6074ef985d541215416c682223869f
+Author: michaeltmeehan <michael.meehan1@jcu.edu.au>
+Date:   Sun Nov 22 12:53:12 2026 +1000
+
+    Added site-dependent cfr
+
+diff --git a/src/models/DoddExtended/dynamics.jl b/src/models/DoddExtended/dynamics.jl
+index 318833d..dfc87ae 100644
+--- a/src/models/DoddExtended/dynamics.jl
++++ b/src/models/DoddExtended/dynamics.jl
+@@ -155,8 +155,8 @@ function tb_rhs!(
+             ╬┤ = base_detection *
+                 p.relative_detection[k]
+ 
+-            ╬│ = p.self_cure[a]
+-            ╬╝ = p.tb_mortality[a]
++            ╬│ = p.self_cure[a, k]
++            ╬╝ = p.tb_mortality[a, k]
+ 
+             detection_0 = ╬┤ * active_0
+             detection_1 = ╬┤ * active_1
+diff --git a/src/models/DoddExtended/parameters.jl b/src/models/DoddExtended/parameters.jl
+index 42f07a4..bea27e7 100644
+--- a/src/models/DoddExtended/parameters.jl
++++ b/src/models/DoddExtended/parameters.jl
+@@ -54,8 +54,8 @@ struct DoddExtendedTBParameters{T<:Real}
+     nu::Vector{T}
+     omega::Vector{T}
+ 
+-    self_cure::Vector{T}
+-    tb_mortality::Vector{T}
++    self_cure::Matrix{T}
++    tb_mortality::Matrix{T}
+     detection_multiplier::Vector{T}
+ 
+     treatment_rate::T
+@@ -78,11 +78,13 @@ function priors(model::DoddExtendedTBModel)
+         nu=LogNormal(-6.89, 0.58),
+         omega=LogNormal(-3.95, 0.27),
+         detection_logitK=Normal(0.0, 0.3),
+-        detection_trend=Gamma(0.5, 0.04),
++        detection_trend=Gamma(1., 0.02),
+         detection_or_0_4=LogNormal(-0.100, 0.626),
+         detection_or_5_14=LogNormal(-0.567, 0.458),
+         duration=LogNormal(1.1, 0.2),
+-        untreated_cfr=Beta(25.48, 33.78),
++        untreated_cfr_sp=Beta(14, 6),
++        untreated_cfr_sn=Beta(4, 16),
++        untreated_cfr_ep=Beta(4, 16),
+         treatment_cfr=Beta(2.71, 87.55),
+     )
+ 
+@@ -148,7 +150,11 @@ function make_parameters(
+         for age in 0:(nages-1)
+     ]
+ 
+-    fatality = x(:untreated_cfr)
++    fatality = T[
++        x(:untreated_cfr_sp),
++        x(:untreated_cfr_sn),
++        x(:untreated_cfr_ep),
++    ]
+ 
+     relative_detection_age = T[
+         age < 5 ? x(:detection_or_0_4) :
+@@ -181,8 +187,10 @@ function make_parameters(
+         (╬¢0, ╬▓, ╧ê, ╬║, x(:treatment_cfr))) ||
+         throw(ArgumentError("Invalid nonnegative parameter"))
+ 
+-    0 <= fatality <= 1 ||
+-        throw(ArgumentError("Invalid untreated CFR"))
++    all(c -> isfinite(c) && 0 <= c <= 1, fatality) ||
++        throw(ArgumentError(
++            "Untreated CFRs must be finite and between 0 and 1"
++        ))
+ 
+     0 <= x(:treatment_cfr) <= 1 ||
+         throw(ArgumentError("Invalid treatment CFR"))
+@@ -203,8 +211,11 @@ function make_parameters(
+     all(v -> isfinite(v) && v >= 0, relative_detection_age) ||
+         throw(ArgumentError("Invalid detection multipliers"))
+ 
+-    ╬│ = (one(T) - fatality) ./ duration
+-    ╬╝ = fatality ./ duration
++    ╬│ = (one(T) .- reshape(fatality, 1, 3)) ./
++        reshape(duration, :, 1)
++
++    ╬╝ = reshape(fatality, 1, 3) ./
++        reshape(duration, :, 1)
+     detection_multiplier = relative_detection_age ./ duration
+ 
+     return DoddExtendedTBParameters(

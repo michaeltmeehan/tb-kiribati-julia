@@ -71,9 +71,9 @@ end
 
 function priors(model::DoddExtendedTBModel)
     base = (
-        beta=LogNormal(log(10), 0.75),
+        beta=LogNormal(log(10), 0.5),
         psi=Beta(20.7, 77.9),
-        Lambda0=LogNormal(log(3e-2), 0.75),
+        Lambda0=LogNormal(log(5e-3), 0.7),
         # Mean residence time in early infection (years).
         # Provisional prior: median 6 months.
         early_duration=LogNormal(log(0.5), 0.35),
@@ -83,9 +83,9 @@ function priors(model::DoddExtendedTBModel)
         fast_risk_5_9=Beta(0.4, 19.6),
         fast_risk_10_14=Beta(2, 18),
         fast_risk_15_plus=Beta(1, 19),
-        nu=LogNormal(-6.89, 0.58),
-        omega=LogNormal(-3.95, 0.27),
-        detection_logitK=Normal(0.0, 1.5),
+        nu=LogNormal(log(0.003), 1.0),
+        omega=LogNormal(log(0.005), 0.5),
+        detection_logitK=Normal(-0.4, 0.8),
         detection_trend=Normal(0.0, 0.03),
         detection_or_0_4=LogNormal(-0.100, 0.626),
         detection_or_5_14=LogNormal(-0.567, 0.458),
