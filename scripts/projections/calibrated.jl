@@ -9,6 +9,7 @@
 
 using TBKiribatiJulia
 using CSV, DataFrames, Random, Statistics
+using CairoMakie
 using Distributions: Normal, truncated, median
 using SciMLBase: successful_retcode
 
@@ -115,6 +116,14 @@ let
     cumulative_effect_tables = DataFrame[]
     metadata = NamedTuple[]
     failure_rows = NamedTuple[]
+    ageband_rows = NamedTuple[]
+    age_effect_rows = NamedTuple[]
+    band_names = ("0-4", "5-14", "15-24", "25-34", "35-44",
+        "45-54", "55-64", "65+")
+    band_edges = (0, 5, 15, 25, 35, 45, 55, 65, 96)
+    age_effect_pairs = (("population_growth", :growth_only, :fixed),
+        ("demographic_composition", :projected, :growth_only),
+        ("combined_demography", :projected, :fixed))
 
     # Cumulative contrasts use the exact same paired projection draws.
     function cumulative_burden(national::DataFrame)
@@ -170,6 +179,50 @@ let
             push!(cumulative_effect_tables, cumulative_effects)
             push!(metadata, merge((parameter_draw=d.id, chain=d.chain,
                 iteration=d.iteration), d.theta))
+
+            # For EACH draw, aggregate the existing single-year outputs into
+            # eight prespecified age bands; never reinitialise the epidemic.
+            for (yi, year) in enumerate(years)
+                for b in eachindex(band_names)
+                    ages = (band_edges[b]+1):band_edges[b+1]
+                    band = band_names[b]
+                    values = Dict{Symbol,NamedTuple}()
+                    for scenario in (:fixed, :growth_only, :projected)
+                        o = getproperty(results, scenario).outputs
+                        values[scenario] = (
+                            population=sum(o.population[ages, yi]),
+                            incidence=sum(o.incidence[ages, yi]),
+                            notifications=sum(o.notifications[ages, yi]),
+                            mortality=sum(o.mortality[ages, yi]),
+                        )
+                        v = values[scenario]
+                        push!(ageband_rows, (
+                            parameter_draw=d.id, demographic_draw=1,
+                            scenario=String(scenario), year=year,
+                            age_group=band,
+                            population=v.population,
+                            incidence=v.incidence,
+                            notifications=v.notifications,
+                            mortality=v.mortality,
+                            incidence_rate=100_000*v.incidence/v.population,
+                            mortality_rate=100_000*v.mortality/v.population,
+                        ))
+                    end
+                    for (effect, numerator, denominator) in age_effect_pairs
+                        x, y = values[numerator], values[denominator]
+                        for variable in (:incidence, :notifications, :mortality)
+                            xn, yn = getproperty(x, variable), getproperty(y, variable)
+                            push!(age_effect_rows, (
+                                parameter_draw=d.id, demographic_draw=1,
+                                year=year, age_group=band, effect=effect,
+                                variable=String(variable),
+                                difference=xn-yn,
+                                percentage_change=yn == 0 ? missing : 100*(xn/yn-1),
+                            ))
+                        end
+                    end
+                end
+            end
 
             # Save full single-year age profiles for the reference MAP.
             if d.id == 0
@@ -228,6 +281,21 @@ let
     CSV.write(joinpath(outdir, "cumulative_effects_draws.csv"),
         full_cumulative_effects)
 
+    agebands = DataFrame(ageband_rows)
+    ageeffects = DataFrame(age_effect_rows)
+    CSV.write(joinpath(outdir, "age_band_draws.csv"), agebands)
+    CSV.write(joinpath(outdir, "age_band_effects_draws.csv"), ageeffects)
+
+    # Cumulative additional cases/deaths by age band are sums of paired
+    # annual differences for the SAME parameter draw and effect.
+    age_cumulative = combine(
+        groupby(ageeffects, [:parameter_draw, :demographic_draw,
+            :age_group, :effect, :variable]),
+        :difference => sum => :difference,
+    )
+    CSV.write(joinpath(outdir, "age_band_cumulative_effects_draws.csv"),
+        age_cumulative)
+
     if ndraws > 0
         # Exclude MAP (draw 0) from posterior summaries.
         function intervals(df, group_cols, value_cols)
@@ -263,7 +331,20 @@ let
             intervals(full_cumulative_effects,
                 [:effect, :year, :variable],
                 [:difference, :ratio, :percentage_change]))
+        CSV.write(joinpath(outdir, "age_band_intervals.csv"),
+            intervals(agebands, [:scenario, :year, :age_group],
+                [:population, :incidence, :notifications, :mortality,
+                    :incidence_rate, :mortality_rate]))
+        CSV.write(joinpath(outdir, "age_band_effects_intervals.csv"),
+            intervals(ageeffects, [:effect, :year, :age_group, :variable],
+                [:difference, :percentage_change]))
+        CSV.write(joinpath(outdir, "age_band_cumulative_effects_intervals.csv"),
+            intervals(age_cumulative, [:effect, :age_group, :variable],
+                [:difference]))
     end
+    # Plot from saved CSVs so figures can also be regenerated independently.
+    include(joinpath(@__DIR__, "projection_figures.jl"))
+    plot_calibrated_projection_figures(outdir; use_posterior=(ndraws > 0))
     println("\nSaved calibrated projections to: ", outdir)
     println("Posterior samples: ", ndraws,
         " requested; ", length(metadata)-1, " successful")
