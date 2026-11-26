@@ -123,6 +123,8 @@ include("inference/diagnostics.jl")
 include("inference/annual_effects.jl")
 include("inference/reporting.jl")
 
+include("inference/predictive.jl")
+
 # ============================================================
 # Analysis and visualisation
 # ============================================================
@@ -135,6 +137,8 @@ include("visualisation/annual_effects.jl")
 include("visualisation/profiles.jl")
 include("visualisation/projections.jl")
 include("visualisation/priors.jl")
+include("visualisation/mixing.jl")
+include("visualisation/predictive.jl")
 
 # ============================================================
 # Exports
@@ -240,6 +244,8 @@ export RecurrentTBObservation,
 
 export SiteTBObservation, site_loglikelihood
 
+export notification_predictive
+
 # Analysis
 export sensitivity_data,
     sensitivity_correlations,
@@ -263,5 +269,15 @@ export plot_projections,
     plot_projection_effects!
 
 export plot_prior_posterior
+
+export plot_contact_matrix,
+    plot_contact_intensity
+
+export predictive_intervals,
+    plot_predictive!,
+    plot_predictive_summary,
+    plot_predictive_comparison,
+    plot_predictive_by_age,
+    plot_predictive_groups
 
 end # module TBKiribatiJulia
