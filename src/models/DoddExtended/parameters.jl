@@ -70,7 +70,7 @@ struct DoddExtendedTBParameters{T<:Real}
 end
 
 
-function priors(model::DoddExtendedTBModel)
+function doddextended_priors(; reinfection=true)
     p = (
         # Transmission and reinfection
         beta=LogNormal(log(10), 0.5),
@@ -116,9 +116,12 @@ function priors(model::DoddExtendedTBModel)
         treatment_cfr=Beta(2.71, 87.55),
     )
 
-    return model.reinfection ?
+    return reinfection ?
            p : Base.structdiff(p, (psi=nothing,))
 end
+
+priors(model::DoddExtendedTBModel) =
+    doddextended_priors(; reinfection=model.reinfection)
 
 
 extended_fixed_parameters() = (

@@ -134,6 +134,7 @@ include("visualisation/calibration.jl")
 include("visualisation/annual_effects.jl")
 include("visualisation/profiles.jl")
 include("visualisation/projections.jl")
+include("visualisation/priors.jl")
 
 # ============================================================
 # Exports
@@ -260,5 +261,7 @@ export plot_projections,
     plot_projections!,
     plot_projection_effects,
     plot_projection_effects!
+
+export plot_prior_posterior
 
 end # module TBKiribatiJulia

@@ -12,7 +12,7 @@ using Turing
 using AdvancedMH
 using MCMCChains
 using CSV, DataFrames, Random, Statistics
-using Distributions: Normal, truncated, median
+using Distributions: Normal, truncated, median, params, quantile
 using LinearAlgebra
 using ForwardDiff
 using Statistics
@@ -203,6 +203,80 @@ let
 
     combined = reduce(vcat, chain_tables)
     CSV.write(joinpath(output_dir, "posterior_draws.csv"), combined)
+
+    # --------------------------------------------------
+    # Save calibration parameter specifications
+    # --------------------------------------------------
+
+    prior_table = DataFrame([
+        (
+            parameter=String(k),
+            distribution=String(nameof(typeof(d))),
+            param1=params(d)[1],
+            param2=params(d)[2],
+            median=median(d),
+            q025=quantile(d, 0.025),
+            q975=quantile(d, 0.975),
+        )
+        for (k, d) in pairs(problem.prior)
+        if k in free
+    ])
+
+    CSV.write(
+        joinpath(output_dir, "prior_parameters.csv"),
+        prior_table,
+    )
+
+    fixed_table = DataFrame([
+        (
+            parameter=String(k),
+            value=v,
+        )
+        for (k, v) in pairs(defaults)
+        if !(k in free)
+    ])
+
+    CSV.write(
+        joinpath(output_dir, "fixed_parameters.csv"),
+        fixed_table,
+    )
+
+    # --------------------------------------------------
+    # Save run configuration
+    # --------------------------------------------------
+
+    repo_dir = normpath(joinpath(@__DIR__, "..", ".."))
+
+    git_commit = try
+        readchomp(`git -C $repo_dir rev-parse HEAD`)
+    catch
+        "unknown"
+    end
+
+    git_dirty = try
+        !isempty(readchomp(
+            `git -C $repo_dir status --porcelain`
+        ))
+    catch
+        missing
+    end
+
+    configuration = DataFrame(
+        nchains=[nchains],
+        warmup=[nwarm],
+        samples_per_chain=[nsamples],
+        posterior_predictions=[npredict],
+        seed=[seed],
+        sampler=["RobustAdaptiveMetropolis"],
+        julia_version=[string(VERSION)],
+        git_commit=[git_commit],
+        git_dirty=[git_dirty],
+    )
+
+    CSV.write(
+        joinpath(output_dir, "run_configuration.csv"),
+        configuration,
+    )
 
     # MCMCChains provides a standard chain summary (R-hat, ESS, quantiles).
     try
